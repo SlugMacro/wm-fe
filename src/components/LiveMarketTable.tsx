@@ -82,7 +82,7 @@ function SettlementCell({ market }: { market: Market }) {
   const time = `${String(h12).padStart(2, '0')}:${minutes} ${ampm}`;
 
   return (
-    <div className="flex flex-col items-end">
+    <div className="flex flex-col items-end gap-1">
       <span className="text-sm font-normal text-[#f9f9fa]">{formatted}</span>
       <span className="text-xs font-normal text-[#7a7a83]">{time}</span>
     </div>
@@ -111,7 +111,7 @@ function TokenCell({ market }: { market: Market }) {
 function PriceCell({ price, change }: { price: number; change: number }) {
   const isPositive = change >= 0;
   return (
-    <div className="flex flex-col items-end">
+    <div className="flex flex-col items-end gap-1">
       <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">${formatPrice(price)}</span>
       <span className={`text-xs font-normal tabular-nums ${isPositive ? 'text-[#5bd197]' : 'text-[#fd5e67]'}`}>
         {formatPercent(change)}
@@ -123,7 +123,7 @@ function PriceCell({ price, change }: { price: number; change: number }) {
 function VolumeCell({ volume, change }: { volume: number; change: number }) {
   const isPositive = change >= 0;
   return (
-    <div className="flex flex-col items-end">
+    <div className="flex flex-col items-end gap-1">
       <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">{formatVolume(volume)}</span>
       <span className={`text-xs font-normal tabular-nums ${isPositive ? 'text-[#5bd197]' : 'text-[#fd5e67]'}`}>
         {formatPercent(change)}
