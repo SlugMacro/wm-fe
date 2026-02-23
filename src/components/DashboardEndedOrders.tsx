@@ -54,13 +54,13 @@ function ExternalLinkIcon() {
   );
 }
 
-function TokenIcon({ color }: { color: string }) {
+function TokenIcon({ color, label }: { color: string; label: string }) {
   return (
     <div
       className="flex size-5 items-center justify-center rounded-full"
       style={{ backgroundColor: color }}
     >
-      <span className="text-[7px] font-bold text-white">T</span>
+      <span className="text-[7px] font-bold text-white">{label}</span>
     </div>
   );
 }
@@ -279,22 +279,22 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
             </div>
             <div className="w-[100px] text-right">
               <button onClick={() => handleSort('price')} className="inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
-                Price ($) <SortIcon active={sortField === 'price'} direction={sortField === 'price' ? sortDir : null} />
+                <span className="border-b border-dashed border-[#2e2e34]">Price ($)</span> <SortIcon active={sortField === 'price'} direction={sortField === 'price' ? sortDir : null} />
               </button>
             </div>
             <div className="w-[90px] text-right">
               <button onClick={() => handleSort('amount')} className="inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
-                Amount <SortIcon active={sortField === 'amount'} direction={sortField === 'amount' ? sortDir : null} />
+                <span className="border-b border-dashed border-[#2e2e34]">Amount</span> <SortIcon active={sortField === 'amount'} direction={sortField === 'amount' ? sortDir : null} />
               </button>
             </div>
             <div className="w-[110px] text-right">
               <button onClick={() => handleSort('deposited')} className="inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
-                Deposited <SortIcon active={sortField === 'deposited'} direction={sortField === 'deposited' ? sortDir : null} />
+                <span className="border-b border-dashed border-[#2e2e34]">Deposited</span> <SortIcon active={sortField === 'deposited'} direction={sortField === 'deposited' ? sortDir : null} />
               </button>
             </div>
             <div className="w-[120px] text-right">
               <button onClick={() => handleSort('received')} className="inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
-                Received <SortIcon active={sortField === 'received'} direction={sortField === 'received' ? sortDir : null} />
+                <span className="border-b border-dashed border-[#2e2e34]">Received</span> <SortIcon active={sortField === 'received'} direction={sortField === 'received' ? sortDir : null} />
               </button>
             </div>
             <div className="w-[90px] text-right">
@@ -315,7 +315,7 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
               >
                 {/* Pair */}
                 <div className="w-[180px] flex items-center gap-2">
-                  <TokenIcon color={order.tokenColor} />
+                  <TokenIcon color={order.tokenColor} label={order.pair.charAt(0)} />
                   <span className="text-sm text-[#f9f9fa]">{order.pair}</span>
                   {order.hasBadge === 'RS' && (
                     <span className="rounded px-1.5 py-0.5 text-[10px] font-medium bg-[rgba(234,179,8,0.15)] text-[#facc15]">
