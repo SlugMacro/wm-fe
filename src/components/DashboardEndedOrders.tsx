@@ -298,12 +298,12 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
                 <span className="border-b border-dashed border-[#2e2e34]">Deposited</span> <SortIcon active={sortField === 'deposited'} direction={sortField === 'deposited' ? sortDir : null} />
               </button>
             </div>
-            <div className="w-[10%] min-w-[100px] text-right">
+            <div className="w-[12%] min-w-[120px] text-right">
               <button onClick={() => handleSort('received')} className="inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
                 <span className="border-b border-dashed border-[#2e2e34]">Received</span> <SortIcon active={sortField === 'received'} direction={sortField === 'received' ? sortDir : null} />
               </button>
             </div>
-            <div className="w-[8%] min-w-[80px] text-right">
+            <div className="w-[10%] min-w-[100px] text-right">
               <span className="text-xs font-medium text-[#7a7a83]" />
             </div>
             <div className="flex-1 text-right pr-1">
@@ -361,13 +361,13 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
                 </div>
 
                 {/* Received */}
-                <div className="w-[10%] min-w-[100px] flex items-center justify-end gap-1">
+                <div className="w-[12%] min-w-[120px] flex items-center justify-end gap-1">
                   <span className="text-sm text-[#f9f9fa] tabular-nums">{order.received}</span>
                   <AssetIcon type={order.receivedType} />
                 </div>
 
                 {/* Status */}
-                <div className="w-[8%] min-w-[80px] flex justify-end">
+                <div className="w-[10%] min-w-[100px] flex justify-end">
                   <StatusBadge status={order.status} />
                 </div>
 
