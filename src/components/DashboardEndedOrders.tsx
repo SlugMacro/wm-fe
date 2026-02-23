@@ -306,7 +306,7 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
             <div className="w-[8%] min-w-[80px] text-right">
               <span className="text-xs font-medium text-[#7a7a83]" />
             </div>
-            <div className="w-[7%] min-w-[70px] text-right">
+            <div className="flex-1 text-right pr-1">
               <span className="text-xs font-medium text-[#7a7a83]">Action</span>
             </div>
           </div>
@@ -372,7 +372,7 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
                 </div>
 
                 {/* Action */}
-                <div className="w-[7%] min-w-[70px] flex justify-end">
+                <div className="flex-1 flex justify-end pr-1">
                   <button className="flex items-center justify-center rounded border border-[#252527] size-7 text-[#7a7a83] transition-colors hover:border-[#3a3a3d] hover:text-[#f9f9fa]">
                     <ExternalLinkIcon />
                   </button>

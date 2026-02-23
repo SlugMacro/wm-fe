@@ -295,7 +295,7 @@ export default function DashboardOpenOrders({ openOrders, filledOrders }: Dashbo
                 <span className="border-b border-dashed border-[#2e2e34]">Progress</span> <SortIcon active={sortField === 'progress'} direction={sortField === 'progress' ? sortDir : null} />
               </button>
             </div>
-            <div className="w-[7%] min-w-[70px] text-right">
+            <div className="flex-1 text-right pr-1">
               <span className="text-xs font-medium text-[#7a7a83]">Action</span>
             </div>
           </div>
@@ -368,7 +368,7 @@ export default function DashboardOpenOrders({ openOrders, filledOrders }: Dashbo
                 </div>
 
                 {/* Action */}
-                <div className="w-[7%] min-w-[70px] flex justify-end">
+                <div className="flex-1 flex justify-end pr-1">
                   <button className="rounded border border-[#252527] px-3 py-1 text-xs font-medium text-[#7a7a83] transition-colors hover:border-[#3a3a3d] hover:text-[#f9f9fa]">
                     Close
                   </button>
