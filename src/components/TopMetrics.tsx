@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useFearGreedIndex, useAltcoinSeasonIndex } from '../hooks/useMarketMetrics';
 
 function SparklineChart() {
   const linePath = 'M0 40 L20 34 L40 36 L60 28 L80 30 L100 22 L120 24 L140 16 L160 18 L180 10 L200 12 L220 6 L240 3 L260 5 L280 2';
@@ -31,7 +32,7 @@ function SparklineChart() {
   );
 }
 
-function FearGreedGauge({ value }: { value: number }) {
+function FearGreedGauge({ value, label }: { value: number; label: string }) {
   const angle = (value / 100) * 180 - 90;
   return (
     <div className="relative flex flex-col items-center">
@@ -55,7 +56,7 @@ function FearGreedGauge({ value }: { value: number }) {
         <circle
           cx={72 + 56 * Math.cos((angle * Math.PI) / 180)}
           cy={72 + 56 * Math.sin((angle * Math.PI) / 180)}
-          r="5"
+          r="6"
           fill="#f9f9fa"
           stroke="#0a0a0b"
           strokeWidth="2"
@@ -65,7 +66,7 @@ function FearGreedGauge({ value }: { value: number }) {
         <span className="text-[28px] font-medium leading-9 text-[#f9f9fa]" style={{ fontFeatureSettings: "'lnum', 'tnum'" }}>
           {value}
         </span>
-        <span className="text-xs font-normal text-[#7a7a83]">Neutral</span>
+        <span className="text-xs font-normal text-[#7a7a83]">{label}</span>
       </div>
     </div>
   );
@@ -76,19 +77,23 @@ function AltcoinSeasonBar({ value }: { value: number }) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-[#7a7a83]">Bitcoin</span>
-        <span className="text-xs font-medium text-[#7a7a83]">Altcoin</span>
+        <span className="text-xs font-medium text-[#f9f9fa]">Bitcoin</span>
+        <span className="text-xs font-medium text-[#f9f9fa]">Altcoin</span>
       </div>
-      <div className="relative h-2 w-full overflow-hidden rounded-full">
+      <div className="relative h-4 w-full">
         <div
-          className="absolute inset-0 rounded-full"
-          style={{
-            background: 'linear-gradient(to right, #f9f9fa 1.4%, #16c284 100%)',
-          }}
-        />
+          className="absolute top-1/2 -translate-y-1/2 h-2 w-full overflow-hidden rounded-full"
+        >
+          <div
+            className="absolute inset-0 rounded-full"
+            style={{
+              background: 'linear-gradient(to right, #f9f9fa 1.4%, #16c284 100%)',
+            }}
+          />
+        </div>
         <div
-          className="absolute top-1/2 -translate-y-1/2 size-4 rounded-full border-2 border-[#0a0a0b] bg-[#16c284]"
-          style={{ left: `${position}%`, transform: `translate(-50%, -50%)` }}
+          className="absolute top-1/2 size-4 rounded-full border-2 border-[#0a0a0b] bg-[#f9f9fa]"
+          style={{ left: `${position}%`, transform: 'translate(-50%, -50%)' }}
         />
       </div>
     </div>
@@ -136,6 +141,9 @@ function CountdownTimer() {
 }
 
 export default function TopMetrics() {
+  const fearGreed = useFearGreedIndex();
+  const altcoinSeason = useAltcoinSeasonIndex();
+
   return (
     <div className="grid grid-cols-4 gap-4">
       {/* Pre-market 24h vol */}
@@ -157,16 +165,19 @@ export default function TopMetrics() {
       {/* Fear & Greed */}
       <div className="flex flex-col items-center gap-1 rounded-[10px] bg-[rgba(255,255,255,0.03)] px-5 pt-4 pb-5">
         <span className="text-xs font-normal text-[#7a7a83] self-start">Fear & Greed</span>
-        <FearGreedGauge value={43} />
+        <FearGreedGauge value={fearGreed.value} label={fearGreed.label} />
       </div>
 
       {/* Altcoin Season */}
-      <div className="flex flex-col gap-2 rounded-[10px] bg-[rgba(255,255,255,0.03)] px-5 py-4">
-        <span className="text-xs font-normal text-[#7a7a83]">Altcoin season</span>
-        <span className="text-2xl font-medium text-[#f9f9fa]" style={{ fontFeatureSettings: "'lnum', 'tnum'" }}>
-          70<span className="text-sm font-normal text-[#7a7a83]">/100</span>
-        </span>
-        <AltcoinSeasonBar value={70} />
+      <div className="flex flex-col gap-2 rounded-[10px] bg-[rgba(255,255,255,0.03)] px-5 pt-4 pb-5">
+        <span className="text-xs font-medium text-[#7a7a83]">Altcoin season</span>
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center text-2xl font-medium leading-8" style={{ fontFeatureSettings: "'lnum', 'tnum'" }}>
+            <span className="text-[#f9f9fa]">{altcoinSeason.value}</span>
+            <span className="text-[#7a7a83]">/100</span>
+          </div>
+          <AltcoinSeasonBar value={altcoinSeason.value} />
+        </div>
       </div>
 
       {/* Next Settlement */}
