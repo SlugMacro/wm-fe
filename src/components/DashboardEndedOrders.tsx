@@ -111,6 +111,12 @@ function StatusBadge({ status }: { status: DashboardEndedOrder['status'] }) {
   );
 }
 
+function formatPrice(price: number): string {
+  if (price < 0.01) return price.toFixed(4);
+  if (price < 0.1) return price.toFixed(3);
+  return price.toFixed(2);
+}
+
 interface DashboardEndedOrdersProps {
   orders: DashboardEndedOrder[];
 }
@@ -266,41 +272,41 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
         <>
           {/* Table Header */}
           <div className="flex items-center border-b border-[#1b1b1c] h-9">
-            <div className="w-[180px]">
+            <div className="w-[14%] min-w-[160px]">
               <span className="text-xs font-medium text-[#7a7a83]">Pair</span>
             </div>
-            <div className="w-[140px]">
+            <div className="w-[12%] min-w-[130px]">
               <button onClick={() => handleSort('time')} className="inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
                 Time <SortIcon active={sortField === 'time'} direction={sortField === 'time' ? sortDir : null} />
               </button>
             </div>
-            <div className="w-[80px]">
+            <div className="w-[8%] min-w-[80px]">
               <span className="text-xs font-medium text-[#7a7a83]">Side</span>
             </div>
-            <div className="w-[100px] text-right">
+            <div className="w-[10%] min-w-[100px] text-right">
               <button onClick={() => handleSort('price')} className="inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
                 <span className="border-b border-dashed border-[#2e2e34]">Price ($)</span> <SortIcon active={sortField === 'price'} direction={sortField === 'price' ? sortDir : null} />
               </button>
             </div>
-            <div className="w-[90px] text-right">
+            <div className="w-[10%] min-w-[100px] text-right">
               <button onClick={() => handleSort('amount')} className="inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
                 <span className="border-b border-dashed border-[#2e2e34]">Amount</span> <SortIcon active={sortField === 'amount'} direction={sortField === 'amount' ? sortDir : null} />
               </button>
             </div>
-            <div className="w-[110px] text-right">
+            <div className="w-[10%] min-w-[100px] text-right">
               <button onClick={() => handleSort('deposited')} className="inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
                 <span className="border-b border-dashed border-[#2e2e34]">Deposited</span> <SortIcon active={sortField === 'deposited'} direction={sortField === 'deposited' ? sortDir : null} />
               </button>
             </div>
-            <div className="w-[120px] text-right">
+            <div className="w-[10%] min-w-[100px] text-right">
               <button onClick={() => handleSort('received')} className="inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
                 <span className="border-b border-dashed border-[#2e2e34]">Received</span> <SortIcon active={sortField === 'received'} direction={sortField === 'received' ? sortDir : null} />
               </button>
             </div>
-            <div className="w-[90px] text-right">
+            <div className="w-[8%] min-w-[80px] text-right">
               <span className="text-xs font-medium text-[#7a7a83]" />
             </div>
-            <div className="flex-1 text-right">
+            <div className="w-[7%] min-w-[70px] text-right">
               <span className="text-xs font-medium text-[#7a7a83]">Action</span>
             </div>
           </div>
@@ -314,7 +320,7 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
                 className="flex items-center border-b border-[#1b1b1c] h-[52px] transition-colors hover:bg-[rgba(255,255,255,0.02)]"
               >
                 {/* Pair */}
-                <div className="w-[180px] flex items-center gap-2">
+                <div className="w-[14%] min-w-[160px] flex items-center gap-2">
                   <TokenIcon color={order.tokenColor} label={order.pair.charAt(0)} />
                   <span className="text-sm text-[#f9f9fa]">{order.pair}</span>
                   {order.hasBadge === 'RS' && (
@@ -325,48 +331,48 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
                 </div>
 
                 {/* Time */}
-                <div className="w-[140px]">
+                <div className="w-[12%] min-w-[130px]">
                   <span className="text-sm text-[#7a7a83]">{order.time}</span>
                 </div>
 
                 {/* Side */}
-                <div className="w-[80px]">
+                <div className="w-[8%] min-w-[80px]">
                   <span className={`text-sm font-medium ${sideColor(order.side)}`}>
                     {order.side}
                   </span>
                 </div>
 
                 {/* Price */}
-                <div className="w-[100px] text-right">
-                  <span className={`text-sm tabular-nums ${isResell ? 'text-[#facc15]' : 'text-[#f9f9fa]'}`}>
-                    {order.price < 0.01 ? order.price.toFixed(4) : order.price.toFixed(2)}
+                <div className="w-[10%] min-w-[100px] text-right">
+                  <span className={`text-sm tabular-nums ${isResell ? 'text-[#16c284]' : 'text-[#f9f9fa]'}`}>
+                    {formatPrice(order.price)}
                   </span>
                 </div>
 
                 {/* Amount */}
-                <div className="w-[90px] text-right">
+                <div className="w-[10%] min-w-[100px] text-right">
                   <span className="text-sm text-[#f9f9fa] tabular-nums">{order.amount}</span>
                 </div>
 
                 {/* Deposited */}
-                <div className="w-[110px] flex items-center justify-end gap-1">
+                <div className="w-[10%] min-w-[100px] flex items-center justify-end gap-1">
                   <span className="text-sm text-[#f9f9fa] tabular-nums">{order.deposited}</span>
                   <AssetIcon type={order.depositedType} />
                 </div>
 
                 {/* Received */}
-                <div className="w-[120px] flex items-center justify-end gap-1">
+                <div className="w-[10%] min-w-[100px] flex items-center justify-end gap-1">
                   <span className="text-sm text-[#f9f9fa] tabular-nums">{order.received}</span>
                   <AssetIcon type={order.receivedType} />
                 </div>
 
                 {/* Status */}
-                <div className="w-[90px] flex justify-end">
+                <div className="w-[8%] min-w-[80px] flex justify-end">
                   <StatusBadge status={order.status} />
                 </div>
 
                 {/* Action */}
-                <div className="flex-1 flex justify-end">
+                <div className="w-[7%] min-w-[70px] flex justify-end">
                   <button className="flex items-center justify-center rounded border border-[#252527] size-7 text-[#7a7a83] transition-colors hover:border-[#3a3a3d] hover:text-[#f9f9fa]">
                     <ExternalLinkIcon />
                   </button>
