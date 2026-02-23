@@ -21,7 +21,7 @@ export const liveMarkets: Market[] = [
     settleTime: hoursFromNow(3.58),
     status: 'live',
     settlementStatus: 'in-progress',
-    chartData: [20, 25, 22, 30, 28, 35, 40, 38, 45, 50, 48, 55],
+    chartData: [18, 20, 22, 25, 35, 55, 50, 48, 52, 58, 53, 55],
     chartColor: 'green',
   },
   {
@@ -40,7 +40,7 @@ export const liveMarkets: Market[] = [
     settleTime: hoursFromNow(18.6),
     status: 'live',
     settlementStatus: 'upcoming',
-    chartData: [15, 18, 16, 20, 22, 25, 28, 30, 35, 32, 38, 40],
+    chartData: [12, 14, 18, 15, 20, 24, 22, 30, 28, 35, 38, 40],
     chartColor: 'green',
   },
   {
@@ -58,7 +58,7 @@ export const liveMarkets: Market[] = [
     impliedFdv: '22.2M',
     settleTime: '2026-05-30T13:00:00Z',
     status: 'live',
-    chartData: [10, 15, 12, 18, 22, 20, 25, 28, 30, 35, 32, 38],
+    chartData: [35, 28, 20, 14, 10, 12, 18, 25, 30, 34, 36, 38],
     chartColor: 'green',
   },
   {
@@ -76,7 +76,7 @@ export const liveMarkets: Market[] = [
     impliedFdv: '36.1M',
     settleTime: null,
     status: 'live',
-    chartData: [5, 10, 8, 15, 12, 18, 22, 25, 30, 28, 35, 32],
+    chartData: [8, 18, 10, 24, 14, 28, 20, 32, 24, 36, 30, 35],
     chartColor: 'green',
   },
   {
@@ -94,7 +94,7 @@ export const liveMarkets: Market[] = [
     impliedFdv: '8.3M',
     settleTime: null,
     status: 'live',
-    chartData: [50, 48, 45, 42, 38, 35, 32, 30, 28, 25, 22, 20],
+    chartData: [52, 50, 48, 42, 45, 38, 35, 30, 32, 25, 22, 20],
     chartColor: 'red',
   },
   {
@@ -113,7 +113,7 @@ export const liveMarkets: Market[] = [
     settleTime: null,
     status: 'live',
     settlementStatus: 'new-market',
-    chartData: [10, 12, 15, 18, 22, 20, 25, 28, 30, 28, 32, 35],
+    chartData: [15, 14, 16, 15, 14, 16, 18, 24, 30, 32, 34, 35],
     chartColor: 'green',
   },
 ];

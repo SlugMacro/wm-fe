@@ -3,19 +3,6 @@ import { recentTrades as initialTrades } from '../mock-data/recentTrades';
 import type { RecentTrade } from '../types';
 import TokenIcon from './TokenIcon';
 
-function SortIcon() {
-  return (
-    <span className="ml-1 inline-flex flex-col gap-[1px]">
-      <svg width="6" height="4" viewBox="0 0 6 4" fill="none">
-        <path d="M3 0L6 4H0L3 0Z" fill="#3a3a3d" />
-      </svg>
-      <svg width="6" height="4" viewBox="0 0 6 4" fill="none">
-        <path d="M3 4L0 0H6L3 4Z" fill="#3a3a3d" />
-      </svg>
-    </span>
-  );
-}
-
 function ArrowRightUpIcon() {
   return (
     <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -151,62 +138,54 @@ export default function RecentTradesTable() {
   return (
     <div>
       {/* Section title */}
-      <div className="flex items-center border-b border-[#1b1b1c] h-[52px]">
+      <div className="flex items-center h-[44px]">
         <h2 className="text-xl font-medium leading-7 text-[#f9f9fa]">Recent Trades</h2>
       </div>
 
       {/* Table */}
       <div className="w-full">
-        {/* Header */}
+        {/* Header — aligned with market table: Time+Side = Token area, Pair = Chart+LastPrice area */}
         <div className="flex items-center border-b border-[#1b1b1c] h-9 px-2">
-          <div className="w-[128px] shrink-0 text-left">
-            <span className="text-xs font-normal text-[#7a7a83]">
-              Time <SortIcon />
-            </span>
-          </div>
-          <div className="w-[100px] shrink-0 text-left">
+          <div className="flex-1 min-w-0 flex items-center">
+            <div className="w-[128px] shrink-0">
+              <span className="text-xs font-normal text-[#7a7a83]">Time</span>
+            </div>
             <span className="text-xs font-normal text-[#7a7a83]">Side</span>
           </div>
-          <div className="flex-1 min-w-0 text-left">
+          <div className="w-[292px] shrink-0 text-left">
             <span className="text-xs font-normal text-[#7a7a83]">Pair</span>
           </div>
-          <div className="flex-1 min-w-0 text-right">
+          <div className="w-[180px] shrink-0 text-right">
             <span className="text-xs font-normal text-[#7a7a83]">Price ($)</span>
           </div>
-          <div className="flex-1 min-w-0 text-right">
+          <div className="w-[180px] shrink-0 text-right">
             <span className="text-xs font-normal text-[#7a7a83]">Amount</span>
           </div>
-          <div className="flex-1 min-w-0 text-right">
+          <div className="w-[180px] shrink-0 text-right">
             <span className="text-xs font-normal text-[#7a7a83]">Collateral</span>
           </div>
-          <div className="w-[80px] shrink-0 text-right">
+          <div className="w-[180px] shrink-0 text-right">
             <span className="text-xs font-normal text-[#7a7a83]">Tx.ID</span>
           </div>
         </div>
 
-        {/* Rows — scrollable on small screens, scroll appears on hover */}
-        <div
-          ref={tableBodyRef}
-          className="overflow-y-hidden hover:overflow-y-auto transition-all"
-          style={{ maxHeight: '600px', scrollbarGutter: 'stable' }}
-        >
+        {/* Rows */}
+        <div ref={tableBodyRef}>
           {trades.map((trade) => (
             <div
               key={trade.id}
-              className={`flex items-center border-b border-[#1b1b1c] h-[60px] px-2 transition-all hover:bg-[rgba(255,255,255,0.02)] ${
+              className={`flex items-center border-b border-[#1b1b1c] last:border-b-0 h-[60px] px-2 transition-all hover:bg-[rgba(255,255,255,0.02)] ${
                 trade.isNew ? 'bg-[rgba(91,209,151,0.05)]' : ''
               }`}
               style={trade.isNew ? { animation: 'slideIn 0.4s ease-out' } : undefined}
             >
-              {/* Time */}
-              <div className="w-[128px] shrink-0 text-left">
-                <span className={`text-sm font-normal ${trade.isNew ? 'text-[#5bd197]' : 'text-[#7a7a83]'}`}>
-                  {trade.time}
-                </span>
-              </div>
-
-              {/* Side */}
-              <div className="w-[100px] shrink-0 text-left">
+              {/* Time + Side — aligned with Token name area */}
+              <div className="flex-1 min-w-0 flex items-center">
+                <div className="w-[128px] shrink-0">
+                  <span className={`text-sm font-normal ${trade.isNew ? 'text-[#5bd197]' : 'text-[#7a7a83]'}`}>
+                    {trade.time}
+                  </span>
+                </div>
                 <div className="flex items-center gap-2">
                   <span
                     className={`text-sm font-medium ${
@@ -223,8 +202,8 @@ export default function RecentTradesTable() {
                 </div>
               </div>
 
-              {/* Pair */}
-              <div className="flex-1 min-w-0 text-left">
+              {/* Pair — aligned with Chart + Last Price area */}
+              <div className="w-[292px] shrink-0 text-left">
                 <div className="flex items-center gap-2">
                   <TokenIcon symbol={trade.pair.split('/')[0]} chain="solana" size="sm" showChain={false} />
                   <span className="text-sm font-medium text-[#f9f9fa]">{trade.pair}</span>
@@ -232,19 +211,19 @@ export default function RecentTradesTable() {
               </div>
 
               {/* Price */}
-              <div className="flex-1 min-w-0 text-right">
+              <div className="w-[180px] shrink-0 text-right">
                 <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">
                   {trade.price.toFixed(4)}
                 </span>
               </div>
 
               {/* Amount */}
-              <div className="flex-1 min-w-0 text-right">
+              <div className="w-[180px] shrink-0 text-right">
                 <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">{trade.amount}</span>
               </div>
 
               {/* Collateral */}
-              <div className="flex-1 min-w-0">
+              <div className="w-[180px] shrink-0">
                 <div className="flex items-center justify-end gap-2">
                   <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">
                     {trade.collateral < 1
@@ -259,7 +238,7 @@ export default function RecentTradesTable() {
               </div>
 
               {/* Tx.ID - Arrow button */}
-              <div className="w-[80px] shrink-0 flex justify-end">
+              <div className="w-[180px] shrink-0 flex justify-end">
                 <button className="inline-flex items-center justify-center w-[52px] h-7 rounded-md border border-[#252527] transition-colors hover:border-[#3a3a3d] hover:bg-[rgba(255,255,255,0.03)]">
                   <ArrowRightUpIcon />
                 </button>

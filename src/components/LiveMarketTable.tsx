@@ -82,9 +82,9 @@ function SettlementCell({ market }: { market: Market }) {
   const time = `${String(h12).padStart(2, '0')}:${minutes} ${ampm}`;
 
   return (
-    <div className="flex flex-col items-end">
+    <div className="flex flex-col items-end gap-1">
       <span className="text-sm font-normal text-[#f9f9fa]">{formatted}</span>
-      <span className="text-sm font-normal text-[#7a7a83]">{time}</span>
+      <span className="text-xs font-normal text-[#7a7a83]">{time}</span>
     </div>
   );
 }
@@ -102,7 +102,7 @@ function TokenCell({ market }: { market: Market }) {
             </span>
           )}
         </div>
-        <span className="text-sm font-normal text-[#7a7a83]">{market.tokenName}</span>
+        <span className="text-xs font-normal text-[#7a7a83]">{market.tokenName}</span>
       </div>
     </div>
   );
@@ -111,9 +111,9 @@ function TokenCell({ market }: { market: Market }) {
 function PriceCell({ price, change }: { price: number; change: number }) {
   const isPositive = change >= 0;
   return (
-    <div className="flex flex-col items-end">
+    <div className="flex flex-col items-end gap-1">
       <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">${formatPrice(price)}</span>
-      <span className={`text-sm font-normal tabular-nums ${isPositive ? 'text-[#5bd197]' : 'text-[#fd5e67]'}`}>
+      <span className={`text-xs font-normal tabular-nums ${isPositive ? 'text-[#5bd197]' : 'text-[#fd5e67]'}`}>
         {formatPercent(change)}
       </span>
     </div>
@@ -123,9 +123,9 @@ function PriceCell({ price, change }: { price: number; change: number }) {
 function VolumeCell({ volume, change }: { volume: number; change: number }) {
   const isPositive = change >= 0;
   return (
-    <div className="flex flex-col items-end">
+    <div className="flex flex-col items-end gap-1">
       <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">{formatVolume(volume)}</span>
-      <span className={`text-sm font-normal tabular-nums ${isPositive ? 'text-[#5bd197]' : 'text-[#fd5e67]'}`}>
+      <span className={`text-xs font-normal tabular-nums ${isPositive ? 'text-[#5bd197]' : 'text-[#fd5e67]'}`}>
         {formatPercent(change)}
       </span>
     </div>
@@ -187,24 +187,22 @@ export default function LiveMarketTable() {
   return (
     <div>
       {/* Tab Filters */}
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center gap-6 mb-2">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.key;
           return (
             <button
               key={tab.key}
               onClick={() => { setActiveTab(tab.key); setSortConfig({ field: null, direction: null }); }}
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
-                isActive
-                  ? 'border border-[rgba(22,194,132,0.2)] bg-[rgba(22,194,132,0.1)] text-[#5bd197]'
-                  : 'border border-transparent bg-[rgba(255,255,255,0.03)] text-[#7a7a83] hover:text-[#f9f9fa]'
-              }`}
+              className="flex items-center gap-2 transition-colors"
             >
-              {tab.label}
+              <span className={`text-xl font-medium leading-7 ${isActive ? 'text-[#f9f9fa]' : 'text-[#7a7a83] hover:text-[#f9f9fa]'}`}>
+                {tab.label}
+              </span>
               <span
-                className={`inline-flex items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-medium leading-3 ${
+                className={`inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-medium leading-4 ${
                   isActive
-                    ? 'bg-[#16c284] text-[#0a0a0b]'
+                    ? 'bg-[rgba(22,194,132,0.15)] text-[#5bd197]'
                     : 'bg-[#252527] text-[#7a7a83]'
                 }`}
               >
@@ -222,6 +220,7 @@ export default function LiveMarketTable() {
           <div className="flex-1 min-w-0">
             <span className="text-xs font-normal text-[#7a7a83]">Token</span>
           </div>
+          <div className="w-[112px] shrink-0" />
           {sortableHeaders.map((header) => (
             <div key={header.field} className={`${header.width} shrink-0 text-right`}>
               <button
@@ -250,12 +249,14 @@ export default function LiveMarketTable() {
             onClick={() => navigate(`/markets/${market.id}`)}
             className="flex items-center border-b border-[#1b1b1c] h-[76px] px-2 cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.02)]"
           >
-            {/* Token + Chart */}
-            <div className="flex flex-1 items-center gap-4 min-w-0">
+            {/* Token */}
+            <div className="flex-1 min-w-0 flex items-center">
               <TokenCell market={market} />
-              <div className="ml-auto mr-4">
-                <MiniChart data={market.chartData} color={market.chartColor} />
-              </div>
+            </div>
+
+            {/* Chart */}
+            <div className="w-[112px] shrink-0 flex items-center pr-4">
+              <MiniChart data={market.chartData} color={market.chartColor} />
             </div>
 
             {/* Last Price */}

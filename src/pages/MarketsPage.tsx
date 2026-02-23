@@ -7,12 +7,12 @@ export default function MarketsPage() {
   return (
     <div className="mx-auto max-w-[1440px] px-12 py-4">
       {/* Top Metrics */}
-      <div className="mb-4">
+      <div className="mb-8">
         <TopMetrics />
       </div>
 
       {/* Live Market Table */}
-      <div className="mb-4">
+      <div className="mb-8">
         <LiveMarketTable />
       </div>
 
