@@ -1,10 +1,26 @@
 import { useState, useEffect } from 'react';
 
 function SparklineChart() {
+  const linePath = 'M0 40 L20 34 L40 36 L60 28 L80 30 L100 22 L120 24 L140 16 L160 18 L180 10 L200 12 L220 6 L240 3 L260 5 L280 2';
+  const areaPath = `${linePath} L280 48 L0 48 Z`;
   return (
-    <svg width="64" height="32" viewBox="0 0 64 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      className="w-full"
+      height="48"
+      viewBox="0 0 280 48"
+      preserveAspectRatio="none"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <linearGradient id="sparklineGradient" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#16c284" stopOpacity="0.3" />
+          <stop offset="100%" stopColor="#16c284" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <path d={areaPath} fill="url(#sparklineGradient)" />
       <path
-        d="M2 28 L8 22 L14 24 L20 18 L26 20 L32 14 L38 16 L44 10 L50 12 L56 6 L62 4"
+        d={linePath}
         stroke="#5bd197"
         strokeWidth="1.5"
         fill="none"
@@ -123,18 +139,18 @@ export default function TopMetrics() {
   return (
     <div className="grid grid-cols-4 gap-4">
       {/* Pre-market 24h vol */}
-      <div className="flex flex-col gap-2 rounded-[10px] bg-[rgba(255,255,255,0.03)] px-5 py-4">
-        <span className="text-xs font-normal text-[#7a7a83]">Pre-market 24 vol.</span>
-        <div className="flex items-center gap-3">
-          <div className="flex items-baseline gap-2">
+      <div className="relative flex flex-col rounded-[10px] bg-[#1b1b1c] overflow-hidden">
+        <div className="flex flex-col gap-2 px-5 pt-4">
+          <span className="text-xs font-normal text-[#7a7a83]">Pre-market 24 vol.</span>
+          <div className="flex items-baseline gap-1">
             <span className="text-2xl font-medium text-[#f9f9fa]" style={{ fontFeatureSettings: "'lnum', 'tnum'" }}>
               $4.2M
             </span>
-            <span className="text-sm font-normal text-[#5bd197]">+12.5%</span>
+            <span className="text-xs font-normal text-[#5bd197]">+12.5%</span>
           </div>
-          <div className="ml-auto">
-            <SparklineChart />
-          </div>
+        </div>
+        <div className="mt-auto">
+          <SparklineChart />
         </div>
       </div>
 
