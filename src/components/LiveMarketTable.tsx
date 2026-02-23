@@ -84,7 +84,7 @@ function SettlementCell({ market }: { market: Market }) {
   return (
     <div className="flex flex-col items-end">
       <span className="text-sm font-normal text-[#f9f9fa]">{formatted}</span>
-      <span className="text-sm font-normal text-[#7a7a83]">{time}</span>
+      <span className="text-xs font-normal text-[#7a7a83]">{time}</span>
     </div>
   );
 }
@@ -102,7 +102,7 @@ function TokenCell({ market }: { market: Market }) {
             </span>
           )}
         </div>
-        <span className="text-sm font-normal text-[#7a7a83]">{market.tokenName}</span>
+        <span className="text-xs font-normal text-[#7a7a83]">{market.tokenName}</span>
       </div>
     </div>
   );
@@ -113,7 +113,7 @@ function PriceCell({ price, change }: { price: number; change: number }) {
   return (
     <div className="flex flex-col items-end">
       <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">${formatPrice(price)}</span>
-      <span className={`text-sm font-normal tabular-nums ${isPositive ? 'text-[#5bd197]' : 'text-[#fd5e67]'}`}>
+      <span className={`text-xs font-normal tabular-nums ${isPositive ? 'text-[#5bd197]' : 'text-[#fd5e67]'}`}>
         {formatPercent(change)}
       </span>
     </div>
@@ -125,7 +125,7 @@ function VolumeCell({ volume, change }: { volume: number; change: number }) {
   return (
     <div className="flex flex-col items-end">
       <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">{formatVolume(volume)}</span>
-      <span className={`text-sm font-normal tabular-nums ${isPositive ? 'text-[#5bd197]' : 'text-[#fd5e67]'}`}>
+      <span className={`text-xs font-normal tabular-nums ${isPositive ? 'text-[#5bd197]' : 'text-[#fd5e67]'}`}>
         {formatPercent(change)}
       </span>
     </div>
