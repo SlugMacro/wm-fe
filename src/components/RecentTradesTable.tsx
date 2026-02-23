@@ -144,15 +144,15 @@ export default function RecentTradesTable() {
 
       {/* Table */}
       <div className="w-full">
-        {/* Header */}
+        {/* Header — aligned with market table: Time+Side = Token area, Pair = Chart+LastPrice area */}
         <div className="flex items-center border-b border-[#1b1b1c] h-9 px-2">
-          <div className="w-[128px] shrink-0 text-left">
-            <span className="text-xs font-normal text-[#7a7a83]">Time</span>
-          </div>
-          <div className="w-[128px] shrink-0 text-left">
+          <div className="flex-1 min-w-0 flex items-center">
+            <div className="w-[128px] shrink-0">
+              <span className="text-xs font-normal text-[#7a7a83]">Time</span>
+            </div>
             <span className="text-xs font-normal text-[#7a7a83]">Side</span>
           </div>
-          <div className="flex-1 min-w-0 text-left">
+          <div className="w-[292px] shrink-0 text-left">
             <span className="text-xs font-normal text-[#7a7a83]">Pair</span>
           </div>
           <div className="w-[180px] shrink-0 text-right">
@@ -179,15 +179,13 @@ export default function RecentTradesTable() {
               }`}
               style={trade.isNew ? { animation: 'slideIn 0.4s ease-out' } : undefined}
             >
-              {/* Time */}
-              <div className="w-[128px] shrink-0 text-left">
-                <span className={`text-sm font-normal ${trade.isNew ? 'text-[#5bd197]' : 'text-[#7a7a83]'}`}>
-                  {trade.time}
-                </span>
-              </div>
-
-              {/* Side */}
-              <div className="w-[128px] shrink-0 text-left">
+              {/* Time + Side — aligned with Token name area */}
+              <div className="flex-1 min-w-0 flex items-center">
+                <div className="w-[128px] shrink-0">
+                  <span className={`text-sm font-normal ${trade.isNew ? 'text-[#5bd197]' : 'text-[#7a7a83]'}`}>
+                    {trade.time}
+                  </span>
+                </div>
                 <div className="flex items-center gap-2">
                   <span
                     className={`text-sm font-medium ${
@@ -204,8 +202,8 @@ export default function RecentTradesTable() {
                 </div>
               </div>
 
-              {/* Pair */}
-              <div className="flex-1 min-w-0 text-left">
+              {/* Pair — aligned with Chart + Last Price area */}
+              <div className="w-[292px] shrink-0 text-left">
                 <div className="flex items-center gap-2">
                   <TokenIcon symbol={trade.pair.split('/')[0]} chain="solana" size="sm" showChain={false} />
                   <span className="text-sm font-medium text-[#f9f9fa]">{trade.pair}</span>

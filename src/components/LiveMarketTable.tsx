@@ -222,6 +222,7 @@ export default function LiveMarketTable() {
           <div className="flex-1 min-w-0">
             <span className="text-xs font-normal text-[#7a7a83]">Token</span>
           </div>
+          <div className="w-[112px] shrink-0" />
           {sortableHeaders.map((header) => (
             <div key={header.field} className={`${header.width} shrink-0 text-right`}>
               <button
@@ -250,12 +251,14 @@ export default function LiveMarketTable() {
             onClick={() => navigate(`/markets/${market.id}`)}
             className="flex items-center border-b border-[#1b1b1c] h-[76px] px-2 cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.02)]"
           >
-            {/* Token + Chart */}
-            <div className="flex flex-1 items-center gap-4 min-w-0">
+            {/* Token */}
+            <div className="flex-1 min-w-0 flex items-center">
               <TokenCell market={market} />
-              <div className="ml-auto mr-4">
-                <MiniChart data={market.chartData} color={market.chartColor} />
-              </div>
+            </div>
+
+            {/* Chart */}
+            <div className="w-[112px] shrink-0 flex items-center pr-4">
+              <MiniChart data={market.chartData} color={market.chartColor} />
             </div>
 
             {/* Last Price */}
