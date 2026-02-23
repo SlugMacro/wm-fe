@@ -1,8 +1,10 @@
+import { Routes, Route } from 'react-router-dom'
+
 function App() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <h1 className="text-4xl font-bold text-blue-600">WM FE</h1>
-    </div>
+    <Routes>
+      <Route path="/" element={<div className="min-h-screen bg-[#0A0E17] text-white flex items-center justify-center"><h1 className="text-4xl font-bold">Whales Market</h1></div>} />
+    </Routes>
   )
 }
 
