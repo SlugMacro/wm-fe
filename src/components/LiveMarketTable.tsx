@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { Market, MarketTab, SortConfig, SortField } from '../types';
 import { liveMarkets, upcomingMarkets, endedMarkets, marketTabCounts } from '../mock-data/markets';
 import { formatPrice, formatVolume, formatPercent } from '../utils/formatNumber';
@@ -157,6 +158,7 @@ function VolumeCell({ volume, change }: { volume: number; change: number }) {
 }
 
 export default function LiveMarketTable() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<MarketTab>('live');
   const [sortConfig, setSortConfig] = useState<SortConfig>({ field: null, direction: null });
 
@@ -270,6 +272,7 @@ export default function LiveMarketTable() {
         {markets.map((market) => (
           <div
             key={market.id}
+            onClick={() => navigate(`/markets/${market.id}`)}
             className="flex items-center border-b border-[#1b1b1c] h-[76px] px-2 cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.02)]"
           >
             {/* Token + Chart */}

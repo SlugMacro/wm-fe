@@ -43,3 +43,54 @@ export interface SortConfig {
   field: SortField | null;
   direction: SortDirection;
 }
+
+// Token Detail types
+export interface TokenDetail {
+  id: string;
+  tokenSymbol: string;
+  tokenName: string;
+  tokenIcon: string;
+  chain: 'solana' | 'ethereum' | 'sui';
+  subtitle: string;
+  price: number;
+  priceChange: number;
+  volume24h: number;
+  volumeChange24h: number;
+  totalVolume: number;
+  impliedFdv: string;
+  settleTime: string | null;
+  category: 'Pre-market' | 'Points';
+}
+
+export interface OrderBookEntry {
+  id: string;
+  price: number;
+  amount: number;
+  amountFormatted: string;
+  collateral: number;
+  collateralIcon: string;
+  isOwner?: boolean;
+}
+
+export interface MyOrder {
+  id: string;
+  side: 'Buy' | 'Sell';
+  pair: string;
+  hasBadge?: string;
+  date: string;
+  price: number;
+  entryPrice?: number;
+  originalPrice?: number;
+  amount: string;
+  collateral: string;
+  canResell?: boolean;
+}
+
+export interface PriceDataPoint {
+  time: string;
+  price: number;
+  volume: number;
+}
+
+export type OrderBookTab = 'regular' | 'resell' | 'all';
+export type MyOrdersTab = 'filled' | 'open';
