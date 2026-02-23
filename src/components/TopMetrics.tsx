@@ -14,7 +14,7 @@ function SparklineChart() {
     >
       <defs>
         <linearGradient id="sparklineGradient" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#16c284" stopOpacity="0.3" />
+          <stop offset="0%" stopColor="#16c284" stopOpacity="0.15" />
           <stop offset="100%" stopColor="#16c284" stopOpacity="0" />
         </linearGradient>
       </defs>
@@ -139,7 +139,7 @@ export default function TopMetrics() {
   return (
     <div className="grid grid-cols-4 gap-4">
       {/* Pre-market 24h vol */}
-      <div className="relative flex flex-col rounded-[10px] bg-[#1b1b1c] overflow-hidden">
+      <div className="relative flex flex-col rounded-[10px] bg-[rgba(255,255,255,0.03)] overflow-hidden">
         <div className="flex flex-col gap-2 px-5 pt-4">
           <span className="text-xs font-normal text-[#7a7a83]">Pre-market 24 vol.</span>
           <div className="flex items-baseline gap-1">
