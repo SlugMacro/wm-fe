@@ -1,4 +1,5 @@
 import { recentTrades } from '../mock-data/recentTrades';
+import TokenIcon from './TokenIcon';
 
 function SortIcon() {
   return (
@@ -129,9 +130,7 @@ export default function RecentTradesTable() {
             {/* Pair */}
             <div className="flex-1 min-w-0 text-left">
               <div className="flex items-center gap-2">
-                <div className="flex size-4 items-center justify-center rounded-full bg-[#252527] text-[7px] font-bold text-[#f9f9fa] shrink-0">
-                  {trade.pair.charAt(0)}
-                </div>
+                <TokenIcon symbol={trade.pair.split('/')[0]} chain="solana" size="sm" showChain={false} />
                 <span className="text-sm font-medium text-[#f9f9fa]">{trade.pair}</span>
               </div>
             </div>

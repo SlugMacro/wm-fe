@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useFearGreedIndex, useAltcoinSeasonIndex } from '../hooks/useMarketMetrics';
+import TokenIcon from './TokenIcon';
 
 function SparklineChart() {
   const linePath = 'M0 40 L20 34 L40 36 L60 28 L80 30 L100 22 L120 24 L140 16 L160 18 L180 10 L200 12 L220 6 L240 3 L260 5 L280 2';
@@ -186,11 +187,7 @@ export default function TopMetrics() {
         <span className="text-xs font-medium text-[#7a7a83]">Next settlement</span>
         <div className="flex flex-col items-center gap-4">
           <div className="flex w-full items-center gap-2">
-            <div className="flex size-[44px] shrink-0 items-center justify-center">
-              <div className="flex size-9 items-center justify-center rounded-full bg-[#252527]">
-                <span className="text-xs font-medium text-[#f9f9fa]">S</span>
-              </div>
-            </div>
+            <TokenIcon symbol="SKATE" chain="solana" size="md" />
             <div className="flex flex-col gap-0.5">
               <span className="text-sm font-medium text-[#f9f9fa]">SKATE</span>
               <span className="text-xs font-normal text-[#7a7a83]">09/06/2025 14:00 (UTC)</span>
