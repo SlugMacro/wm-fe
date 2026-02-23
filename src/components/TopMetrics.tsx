@@ -33,7 +33,8 @@ function SparklineChart() {
 }
 
 function FearGreedGauge({ value, label }: { value: number; label: string }) {
-  const angle = (value / 100) * 180 - 90;
+  // Arc goes left(0%) → top(50%) → right(100%), parametric angle from π to 0
+  const theta = Math.PI * (1 - value / 100);
   return (
     <div className="relative flex flex-col items-center">
       <svg width="144" height="80" viewBox="0 0 144 80" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -54,8 +55,8 @@ function FearGreedGauge({ value, label }: { value: number; label: string }) {
           fill="none"
         />
         <circle
-          cx={72 + 56 * Math.cos((angle * Math.PI) / 180)}
-          cy={72 + 56 * Math.sin((angle * Math.PI) / 180)}
+          cx={72 + 56 * Math.cos(theta)}
+          cy={72 - 56 * Math.sin(theta)}
           r="6"
           fill="#f9f9fa"
           stroke="#0a0a0b"
@@ -126,14 +127,14 @@ function CountdownTimer() {
   ];
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex w-full items-center gap-2">
       {blocks.map((block) => (
         <div
           key={block.label}
-          className="flex items-center justify-center rounded-lg bg-[rgba(255,255,255,0.03)] px-3 py-1.5"
+          className="flex flex-1 items-baseline justify-center gap-0.5 rounded-lg bg-[rgba(255,255,255,0.03)] px-2 py-1"
         >
           <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">{block.value}</span>
-          <span className="text-xs font-medium text-[#7a7a83] ml-0.5">{block.label}</span>
+          <span className="text-xs font-medium text-[#7a7a83]">{block.label}</span>
         </div>
       ))}
     </div>
@@ -181,18 +182,22 @@ export default function TopMetrics() {
       </div>
 
       {/* Next Settlement */}
-      <div className="flex flex-col gap-3 rounded-[10px] bg-[rgba(255,255,255,0.03)] px-5 py-4">
-        <span className="text-xs font-normal text-[#7a7a83]">Next settlement</span>
-        <div className="flex items-center gap-2">
-          <div className="flex size-8 items-center justify-center rounded-full bg-[#252527]">
-            <span className="text-xs font-medium text-[#f9f9fa]">S</span>
+      <div className="flex flex-col gap-2 rounded-[10px] bg-[rgba(255,255,255,0.03)] px-5 pt-4 pb-5">
+        <span className="text-xs font-medium text-[#7a7a83]">Next settlement</span>
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex w-full items-center gap-2">
+            <div className="flex size-[44px] shrink-0 items-center justify-center">
+              <div className="flex size-9 items-center justify-center rounded-full bg-[#252527]">
+                <span className="text-xs font-medium text-[#f9f9fa]">S</span>
+              </div>
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-sm font-medium text-[#f9f9fa]">SKATE</span>
+              <span className="text-xs font-normal text-[#7a7a83]">09/06/2025 14:00 (UTC)</span>
+            </div>
           </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-medium text-[#f9f9fa]">SKATE</span>
-            <span className="text-xs font-normal text-[#7a7a83]">09/06/2025 14:00 (UTC)</span>
-          </div>
+          <CountdownTimer />
         </div>
-        <CountdownTimer />
       </div>
     </div>
   );
