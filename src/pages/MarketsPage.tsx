@@ -12,7 +12,7 @@ export default function MarketsPage() {
       </div>
 
       {/* Live Market Table */}
-      <div className="mb-4">
+      <div className="mb-8">
         <LiveMarketTable />
       </div>
 
