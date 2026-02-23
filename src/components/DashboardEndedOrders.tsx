@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import type { DashboardEndedOrder } from '../types';
 import Pagination from './Pagination';
+import TokenIconComponent from './TokenIcon';
 
 function SortIcon({ active, direction }: { active: boolean; direction: 'asc' | 'desc' | null }) {
   return (
@@ -51,17 +52,6 @@ function ExternalLinkIcon() {
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
       <path d="M4 10L10 4M10 4H5.5M10 4V8.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
-  );
-}
-
-function TokenIcon({ color, label }: { color: string; label: string }) {
-  return (
-    <div
-      className="flex size-5 items-center justify-center rounded-full"
-      style={{ backgroundColor: color }}
-    >
-      <span className="text-[7px] font-bold text-white">{label}</span>
-    </div>
   );
 }
 
@@ -321,7 +311,7 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
               >
                 {/* Pair */}
                 <div className="w-[14%] min-w-[160px] flex items-center gap-2">
-                  <TokenIcon color={order.tokenColor} label={order.pair.charAt(0)} />
+                  <TokenIconComponent symbol={order.pair.split('/')[0]} chain="solana" size="sm" />
                   <span className="text-sm text-[#f9f9fa]">{order.pair}</span>
                   {order.hasBadge === 'RS' && (
                     <span className="rounded px-1.5 py-0.5 text-[10px] font-medium bg-[rgba(234,179,8,0.15)] text-[#facc15]">

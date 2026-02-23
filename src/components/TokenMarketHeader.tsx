@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { TokenDetail } from '../types';
+import TokenIcon from './TokenIcon';
 
 const chainIcons: Record<string, string> = {
   solana: '◎',
@@ -80,17 +81,7 @@ export default function TokenMarketHeader({ token }: { token: TokenDetail }) {
       <div className="flex items-center gap-8">
         {/* Token icon + name */}
         <div className="flex items-center gap-3">
-          <div className="relative shrink-0">
-            <div className="flex size-9 items-center justify-center rounded-full bg-[#252527] text-sm font-bold text-[#f9f9fa]">
-              {token.tokenSymbol.charAt(0)}
-            </div>
-            <div
-              className="absolute -bottom-0.5 -left-0.5 flex size-4 items-center justify-center rounded text-[8px]"
-              style={{ backgroundColor: chainColors[token.chain] }}
-            >
-              {chainIcons[token.chain]}
-            </div>
-          </div>
+          <TokenIcon symbol={token.tokenSymbol} chain={token.chain} size="md" />
           <div className="flex flex-col">
             <span className="text-sm font-medium text-[#f9f9fa]">{token.tokenSymbol}</span>
             <div className="flex items-center gap-2">

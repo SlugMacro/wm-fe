@@ -4,18 +4,7 @@ import type { Market, MarketTab, SortConfig, SortField } from '../types';
 import { liveMarkets, upcomingMarkets, endedMarkets, marketTabCounts } from '../mock-data/markets';
 import { formatPrice, formatVolume, formatPercent } from '../utils/formatNumber';
 import MiniChart from './MiniChart';
-
-const chainIcons: Record<string, string> = {
-  solana: '◎',
-  ethereum: '⟠',
-  sui: '💧',
-};
-
-const chainColors: Record<string, string> = {
-  solana: '#9945ff',
-  ethereum: '#627eea',
-  sui: '#4da2ff',
-};
+import TokenIcon from './TokenIcon';
 
 function SortIcon({ active, direction }: { active: boolean; direction: 'asc' | 'desc' | null }) {
   return (
@@ -103,31 +92,17 @@ function SettlementCell({ market }: { market: Market }) {
 function TokenCell({ market }: { market: Market }) {
   return (
     <div className="flex items-center gap-3">
-      {/* Token icon with chain overlay */}
-      <div className="relative shrink-0">
-        <div className="flex size-9 items-center justify-center rounded-full bg-[#252527] text-sm font-bold text-[#f9f9fa]">
-          {market.tokenSymbol.charAt(0)}
+      <TokenIcon symbol={market.tokenSymbol} chain={market.chain} size="md" />
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-1.5">
+          <span className="text-sm font-medium text-[#f9f9fa]">{market.tokenSymbol}</span>
+          {market.settlementStatus === 'new-market' && (
+            <span className="inline-flex items-center rounded-full bg-[rgba(59,130,246,0.1)] px-2 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#60a5fa]">
+              New Market
+            </span>
+          )}
         </div>
-        <div
-          className="absolute -bottom-0.5 -left-0.5 flex size-4 items-center justify-center rounded text-[8px]"
-          style={{ backgroundColor: chainColors[market.chain] }}
-        >
-          {chainIcons[market.chain]}
-        </div>
-      </div>
-      {/* Name */}
-      <div className="flex items-center gap-2">
-        <div className="flex flex-col">
-          <div className="flex items-center gap-1.5">
-            <span className="text-sm font-medium text-[#f9f9fa]">{market.tokenSymbol}</span>
-            {market.settlementStatus === 'new-market' && (
-              <span className="inline-flex items-center rounded-full bg-[rgba(59,130,246,0.1)] px-2 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#60a5fa]">
-                New Market
-              </span>
-            )}
-          </div>
-          <span className="text-sm font-normal text-[#7a7a83]">{market.tokenName}</span>
-        </div>
+        <span className="text-sm font-normal text-[#7a7a83]">{market.tokenName}</span>
       </div>
     </div>
   );
