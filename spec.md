@@ -26,12 +26,11 @@
 
 | # | Page | Route | Description |
 |---|------|-------|-------------|
-| 1 | **Landing / Home** | `/` | Trang chủ — hero section, featured markets, stats overview |
-| 2 | **Markets / Dashboard** | `/markets` | Danh sách tất cả markets đang active, bảng giá, filter/search |
-| 3 | **Token Detail** | `/markets/:tokenId` | Chi tiết token — chart, order book, buy/sell form, market info |
-| 4 | **Portfolio** | `/portfolio` | Portfolio người dùng — holdings, P&L, transaction history |
-| 5 | **Points Market** | `/points` | Giao dịch points/airdrop allocations |
-| 6 | **OTC Market** | `/otc` | Over-the-counter trading interface |
+| 1 | **Markets / Dashboard** | `/markets` | Danh sách tất cả markets đang active, bảng giá, filter/search |
+| 2 | **Token Detail** | `/markets/:tokenId` | Chi tiết token — chart, order book, buy/sell form, market info |
+| 3 | **Portfolio** | `/portfolio` | Portfolio người dùng — holdings, P&L, transaction history |
+| 4 | **Points Market** | `/points` | Giao dịch points/airdrop allocations |
+| 5 | **OTC Market** | `/otc` | Over-the-counter trading interface |
 
 > Các routes sẽ được confirm chính xác khi đọc Figma design.
 

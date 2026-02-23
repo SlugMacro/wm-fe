@@ -113,7 +113,7 @@ src/
 
 - **Primary theme**: Dark mode (dark backgrounds, light text)
 - **Product**: Whales Market — a crypto/DeFi pre-market trading platform
-- **Key pages to implement**: Landing, Markets/Dashboard, Token Detail, Portfolio, etc.
+- **Key pages to implement**: Markets/Dashboard, Token Detail, Portfolio, etc.
 - Always reference the Figma design via MCP when implementing any page or component
 - Match colors, border-radius, shadows, and spacing exactly from Figma
 
