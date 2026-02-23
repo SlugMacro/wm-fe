@@ -187,24 +187,22 @@ export default function LiveMarketTable() {
   return (
     <div>
       {/* Tab Filters */}
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center gap-6 mb-4">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.key;
           return (
             <button
               key={tab.key}
               onClick={() => { setActiveTab(tab.key); setSortConfig({ field: null, direction: null }); }}
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
-                isActive
-                  ? 'border border-[rgba(22,194,132,0.2)] bg-[rgba(22,194,132,0.1)] text-[#5bd197]'
-                  : 'border border-transparent bg-[rgba(255,255,255,0.03)] text-[#7a7a83] hover:text-[#f9f9fa]'
-              }`}
+              className="flex items-center gap-2 transition-colors"
             >
-              {tab.label}
+              <span className={`text-xl font-medium leading-7 ${isActive ? 'text-[#f9f9fa]' : 'text-[#7a7a83] hover:text-[#f9f9fa]'}`}>
+                {tab.label}
+              </span>
               <span
-                className={`inline-flex items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-medium leading-3 ${
+                className={`inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-medium leading-4 ${
                   isActive
-                    ? 'bg-[#16c284] text-[#0a0a0b]'
+                    ? 'bg-[rgba(22,194,132,0.15)] text-[#5bd197]'
                     : 'bg-[#252527] text-[#7a7a83]'
                 }`}
               >

@@ -174,7 +174,7 @@ export default function RecentTradesTable() {
           {trades.map((trade) => (
             <div
               key={trade.id}
-              className={`flex items-center border-b border-[#1b1b1c] h-[60px] px-2 transition-all hover:bg-[rgba(255,255,255,0.02)] ${
+              className={`flex items-center border-b border-[#1b1b1c] last:border-b-0 h-[60px] px-2 transition-all hover:bg-[rgba(255,255,255,0.02)] ${
                 trade.isNew ? 'bg-[rgba(91,209,151,0.05)]' : ''
               }`}
               style={trade.isNew ? { animation: 'slideIn 0.4s ease-out' } : undefined}

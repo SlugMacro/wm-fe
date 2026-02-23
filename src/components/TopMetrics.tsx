@@ -24,7 +24,7 @@ function SparklineChart() {
       <path
         d={linePath}
         stroke="#5bd197"
-        strokeWidth="1.5"
+        strokeWidth="1"
         fill="none"
         strokeLinecap="round"
         strokeLinejoin="round"
