@@ -13,39 +13,27 @@ function SortIcon() {
   );
 }
 
-function WhaleIcon() {
+function ArrowRightUpIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <circle cx="8" cy="8" r="7" fill="#1b1b1c" stroke="#252527" strokeWidth="1" />
-      <text x="8" y="11" textAnchor="middle" fontSize="8" fill="#7a7a83">W</text>
-    </svg>
-  );
-}
-
-function SharkIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <circle cx="8" cy="8" r="7" fill="#1b1b1c" stroke="#252527" strokeWidth="1" />
-      <text x="8" y="11" textAnchor="middle" fontSize="8" fill="#7a7a83">S</text>
-    </svg>
-  );
-}
-
-function ShrimpIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <circle cx="8" cy="8" r="7" fill="#1b1b1c" stroke="#252527" strokeWidth="1" />
-      <text x="8" y="11" textAnchor="middle" fontSize="8" fill="#7a7a83">s</text>
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M3.5 8.5L8.5 3.5M8.5 3.5H4.5M8.5 3.5V7.5"
+        stroke="#f9f9fa"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
 
 function TierIcon({ tier }: { tier: 'whale' | 'shark' | 'shrimp' }) {
-  switch (tier) {
-    case 'whale': return <WhaleIcon />;
-    case 'shark': return <SharkIcon />;
-    case 'shrimp': return <ShrimpIcon />;
-  }
+  const labels: Record<string, string> = { whale: '🐋', shark: '🦈', shrimp: '🦐' };
+  return (
+    <div className="flex size-4 items-center justify-center rounded-full bg-[#1b1b1c] text-[8px]">
+      {labels[tier]}
+    </div>
+  );
 }
 
 function CollateralIcon({ icon }: { icon: string }) {
@@ -62,34 +50,51 @@ function CollateralIcon({ icon }: { icon: string }) {
 }
 
 export default function RecentTradesTable() {
-  const columns = [
-    { label: 'Time', width: 'w-[100px]', sortable: true, align: 'text-left' as const },
-    { label: 'Side', width: 'w-[100px]', sortable: false, align: 'text-left' as const },
-    { label: 'Pair', width: 'w-[172px]', sortable: false, align: 'text-left' as const },
-    { label: 'Market', width: 'w-[120px]', sortable: false, align: 'text-left' as const },
-    { label: 'Price ($)', width: 'w-[140px]', sortable: true, align: 'text-right' as const },
-    { label: 'Amount', width: 'w-[140px]', sortable: true, align: 'text-right' as const },
-    { label: 'Collateral', width: 'w-[140px]', sortable: true, align: 'text-right' as const },
-    { label: 'TxID', width: 'w-[100px]', sortable: true, align: 'text-right' as const },
-  ];
-
   return (
     <div>
       {/* Section title */}
-      <h2 className="text-xl font-medium text-[#f9f9fa] mb-4">Recent Trades</h2>
+      <div className="flex items-center border-b border-[#1b1b1c] h-[52px]">
+        <h2 className="text-xl font-medium leading-7 text-[#f9f9fa]">Recent Trades</h2>
+      </div>
 
       {/* Table */}
       <div className="w-full">
         {/* Header */}
         <div className="flex items-center border-b border-[#1b1b1c] h-9 px-2">
-          {columns.map((col) => (
-            <div key={col.label} className={`${col.width} shrink-0 ${col.align}`}>
-              <span className="text-xs font-normal text-[#7a7a83]">
-                {col.label}
-                {col.sortable && <SortIcon />}
-              </span>
-            </div>
-          ))}
+          <div className="w-[128px] shrink-0 text-left">
+            <span className="text-xs font-normal text-[#7a7a83]">
+              Time <SortIcon />
+            </span>
+          </div>
+          <div className="w-[128px] shrink-0 text-left">
+            <span className="text-xs font-normal text-[#7a7a83]">Side</span>
+          </div>
+          <div className="flex-1 min-w-0 text-left">
+            <span className="text-xs font-normal text-[#7a7a83]">Pair</span>
+          </div>
+          <div className="w-[180px] shrink-0 text-right">
+            <span className="text-xs font-normal text-[#7a7a83]">Market</span>
+          </div>
+          <div className="w-[180px] shrink-0 text-right">
+            <span className="text-xs font-normal text-[#7a7a83]">
+              Price ($) <SortIcon />
+            </span>
+          </div>
+          <div className="w-[180px] shrink-0 text-right">
+            <span className="text-xs font-normal text-[#7a7a83]">
+              Amount <SortIcon />
+            </span>
+          </div>
+          <div className="w-[180px] shrink-0 text-right">
+            <span className="text-xs font-normal text-[#7a7a83]">
+              Collateral <SortIcon />
+            </span>
+          </div>
+          <div className="w-[180px] shrink-0 text-right">
+            <span className="text-xs font-normal text-[#7a7a83]">
+              Tx.ID <SortIcon />
+            </span>
+          </div>
         </div>
 
         {/* Rows */}
@@ -99,13 +104,13 @@ export default function RecentTradesTable() {
             className="flex items-center border-b border-[#1b1b1c] h-[60px] px-2 transition-colors hover:bg-[rgba(255,255,255,0.02)]"
           >
             {/* Time */}
-            <div className="w-[100px] shrink-0 text-left">
+            <div className="w-[128px] shrink-0 text-left">
               <span className="text-sm font-normal text-[#7a7a83]">{trade.time}</span>
             </div>
 
             {/* Side */}
-            <div className="w-[100px] shrink-0 text-left">
-              <div className="flex items-center gap-1.5">
+            <div className="w-[128px] shrink-0 text-left">
+              <div className="flex items-center gap-2">
                 <span
                   className={`text-sm font-medium ${
                     trade.side === 'Buy' ? 'text-[#5bd197]' : 'text-[#fd5e67]'
@@ -114,7 +119,7 @@ export default function RecentTradesTable() {
                   {trade.side}
                 </span>
                 {trade.hasBadge && (
-                  <span className="inline-flex items-center justify-center rounded bg-[#252527] px-1 py-0.5 text-[10px] font-medium leading-3 text-[#7a7a83]">
+                  <span className="inline-flex items-center justify-center rounded-full bg-[#eab308] px-2 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b]">
                     {trade.hasBadge}
                   </span>
                 )}
@@ -122,9 +127,9 @@ export default function RecentTradesTable() {
             </div>
 
             {/* Pair */}
-            <div className="w-[172px] shrink-0 text-left">
+            <div className="flex-1 min-w-0 text-left">
               <div className="flex items-center gap-2">
-                <div className="flex size-5 items-center justify-center rounded-full bg-[#252527] text-[8px] font-bold text-[#f9f9fa]">
+                <div className="flex size-4 items-center justify-center rounded-full bg-[#252527] text-[7px] font-bold text-[#f9f9fa] shrink-0">
                   {trade.pair.charAt(0)}
                 </div>
                 <span className="text-sm font-medium text-[#f9f9fa]">{trade.pair}</span>
@@ -132,37 +137,41 @@ export default function RecentTradesTable() {
             </div>
 
             {/* Market */}
-            <div className="w-[120px] shrink-0 text-left">
+            <div className="w-[180px] shrink-0 text-right">
               <span className="text-sm font-normal text-[#7a7a83]">{trade.market}</span>
             </div>
 
             {/* Price */}
-            <div className="w-[140px] shrink-0 text-right">
-              <span className="text-sm font-normal text-[#f9f9fa] tabular-nums">
+            <div className="w-[180px] shrink-0 text-right">
+              <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">
                 {trade.price.toFixed(4)}
               </span>
             </div>
 
             {/* Amount */}
-            <div className="w-[140px] shrink-0 text-right">
-              <span className="text-sm font-normal text-[#f9f9fa] tabular-nums">{trade.amount}</span>
+            <div className="w-[180px] shrink-0 text-right">
+              <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">{trade.amount}</span>
             </div>
 
             {/* Collateral */}
-            <div className="w-[140px] shrink-0 text-right">
-              <div className="flex items-center justify-end gap-1.5">
-                <span className="text-sm font-normal text-[#f9f9fa] tabular-nums">
-                  {trade.collateral < 1 ? trade.collateral.toFixed(2) : trade.collateral.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            <div className="w-[180px] shrink-0">
+              <div className="flex items-center justify-end gap-2">
+                <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">
+                  {trade.collateral < 1
+                    ? trade.collateral.toFixed(2)
+                    : trade.collateral >= 1000
+                      ? `${(trade.collateral / 1000).toFixed(2)}K`
+                      : trade.collateral.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
                 <CollateralIcon icon={trade.collateralIcon} />
                 <TierIcon tier={trade.tierIcon} />
               </div>
             </div>
 
-            {/* TxID / Trade button */}
-            <div className="w-[100px] shrink-0 text-right">
-              <button className="inline-flex items-center justify-center rounded-lg border border-[#252527] px-3 py-1 text-xs font-medium text-[#f9f9fa] transition-colors hover:border-[#3a3a3d] hover:bg-[rgba(255,255,255,0.03)]">
-                &gt;
+            {/* Tx.ID - Arrow button */}
+            <div className="w-[180px] shrink-0 flex justify-end">
+              <button className="inline-flex items-center justify-center w-[52px] h-7 rounded-md border border-[#252527] transition-colors hover:border-[#3a3a3d] hover:bg-[rgba(255,255,255,0.03)]">
+                <ArrowRightUpIcon />
               </button>
             </div>
           </div>

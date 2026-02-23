@@ -13,21 +13,22 @@ interface NavItemProps {
   hasDropdown?: boolean;
 }
 
-function ChevronDownIcon({ className }: { className?: string }) {
+function ChevronDownIcon({ className, size = 16 }: { className?: string; size?: number }) {
   return (
     <svg
       className={className}
-      width="16"
-      height="16"
-      viewBox="0 0 9.53 5.77"
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M5.478 5.478a1 1 0 0 1-1.413 0L.293 1.707A1 1 0 0 1 1.707.293L4.771 3.357 7.835.293a1.001 1.001 0 0 1 1.415 1.414L5.479 5.478Z"
-        fill="currentColor"
+        d="M4.5 6.5L8 10L11.5 6.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
