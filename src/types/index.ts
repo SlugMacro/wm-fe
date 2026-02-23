@@ -26,7 +26,7 @@ export interface RecentTrade {
   pair: string;
   pairIcon: string;
   pairChain: 'solana' | 'ethereum' | 'sui';
-  market: 'Points' | 'Pre-market';
+  market: 'Pre-market';
   price: number;
   amount: string;
   collateral: number;

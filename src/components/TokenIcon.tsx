@@ -8,6 +8,8 @@ import tokenMmt from '../assets/images/token-mmt.png';
 import tokenSol from '../assets/images/token-sol.png';
 import tokenUsdc from '../assets/images/token-usdc.png';
 import tokenUsdt from '../assets/images/token-usdt.png';
+import tokenPengu from '../assets/images/token-pengu.png';
+import tokenIka from '../assets/images/token-ika.png';
 
 // Chain badge images (downloaded from Figma design)
 import chainSolana from '../assets/images/chain-solana.png';
@@ -25,17 +27,17 @@ const TOKEN_IMAGES: Record<string, string> = {
   SOL: tokenSol,
   USDC: tokenUsdc,
   USDT: tokenUsdt,
+  PENGU: tokenPengu,
+  IKA: tokenIka,
 };
 
 // Fallback brand colors for tokens without local images
 const TOKEN_COLORS: Record<string, string> = {
-  PENGU: '#3b82f6',
   XPL: '#eab308',
   PTB: '#ec4899',
   ME: '#14b8a6',
   MERL: '#8b5cf6',
   NEXO: '#2563eb',
-  IKA: '#06b6d4',
   KARAK: '#f59e0b',
   METEORA: '#6d28d9',
   KARAD: '#d946ef',
