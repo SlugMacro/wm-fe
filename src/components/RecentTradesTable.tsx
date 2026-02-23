@@ -1,4 +1,6 @@
-import { recentTrades } from '../mock-data/recentTrades';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { recentTrades as initialTrades } from '../mock-data/recentTrades';
+import type { RecentTrade } from '../types';
 import TokenIcon from './TokenIcon';
 
 function SortIcon() {
@@ -37,20 +39,79 @@ function TierIcon({ tier }: { tier: 'whale' | 'shark' | 'shrimp' }) {
   );
 }
 
-function CollateralIcon({ icon }: { icon: string }) {
-  const symbol = icon.includes('usdc') ? 'U' : icon.includes('usdt') ? 'T' : icon.includes('sol') ? '◎' : '?';
-  const bgColor = icon.includes('usdc') ? '#2775ca' : icon.includes('usdt') ? '#26a17b' : icon.includes('sol') ? '#9945ff' : '#252527';
-  return (
-    <div
-      className="flex size-4 items-center justify-center rounded-full text-[8px] font-bold text-white"
-      style={{ backgroundColor: bgColor }}
-    >
-      {symbol}
-    </div>
-  );
+// Map collateral icon paths to token symbols for TokenIcon
+function getCollateralSymbol(icon: string): string {
+  if (icon.includes('usdc')) return 'USDC';
+  if (icon.includes('usdt')) return 'USDT';
+  if (icon.includes('sol')) return 'SOL';
+  return 'USDC';
 }
 
+// Pool of sample trades to cycle through for the animation
+const SAMPLE_NEW_TRADES: Omit<RecentTrade, 'id' | 'time'>[] = [
+  { side: 'Buy', pair: 'SKATE/USDC', pairIcon: '', pairChain: 'solana', market: 'Pre-market', price: 0.0052, amount: '20.00K', collateral: 100.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'shark' },
+  { side: 'Sell', pair: 'PENGU/SOL', pairIcon: '', pairChain: 'solana', market: 'Pre-market', price: 0.0051, amount: '45.00K', collateral: 1.8, collateralIcon: '/tokens/sol.svg', tierIcon: 'shark' },
+  { side: 'Buy', hasBadge: 'RS' as const, pair: 'IKA/USDT', pairIcon: '', pairChain: 'solana', market: 'Pre-market', price: 0.121, amount: '2.50K', collateral: 302.5, collateralIcon: '/tokens/usdt.svg', tierIcon: 'shrimp' },
+  { side: 'Buy', pair: 'GRASS/USDC', pairIcon: '', pairChain: 'solana', market: 'Pre-market', price: 0.071, amount: '7.04K', collateral: 500.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'whale' },
+  { side: 'Sell', pair: 'ZBT/USDC', pairIcon: '', pairChain: 'solana', market: 'Pre-market', price: 0.054, amount: '9.26K', collateral: 500.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'shark' },
+  { side: 'Buy', pair: 'LOUD/USDT', pairIcon: '', pairChain: 'solana', market: 'Pre-market', price: 0.958, amount: '1.04K', collateral: 1000.0, collateralIcon: '/tokens/usdt.svg', tierIcon: 'whale' },
+  { side: 'Buy', pair: 'PENGU/USDC', pairIcon: '', pairChain: 'solana', market: 'Pre-market', price: 0.0049, amount: '102.00K', collateral: 500.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'whale' },
+  { side: 'Sell', pair: 'SKATE/SOL', pairIcon: '', pairChain: 'solana', market: 'Pre-market', price: 0.0048, amount: '15.00K', collateral: 0.6, collateralIcon: '/tokens/sol.svg', tierIcon: 'shrimp' },
+];
+
+const MAX_VISIBLE = 10;
+
 export default function RecentTradesTable() {
+  const [trades, setTrades] = useState<(RecentTrade & { isNew?: boolean })[]>(
+    initialTrades.slice(0, MAX_VISIBLE)
+  );
+  const nextIdRef = useRef(initialTrades.length + 1);
+  const sampleIndexRef = useRef(0);
+  const tableBodyRef = useRef<HTMLDivElement>(null);
+
+  const addNewTrade = useCallback(() => {
+    const sample = SAMPLE_NEW_TRADES[sampleIndexRef.current % SAMPLE_NEW_TRADES.length];
+    sampleIndexRef.current += 1;
+
+    const newTrade: RecentTrade & { isNew?: boolean } = {
+      ...sample,
+      id: String(nextIdRef.current),
+      time: 'Just now',
+      isNew: true,
+    };
+    nextIdRef.current += 1;
+
+    setTrades((prev) => {
+      const updated = [newTrade, ...prev.slice(0, MAX_VISIBLE - 1)];
+      return updated;
+    });
+
+    // Remove the "isNew" flag after animation completes
+    setTimeout(() => {
+      setTrades((prev) =>
+        prev.map((t) => (t.id === newTrade.id ? { ...t, isNew: false } : t))
+      );
+    }, 600);
+  }, []);
+
+  useEffect(() => {
+    // Add a new trade every 5-8 seconds
+    const scheduleNext = () => {
+      const delay = 5000 + Math.random() * 3000;
+      return setTimeout(() => {
+        addNewTrade();
+        timerRef.current = scheduleNext();
+      }, delay);
+    };
+
+    const timerRef: { current: ReturnType<typeof setTimeout> | null } = { current: null };
+    timerRef.current = scheduleNext();
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [addNewTrade]);
+
   return (
     <div>
       {/* Section title */}
@@ -74,9 +135,6 @@ export default function RecentTradesTable() {
             <span className="text-xs font-normal text-[#7a7a83]">Pair</span>
           </div>
           <div className="w-[180px] shrink-0 text-right">
-            <span className="text-xs font-normal text-[#7a7a83]">Market</span>
-          </div>
-          <div className="w-[180px] shrink-0 text-right">
             <span className="text-xs font-normal text-[#7a7a83]">
               Price ($) <SortIcon />
             </span>
@@ -98,84 +156,114 @@ export default function RecentTradesTable() {
           </div>
         </div>
 
-        {/* Rows */}
-        {recentTrades.map((trade) => (
-          <div
-            key={trade.id}
-            className="flex items-center border-b border-[#1b1b1c] h-[60px] px-2 transition-colors hover:bg-[rgba(255,255,255,0.02)]"
-          >
-            {/* Time */}
-            <div className="w-[128px] shrink-0 text-left">
-              <span className="text-sm font-normal text-[#7a7a83]">{trade.time}</span>
-            </div>
-
-            {/* Side */}
-            <div className="w-[128px] shrink-0 text-left">
-              <div className="flex items-center gap-2">
-                <span
-                  className={`text-sm font-medium ${
-                    trade.side === 'Buy' ? 'text-[#5bd197]' : 'text-[#fd5e67]'
-                  }`}
-                >
-                  {trade.side}
+        {/* Rows — scrollable on small screens, scroll appears on hover */}
+        <div
+          ref={tableBodyRef}
+          className="overflow-y-hidden hover:overflow-y-auto transition-all"
+          style={{ maxHeight: '600px', scrollbarGutter: 'stable' }}
+        >
+          {trades.map((trade) => (
+            <div
+              key={trade.id}
+              className={`flex items-center border-b border-[#1b1b1c] h-[60px] px-2 transition-all hover:bg-[rgba(255,255,255,0.02)] ${
+                trade.isNew
+                  ? 'animate-slide-in bg-[rgba(91,209,151,0.05)]'
+                  : ''
+              }`}
+              style={trade.isNew ? {
+                animation: 'slideIn 0.4s ease-out',
+              } : undefined}
+            >
+              {/* Time */}
+              <div className="w-[128px] shrink-0 text-left">
+                <span className={`text-sm font-normal ${trade.isNew ? 'text-[#5bd197]' : 'text-[#7a7a83]'}`}>
+                  {trade.time}
                 </span>
-                {trade.hasBadge && (
-                  <span className="inline-flex items-center justify-center rounded-full bg-[#eab308] px-2 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b]">
-                    {trade.hasBadge}
+              </div>
+
+              {/* Side */}
+              <div className="w-[128px] shrink-0 text-left">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`text-sm font-medium ${
+                      trade.side === 'Buy' ? 'text-[#5bd197]' : 'text-[#fd5e67]'
+                    }`}
+                  >
+                    {trade.side}
                   </span>
-                )}
+                  {trade.hasBadge && (
+                    <span className="inline-flex items-center justify-center rounded-full bg-[#eab308] px-2 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b]">
+                      {trade.hasBadge}
+                    </span>
+                  )}
+                </div>
               </div>
-            </div>
 
-            {/* Pair */}
-            <div className="flex-1 min-w-0 text-left">
-              <div className="flex items-center gap-2">
-                <TokenIcon symbol={trade.pair.split('/')[0]} chain="solana" size="sm" showChain={false} />
-                <span className="text-sm font-medium text-[#f9f9fa]">{trade.pair}</span>
+              {/* Pair */}
+              <div className="flex-1 min-w-0 text-left">
+                <div className="flex items-center gap-2">
+                  <TokenIcon symbol={trade.pair.split('/')[0]} chain="solana" size="sm" showChain={false} />
+                  <span className="text-sm font-medium text-[#f9f9fa]">{trade.pair}</span>
+                </div>
               </div>
-            </div>
 
-            {/* Market */}
-            <div className="w-[180px] shrink-0 text-right">
-              <span className="text-sm font-normal text-[#7a7a83]">{trade.market}</span>
-            </div>
-
-            {/* Price */}
-            <div className="w-[180px] shrink-0 text-right">
-              <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">
-                {trade.price.toFixed(4)}
-              </span>
-            </div>
-
-            {/* Amount */}
-            <div className="w-[180px] shrink-0 text-right">
-              <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">{trade.amount}</span>
-            </div>
-
-            {/* Collateral */}
-            <div className="w-[180px] shrink-0">
-              <div className="flex items-center justify-end gap-2">
+              {/* Price */}
+              <div className="w-[180px] shrink-0 text-right">
                 <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">
-                  {trade.collateral < 1
-                    ? trade.collateral.toFixed(2)
-                    : trade.collateral >= 1000
-                      ? `${(trade.collateral / 1000).toFixed(2)}K`
-                      : trade.collateral.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  {trade.price.toFixed(4)}
                 </span>
-                <CollateralIcon icon={trade.collateralIcon} />
-                <TierIcon tier={trade.tierIcon} />
+              </div>
+
+              {/* Amount */}
+              <div className="w-[180px] shrink-0 text-right">
+                <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">{trade.amount}</span>
+              </div>
+
+              {/* Collateral */}
+              <div className="w-[180px] shrink-0">
+                <div className="flex items-center justify-end gap-2">
+                  <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">
+                    {trade.collateral < 1
+                      ? trade.collateral.toFixed(2)
+                      : trade.collateral >= 1000
+                        ? `${(trade.collateral / 1000).toFixed(2)}K`
+                        : trade.collateral.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                  <TokenIcon symbol={getCollateralSymbol(trade.collateralIcon)} size="sm" showChain={false} />
+                  <TierIcon tier={trade.tierIcon} />
+                </div>
+              </div>
+
+              {/* Tx.ID - Arrow button */}
+              <div className="w-[180px] shrink-0 flex justify-end">
+                <button className="inline-flex items-center justify-center w-[52px] h-7 rounded-md border border-[#252527] transition-colors hover:border-[#3a3a3d] hover:bg-[rgba(255,255,255,0.03)]">
+                  <ArrowRightUpIcon />
+                </button>
               </div>
             </div>
-
-            {/* Tx.ID - Arrow button */}
-            <div className="w-[180px] shrink-0 flex justify-end">
-              <button className="inline-flex items-center justify-center w-[52px] h-7 rounded-md border border-[#252527] transition-colors hover:border-[#3a3a3d] hover:bg-[rgba(255,255,255,0.03)]">
-                <ArrowRightUpIcon />
-              </button>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
+
+      {/* Animation keyframes */}
+      <style>{`
+        @keyframes slideIn {
+          0% {
+            opacity: 0;
+            transform: translateY(-100%);
+            max-height: 0;
+          }
+          50% {
+            opacity: 0.5;
+            max-height: 60px;
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+            max-height: 60px;
+          }
+        }
+      `}</style>
     </div>
   );
 }
