@@ -47,6 +47,33 @@ function getCollateralSymbol(icon: string): string {
   return 'USDC';
 }
 
+// Format elapsed seconds into human-readable time
+function formatElapsed(seconds: number): string {
+  if (seconds < 60) return 'Just now';
+  const mins = Math.floor(seconds / 60);
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  const remainMins = mins % 60;
+  if (remainMins === 0) return `${hours}h ago`;
+  return `${hours}h ${remainMins}m ago`;
+}
+
+// Parse initial "Xm ago" / "Xh ago" strings into seconds
+function parseTimeToSeconds(time: string): number {
+  const hMatch = time.match(/(\d+)h/);
+  const mMatch = time.match(/(\d+)m/);
+  let secs = 0;
+  if (hMatch) secs += parseInt(hMatch[1]) * 3600;
+  if (mMatch) secs += parseInt(mMatch[1]) * 60;
+  return secs || 60; // default 1 min if unparseable
+}
+
+// Internal trade type with createdAt timestamp for time tracking
+interface TradeWithTimestamp extends RecentTrade {
+  createdAt: number; // timestamp ms
+  isNew?: boolean;
+}
+
 // Pool of sample trades to cycle through for the animation
 const SAMPLE_NEW_TRADES: Omit<RecentTrade, 'id' | 'time'>[] = [
   { side: 'Buy', pair: 'SKATE/USDC', pairIcon: '', pairChain: 'solana', market: 'Pre-market', price: 0.0052, amount: '20.00K', collateral: 100.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'shark' },
@@ -60,31 +87,39 @@ const SAMPLE_NEW_TRADES: Omit<RecentTrade, 'id' | 'time'>[] = [
 ];
 
 const MAX_VISIBLE = 10;
+const NEW_TRADE_INTERVAL = 60_000; // 1 minute
+const TIME_UPDATE_INTERVAL = 10_000; // update displayed times every 10s
 
 export default function RecentTradesTable() {
-  const [trades, setTrades] = useState<(RecentTrade & { isNew?: boolean })[]>(
-    initialTrades.slice(0, MAX_VISIBLE)
+  const now = Date.now();
+
+  // Initialize trades with createdAt timestamps based on their initial "Xm ago" strings
+  const [trades, setTrades] = useState<TradeWithTimestamp[]>(() =>
+    initialTrades.slice(0, MAX_VISIBLE).map((t) => ({
+      ...t,
+      createdAt: now - parseTimeToSeconds(t.time) * 1000,
+    }))
   );
+
   const nextIdRef = useRef(initialTrades.length + 1);
   const sampleIndexRef = useRef(0);
   const tableBodyRef = useRef<HTMLDivElement>(null);
 
+  // Add a brand new trade
   const addNewTrade = useCallback(() => {
     const sample = SAMPLE_NEW_TRADES[sampleIndexRef.current % SAMPLE_NEW_TRADES.length];
     sampleIndexRef.current += 1;
 
-    const newTrade: RecentTrade & { isNew?: boolean } = {
+    const newTrade: TradeWithTimestamp = {
       ...sample,
       id: String(nextIdRef.current),
       time: 'Just now',
+      createdAt: Date.now(),
       isNew: true,
     };
     nextIdRef.current += 1;
 
-    setTrades((prev) => {
-      const updated = [newTrade, ...prev.slice(0, MAX_VISIBLE - 1)];
-      return updated;
-    });
+    setTrades((prev) => [newTrade, ...prev.slice(0, MAX_VISIBLE - 1)]);
 
     // Remove the "isNew" flag after animation completes
     setTimeout(() => {
@@ -94,23 +129,24 @@ export default function RecentTradesTable() {
     }, 600);
   }, []);
 
+  // New trade every 1 minute
   useEffect(() => {
-    // Add a new trade every 5-8 seconds
-    const scheduleNext = () => {
-      const delay = 5000 + Math.random() * 3000;
-      return setTimeout(() => {
-        addNewTrade();
-        timerRef.current = scheduleNext();
-      }, delay);
-    };
-
-    const timerRef: { current: ReturnType<typeof setTimeout> | null } = { current: null };
-    timerRef.current = scheduleNext();
-
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
+    const timer = setInterval(addNewTrade, NEW_TRADE_INTERVAL);
+    return () => clearInterval(timer);
   }, [addNewTrade]);
+
+  // Update displayed times every 10 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTrades((prev) =>
+        prev.map((t) => ({
+          ...t,
+          time: formatElapsed(Math.floor((Date.now() - t.createdAt) / 1000)),
+        }))
+      );
+    }, TIME_UPDATE_INTERVAL);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <div>
@@ -128,31 +164,23 @@ export default function RecentTradesTable() {
               Time <SortIcon />
             </span>
           </div>
-          <div className="w-[128px] shrink-0 text-left">
+          <div className="w-[100px] shrink-0 text-left">
             <span className="text-xs font-normal text-[#7a7a83]">Side</span>
           </div>
           <div className="flex-1 min-w-0 text-left">
             <span className="text-xs font-normal text-[#7a7a83]">Pair</span>
           </div>
-          <div className="w-[180px] shrink-0 text-right">
-            <span className="text-xs font-normal text-[#7a7a83]">
-              Price ($) <SortIcon />
-            </span>
+          <div className="flex-1 min-w-0 text-right">
+            <span className="text-xs font-normal text-[#7a7a83]">Price ($)</span>
           </div>
-          <div className="w-[180px] shrink-0 text-right">
-            <span className="text-xs font-normal text-[#7a7a83]">
-              Amount <SortIcon />
-            </span>
+          <div className="flex-1 min-w-0 text-right">
+            <span className="text-xs font-normal text-[#7a7a83]">Amount</span>
           </div>
-          <div className="w-[180px] shrink-0 text-right">
-            <span className="text-xs font-normal text-[#7a7a83]">
-              Collateral <SortIcon />
-            </span>
+          <div className="flex-1 min-w-0 text-right">
+            <span className="text-xs font-normal text-[#7a7a83]">Collateral</span>
           </div>
-          <div className="w-[180px] shrink-0 text-right">
-            <span className="text-xs font-normal text-[#7a7a83]">
-              Tx.ID <SortIcon />
-            </span>
+          <div className="w-[80px] shrink-0 text-right">
+            <span className="text-xs font-normal text-[#7a7a83]">Tx.ID</span>
           </div>
         </div>
 
@@ -166,13 +194,9 @@ export default function RecentTradesTable() {
             <div
               key={trade.id}
               className={`flex items-center border-b border-[#1b1b1c] h-[60px] px-2 transition-all hover:bg-[rgba(255,255,255,0.02)] ${
-                trade.isNew
-                  ? 'animate-slide-in bg-[rgba(91,209,151,0.05)]'
-                  : ''
+                trade.isNew ? 'bg-[rgba(91,209,151,0.05)]' : ''
               }`}
-              style={trade.isNew ? {
-                animation: 'slideIn 0.4s ease-out',
-              } : undefined}
+              style={trade.isNew ? { animation: 'slideIn 0.4s ease-out' } : undefined}
             >
               {/* Time */}
               <div className="w-[128px] shrink-0 text-left">
@@ -182,7 +206,7 @@ export default function RecentTradesTable() {
               </div>
 
               {/* Side */}
-              <div className="w-[128px] shrink-0 text-left">
+              <div className="w-[100px] shrink-0 text-left">
                 <div className="flex items-center gap-2">
                   <span
                     className={`text-sm font-medium ${
@@ -208,19 +232,19 @@ export default function RecentTradesTable() {
               </div>
 
               {/* Price */}
-              <div className="w-[180px] shrink-0 text-right">
+              <div className="flex-1 min-w-0 text-right">
                 <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">
                   {trade.price.toFixed(4)}
                 </span>
               </div>
 
               {/* Amount */}
-              <div className="w-[180px] shrink-0 text-right">
+              <div className="flex-1 min-w-0 text-right">
                 <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">{trade.amount}</span>
               </div>
 
               {/* Collateral */}
-              <div className="w-[180px] shrink-0">
+              <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-end gap-2">
                   <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">
                     {trade.collateral < 1
@@ -235,7 +259,7 @@ export default function RecentTradesTable() {
               </div>
 
               {/* Tx.ID - Arrow button */}
-              <div className="w-[180px] shrink-0 flex justify-end">
+              <div className="w-[80px] shrink-0 flex justify-end">
                 <button className="inline-flex items-center justify-center w-[52px] h-7 rounded-md border border-[#252527] transition-colors hover:border-[#3a3a3d] hover:bg-[rgba(255,255,255,0.03)]">
                   <ArrowRightUpIcon />
                 </button>
