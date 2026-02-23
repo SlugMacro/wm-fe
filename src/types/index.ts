@@ -94,3 +94,44 @@ export interface PriceDataPoint {
 
 export type OrderBookTab = 'regular' | 'resell' | 'all';
 export type MyOrdersTab = 'filled' | 'open';
+
+// Dashboard types
+export interface DashboardOpenOrder {
+  id: string;
+  pair: string;
+  tokenColor: string;
+  hasBadge?: 'FULL' | 'RS';
+  createdTime: string;
+  side: 'Buy' | 'Sell' | 'Resell';
+  price: number;
+  amount: string;
+  deposited: string;
+  depositedType: 'sol' | 'usdc' | 'token';
+  toBeReceived: string;
+  toBeReceivedType: 'sol' | 'usdc' | 'token';
+  progress: number;
+}
+
+export interface DashboardEndedOrder {
+  id: string;
+  pair: string;
+  tokenColor: string;
+  hasBadge?: 'RS';
+  time: string;
+  side: 'Buy' | 'Sell' | 'Resell';
+  price: number;
+  amount: string;
+  deposited: string;
+  depositedType: 'sol' | 'usdc' | 'token';
+  received: string;
+  receivedType: 'sol' | 'usdc' | 'token';
+  status: 'settled' | 'claimed' | 'closed' | 'resold' | 'exited';
+}
+
+export type DashboardOrdersTab = 'open' | 'filled';
+
+export interface LinkedWallet {
+  address: string;
+  chain: string;
+  chainColor: string;
+}
