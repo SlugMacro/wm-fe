@@ -138,7 +138,7 @@ export default function RecentTradesTable() {
   return (
     <div>
       {/* Section title */}
-      <div className="flex items-center border-b border-[#1b1b1c] h-[52px]">
+      <div className="flex items-center h-[44px]">
         <h2 className="text-xl font-medium leading-7 text-[#f9f9fa]">Recent Trades</h2>
       </div>
 

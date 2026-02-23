@@ -187,7 +187,7 @@ export default function LiveMarketTable() {
   return (
     <div>
       {/* Tab Filters */}
-      <div className="flex items-center gap-6 mb-4">
+      <div className="flex items-center gap-6 mb-2">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.key;
           return (
