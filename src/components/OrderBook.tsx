@@ -6,18 +6,6 @@ const VISIBLE_ROWS = 15;
 const ROW_HEIGHT = 42; // h-10 (40px) + mt-0.5 (2px gap)
 const SCROLLBAR_WIDTH = 4;
 
-function SortIcon({ active, direction }: { active: boolean; direction: 'asc' | 'desc' | null }) {
-  return (
-    <span className="ml-0.5 inline-flex flex-col gap-[1px]">
-      <svg width="6" height="4" viewBox="0 0 6 4" fill="none">
-        <path d="M3 0L6 4H0L3 0Z" fill={active && direction === 'asc' ? '#f9f9fa' : '#3a3a3d'} />
-      </svg>
-      <svg width="6" height="4" viewBox="0 0 6 4" fill="none">
-        <path d="M3 4L0 0H6L3 4Z" fill={active && direction === 'desc' ? '#f9f9fa' : '#3a3a3d'} />
-      </svg>
-    </span>
-  );
-}
 
 function InfoIcon() {
   return (
@@ -168,34 +156,10 @@ interface OrderBookProps {
 
 export default function OrderBook({ buyOrders, sellOrders, onSelectOrder, selectedOrderId, tokenSymbol }: OrderBookProps) {
   const [activeTab, setActiveTab] = useState<OrderBookTab>('regular');
-  const [buySortField, setBuySortField] = useState<string | null>(null);
-  const [buySortDir, setBuySortDir] = useState<'asc' | 'desc' | null>(null);
-  const [sellSortField, setSellSortField] = useState<string | null>(null);
-  const [sellSortDir, setSellSortDir] = useState<'asc' | 'desc' | null>(null);
   const [hoveredOrderId, setHoveredOrderId] = useState<string | null>(null);
 
   const buyScroll = useColumnScroll();
   const sellScroll = useColumnScroll();
-
-  const handleBuySort = (field: string) => {
-    if (buySortField === field) {
-      if (buySortDir === 'asc') setBuySortDir('desc');
-      else if (buySortDir === 'desc') { setBuySortField(null); setBuySortDir(null); }
-    } else {
-      setBuySortField(field);
-      setBuySortDir('asc');
-    }
-  };
-
-  const handleSellSort = (field: string) => {
-    if (sellSortField === field) {
-      if (sellSortDir === 'asc') setSellSortDir('desc');
-      else if (sellSortDir === 'desc') { setSellSortField(null); setSellSortDir(null); }
-    } else {
-      setSellSortField(field);
-      setSellSortDir('asc');
-    }
-  };
 
   const tabs: { key: OrderBookTab; label: string; hasInfo?: boolean }[] = [
     { key: 'regular', label: 'Regular' },
@@ -260,19 +224,13 @@ export default function OrderBook({ buyOrders, sellOrders, onSelectOrder, select
           {/* Header */}
           <div className="flex items-center border-b border-[#1b1b1c] h-8">
             <div className="flex-1">
-              <button onClick={() => handleBuySort('price')} className="inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
-                Price ($) <SortIcon active={buySortField === 'price'} direction={buySortField === 'price' ? buySortDir : null} />
-              </button>
+              <span className="text-xs font-medium text-[#7a7a83]">Price ($)</span>
             </div>
             <div className="w-28 text-right">
-              <button onClick={() => handleBuySort('amount')} className="inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
-                Amount <SortIcon active={buySortField === 'amount'} direction={buySortField === 'amount' ? buySortDir : null} />
-              </button>
+              <span className="text-xs font-medium text-[#7a7a83]">Amount</span>
             </div>
             <div className="w-28 text-right">
-              <button onClick={() => handleBuySort('collateral')} className="inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
-                Collateral <SortIcon active={buySortField === 'collateral'} direction={buySortField === 'collateral' ? buySortDir : null} />
-              </button>
+              <span className="text-xs font-medium text-[#7a7a83]">Collateral</span>
             </div>
             <div className="w-24" />
           </div>
@@ -303,8 +261,8 @@ export default function OrderBook({ buyOrders, sellOrders, onSelectOrder, select
                     onMouseEnter={() => setHoveredOrderId(order.id)}
                     onMouseLeave={() => setHoveredOrderId(null)}
                   >
-                    {/* Fill percentage background bar */}
-                    {order.fillPercent > 0 && (
+                    {/* Fill percentage background bar — hidden for FULL orders */}
+                    {order.fillPercent > 0 && order.fillType !== 'FULL' && (
                       <div
                         className="absolute inset-y-0 left-0 rounded-sm bg-[rgba(22,194,132,0.06)] pointer-events-none"
                         style={{ width: `${order.fillPercent}%` }}
@@ -328,8 +286,8 @@ export default function OrderBook({ buyOrders, sellOrders, onSelectOrder, select
                         <TokenIcon symbol={order.collateralToken} size="sm" showChain={false} />
                       </div>
                       <div className="w-24 flex items-center justify-end gap-1">
-                        {order.fillType && (
-                          <span className="text-[10px] font-medium text-[#7a7a83] uppercase">{order.fillType}</span>
+                        {order.fillType === 'FULL' && (
+                          <span className="rounded bg-[#1b1b1c] px-1.5 py-0.5 text-[10px] font-medium text-[#7a7a83] uppercase">Full</span>
                         )}
                         <button className="rounded px-3 py-1 text-xs font-medium text-[#5bd197] bg-[rgba(22,194,132,0.1)] transition-colors hover:bg-[rgba(22,194,132,0.2)]">
                           Buy
@@ -337,7 +295,7 @@ export default function OrderBook({ buyOrders, sellOrders, onSelectOrder, select
                       </div>
                     </div>
                     {/* Tooltip */}
-                    {isHovered && order.fillPercent > 0 && (
+                    {isHovered && order.fillPercent > 0 && order.fillType !== 'FULL' && (
                       <OrderTooltip order={order} tokenSymbol={tokenSymbol} />
                     )}
                   </div>
@@ -373,19 +331,13 @@ export default function OrderBook({ buyOrders, sellOrders, onSelectOrder, select
           {/* Header */}
           <div className="flex items-center border-b border-[#1b1b1c] h-8">
             <div className="flex-1">
-              <button onClick={() => handleSellSort('price')} className="inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
-                Price ($) <SortIcon active={sellSortField === 'price'} direction={sellSortField === 'price' ? sellSortDir : null} />
-              </button>
+              <span className="text-xs font-medium text-[#7a7a83]">Price ($)</span>
             </div>
             <div className="w-28 text-right">
-              <button onClick={() => handleSellSort('amount')} className="inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
-                Amount <SortIcon active={sellSortField === 'amount'} direction={sellSortField === 'amount' ? sellSortDir : null} />
-              </button>
+              <span className="text-xs font-medium text-[#7a7a83]">Amount</span>
             </div>
             <div className="w-28 text-right">
-              <button onClick={() => handleSellSort('collateral')} className="inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
-                Collateral <SortIcon active={sellSortField === 'collateral'} direction={sellSortField === 'collateral' ? sellSortDir : null} />
-              </button>
+              <span className="text-xs font-medium text-[#7a7a83]">Collateral</span>
             </div>
             <div className="w-24" />
           </div>
@@ -416,8 +368,8 @@ export default function OrderBook({ buyOrders, sellOrders, onSelectOrder, select
                     onMouseEnter={() => setHoveredOrderId(order.id)}
                     onMouseLeave={() => setHoveredOrderId(null)}
                   >
-                    {/* Fill percentage background bar — always from left */}
-                    {order.fillPercent > 0 && (
+                    {/* Fill percentage background bar — hidden for FULL orders */}
+                    {order.fillPercent > 0 && order.fillType !== 'FULL' && (
                       <div
                         className="absolute inset-y-0 left-0 rounded-sm bg-[rgba(255,59,70,0.06)] pointer-events-none"
                         style={{ width: `${order.fillPercent}%` }}
@@ -441,8 +393,8 @@ export default function OrderBook({ buyOrders, sellOrders, onSelectOrder, select
                         <TokenIcon symbol={order.collateralToken} size="sm" showChain={false} />
                       </div>
                       <div className="w-24 flex items-center justify-end gap-1">
-                        {order.fillType && (
-                          <span className="text-[10px] font-medium text-[#7a7a83] uppercase">{order.fillType}</span>
+                        {order.fillType === 'FULL' && (
+                          <span className="rounded bg-[#1b1b1c] px-1.5 py-0.5 text-[10px] font-medium text-[#7a7a83] uppercase">Full</span>
                         )}
                         <button className="rounded px-3 py-1 text-xs font-medium text-[#fd5e67] bg-[rgba(255,59,70,0.1)] transition-colors hover:bg-[rgba(255,59,70,0.2)]">
                           Sell
@@ -450,7 +402,7 @@ export default function OrderBook({ buyOrders, sellOrders, onSelectOrder, select
                       </div>
                     </div>
                     {/* Tooltip */}
-                    {isHovered && order.fillPercent > 0 && (
+                    {isHovered && order.fillPercent > 0 && order.fillType !== 'FULL' && (
                       <OrderTooltip order={order} tokenSymbol={tokenSymbol} />
                     )}
                   </div>
