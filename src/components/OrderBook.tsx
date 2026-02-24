@@ -279,7 +279,7 @@ export default function OrderBook({ buyOrders, sellOrders, onSelectOrder, select
                       <div className="w-28 text-right">
                         <span className="text-sm font-normal text-[#f9f9fa] tabular-nums">{order.amountFormatted}</span>
                       </div>
-                      <div className="w-28 text-right flex items-center justify-end gap-1">
+                      <div className="w-28 text-right flex items-center justify-end gap-2">
                         <span className="text-sm font-normal text-[#f9f9fa] tabular-nums">
                           {order.collateral < 1 ? order.collateral.toFixed(2) : order.collateral.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
@@ -386,7 +386,7 @@ export default function OrderBook({ buyOrders, sellOrders, onSelectOrder, select
                       <div className="w-28 text-right">
                         <span className="text-sm font-normal text-[#f9f9fa] tabular-nums">{order.amountFormatted}</span>
                       </div>
-                      <div className="w-28 text-right flex items-center justify-end gap-1">
+                      <div className="w-28 text-right flex items-center justify-end gap-2">
                         <span className="text-sm font-normal text-[#f9f9fa] tabular-nums">
                           {order.collateral < 1 ? order.collateral.toFixed(2) : order.collateral.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>

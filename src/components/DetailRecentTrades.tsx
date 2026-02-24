@@ -282,7 +282,7 @@ export default function DetailRecentTrades({ tokenSymbol = 'SKATE', chain = 'sol
                         ? `${(trade.collateral / 1000).toFixed(2)}K`
                         : trade.collateral.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
-                    <TokenIcon symbol={getCollateralSymbol(trade.collateralIcon)} size="sm" showChain={false} />
+                    <TokenIcon symbol={getCollateralSymbol(trade.collateralIcon)} size="xs" showChain={false} />
                     <TierIcon tier={trade.tierIcon} />
                   </div>
                 </div>

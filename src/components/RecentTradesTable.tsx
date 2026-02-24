@@ -197,7 +197,7 @@ export default function RecentTradesTable() {
               {/* Pair — aligned with Chart + Last Price area */}
               <div className="w-[292px] shrink-0 text-left">
                 <div className="flex items-center gap-2">
-                  <TokenIcon symbol={trade.pair.split('/')[0]} chain="solana" size="sm" showChain={false} />
+                  <TokenIcon symbol={trade.pair.split('/')[0]} chain="solana" size="xs" showChain={false} />
                   <span className="text-sm font-medium text-[#f9f9fa]">{trade.pair}</span>
                 </div>
               </div>
@@ -224,7 +224,7 @@ export default function RecentTradesTable() {
                         ? `${(trade.collateral / 1000).toFixed(2)}K`
                         : trade.collateral.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
-                  <TokenIcon symbol={getCollateralSymbol(trade.collateralIcon)} size="sm" showChain={false} />
+                  <TokenIcon symbol={getCollateralSymbol(trade.collateralIcon)} size="xs" showChain={false} />
                   <TierIcon tier={trade.tierIcon} />
                 </div>
               </div>
