@@ -56,12 +56,25 @@ export interface UpcomingMarket {
   moniScore: number; // 0-50000 range
 }
 
+export interface EndedMarket {
+  id: string;
+  tokenSymbol: string;
+  tokenName: string;
+  chain: 'solana' | 'ethereum' | 'sui';
+  status: 'ended';
+  lastPrice: number;
+  totalVolume: number;
+  settleStartTime: string | null; // ISO date or null for TBA
+  settleEndTime: string | null;   // ISO date or null for TBA
+}
+
 export type SortField = 'lastPrice' | 'volume24h' | 'totalVolume' | 'impliedFdv';
 export type UpcomingSortField = 'watchers' | 'moniScore';
+export type EndedSortField = 'lastPrice' | 'totalVolume';
 export type SortDirection = 'asc' | 'desc' | null;
 
 export interface SortConfig {
-  field: SortField | UpcomingSortField | null;
+  field: SortField | UpcomingSortField | EndedSortField | null;
   direction: SortDirection;
 }
 
