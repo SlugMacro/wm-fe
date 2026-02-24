@@ -149,17 +149,25 @@ export function generateBuyOrders(_basePrice: number): OrderBookEntry[] {
     undefined, undefined, undefined, undefined, undefined, undefined,
   ];
 
+  const tokens: ('SOL' | 'USDC')[] = [
+    'SOL', 'USDC', 'SOL', 'SOL', 'USDC', 'SOL', 'USDC', 'SOL',
+    'SOL', 'USDC', 'SOL', 'USDC', 'SOL', 'SOL', 'USDC', 'SOL',
+    'USDC', 'SOL', 'SOL', 'USDC', 'SOL', 'USDC', 'SOL', 'SOL',
+    'USDC', 'SOL', 'USDC', 'SOL', 'SOL', 'USDC',
+  ];
+
   return prices.map((price, i) => {
     const totalAmount = amounts[i] * 1000;
     const filledAmount = totalAmount * fillPercents[i] / 100;
+    const token = tokens[i];
     return {
       id: `buy-${i}`,
       price,
       amount: totalAmount,
       amountFormatted: `${amounts[i].toFixed(2)}K`,
       collateral: collaterals[i],
-      collateralIcon: '/tokens/sol.svg',
-      collateralToken: 'SOL' as const,
+      collateralIcon: token === 'SOL' ? '/tokens/sol.svg' : '/tokens/usdc.svg',
+      collateralToken: token,
       isOwner: i === 0,
       fillPercent: fillPercents[i],
       filledAmount,
@@ -201,17 +209,25 @@ export function generateSellOrders(_basePrice: number): OrderBookEntry[] {
     'FULL', undefined,
   ];
 
+  const tokens: ('SOL' | 'USDC')[] = [
+    'USDC', 'SOL', 'SOL', 'USDC', 'SOL', 'USDC', 'SOL', 'SOL',
+    'USDC', 'SOL', 'USDC', 'SOL', 'SOL', 'USDC', 'SOL',
+    'SOL', 'USDC', 'SOL', 'USDC', 'SOL', 'USDC', 'SOL', 'USDC',
+    'SOL', 'USDC',
+  ];
+
   return prices.map((price, i) => {
     const totalAmount = amounts[i] * 1000;
     const filledAmount = totalAmount * fillPercents[i] / 100;
+    const token = tokens[i];
     return {
       id: `sell-${i}`,
       price,
       amount: totalAmount,
       amountFormatted: `${amounts[i].toFixed(2)}K`,
       collateral: collaterals[i],
-      collateralIcon: '/tokens/sol.svg',
-      collateralToken: 'SOL' as const,
+      collateralIcon: token === 'SOL' ? '/tokens/sol.svg' : '/tokens/usdc.svg',
+      collateralToken: token,
       isOwner: i === 2,
       fillPercent: fillPercents[i],
       filledAmount,
