@@ -31,7 +31,7 @@ export interface RecentTrade {
   amount: string;
   collateral: number;
   collateralIcon: string;
-  tierIcon: 'whale' | 'shark' | 'shrimp';
+  tierIcon: 'whale' | 'shark' | 'dolphin' | 'fish' | 'shrimp';
 }
 
 export type MarketTab = 'live' | 'upcoming' | 'ended';

@@ -1,4 +1,5 @@
 import { detailRecentTrades } from '../mock-data/tokenDetail';
+import TierIcon from './TierIcon';
 
 function SortIcon() {
   return (
@@ -18,15 +19,6 @@ function ArrowRightUpIcon() {
     <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
       <path d="M3.5 8.5L8.5 3.5M8.5 3.5H4.5M8.5 3.5V7.5" stroke="#f9f9fa" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
-  );
-}
-
-function TierIcon({ tier }: { tier: 'whale' | 'shark' | 'shrimp' }) {
-  const labels: Record<string, string> = { whale: '🐋', shark: '🦈', shrimp: '🦐' };
-  return (
-    <div className="flex size-4 items-center justify-center rounded-full bg-[#1b1b1c] text-[8px]">
-      {labels[tier]}
-    </div>
   );
 }
 

@@ -14,7 +14,7 @@ export const recentTrades: RecentTrade[] = [
     amount: '4.20K',
     collateral: 500.0,
     collateralIcon: '/tokens/usdt.svg',
-    tierIcon: 'shark',
+    tierIcon: 'fish', // $500 → $100-$1K
   },
   {
     id: '2',
@@ -29,7 +29,7 @@ export const recentTrades: RecentTrade[] = [
     amount: '85.35K',
     collateral: 3.0,
     collateralIcon: '/tokens/sol.svg',
-    tierIcon: 'shark',
+    tierIcon: 'fish', // ~$450 in SOL → $100-$1K
   },
   {
     id: '3',
@@ -43,7 +43,7 @@ export const recentTrades: RecentTrade[] = [
     amount: '3.62K',
     collateral: 250.0,
     collateralIcon: '/tokens/usdc.svg',
-    tierIcon: 'shark',
+    tierIcon: 'fish', // $250 → $100-$1K
   },
   {
     id: '4',
@@ -55,9 +55,9 @@ export const recentTrades: RecentTrade[] = [
     market: 'Pre-market',
     price: 0.005,
     amount: '100.00K',
-    collateral: 500.0,
+    collateral: 5000.0,
     collateralIcon: '/tokens/usdc.svg',
-    tierIcon: 'whale',
+    tierIcon: 'dolphin', // $5K → $1K-$10K
   },
   {
     id: '5',
@@ -69,9 +69,9 @@ export const recentTrades: RecentTrade[] = [
     market: 'Pre-market',
     price: 0.055,
     amount: '18.18K',
-    collateral: 1000.0,
+    collateral: 15000.0,
     collateralIcon: '/tokens/usdc.svg',
-    tierIcon: 'whale',
+    tierIcon: 'shark', // $15K → $10K-$100K
   },
   {
     id: '6',
@@ -85,7 +85,7 @@ export const recentTrades: RecentTrade[] = [
     amount: '40.00K',
     collateral: 200.0,
     collateralIcon: '/tokens/usdc.svg',
-    tierIcon: 'shark',
+    tierIcon: 'fish', // $200 → $100-$1K
   },
   {
     id: '7',
@@ -99,7 +99,7 @@ export const recentTrades: RecentTrade[] = [
     amount: '5.50K',
     collateral: 5300.0,
     collateralIcon: '/tokens/usdt.svg',
-    tierIcon: 'whale',
+    tierIcon: 'dolphin', // $5.3K → $1K-$10K
   },
   {
     id: '8',
@@ -111,9 +111,9 @@ export const recentTrades: RecentTrade[] = [
     market: 'Pre-market',
     price: 0.112,
     amount: '8.92K',
-    collateral: 1000.0,
+    collateral: 150000.0,
     collateralIcon: '/tokens/usdc.svg',
-    tierIcon: 'whale',
+    tierIcon: 'whale', // $150K → Over $100K
   },
   {
     id: '9',
@@ -125,9 +125,9 @@ export const recentTrades: RecentTrade[] = [
     market: 'Pre-market',
     price: 0.0048,
     amount: '62.50K',
-    collateral: 2.5,
-    collateralIcon: '/tokens/sol.svg',
-    tierIcon: 'shark',
+    collateral: 50000.0,
+    collateralIcon: '/tokens/usdc.svg',
+    tierIcon: 'shark', // $50K → $10K-$100K
   },
   {
     id: '10',
@@ -139,8 +139,8 @@ export const recentTrades: RecentTrade[] = [
     market: 'Pre-market',
     price: 0.0613,
     amount: '3.62K',
-    collateral: 0.08,
+    collateral: 50.0,
     collateralIcon: '/tokens/usdc.svg',
-    tierIcon: 'shrimp',
+    tierIcon: 'shrimp', // $50 → < $100
   },
 ];

@@ -233,11 +233,11 @@ export function generatePriceData(): PriceDataPoint[] {
 }
 
 export const detailRecentTrades = [
-  { id: 'dt-1', time: '1m ago', side: 'Sell' as const, pair: 'SKATE/USDC', price: 0.005, amount: '36.40K', collateral: 182.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'shark' as const },
-  { id: 'dt-2', time: '2m ago', side: 'Sell' as const, pair: 'SKATE/USDC', price: 0.005, amount: '181.80K', collateral: 909.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'whale' as const },
-  { id: 'dt-3', time: '5m ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.005, amount: '1.00M', collateral: 5000.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'whale' as const, hasBadge: 'RS' },
-  { id: 'dt-4', time: '6m ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.005, amount: '400.00K', collateral: 2000.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'whale' as const, hasBadge: 'RS' },
-  { id: 'dt-5', time: '7m ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.005, amount: '36.20K', collateral: 181.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'shark' as const },
-  { id: 'dt-6', time: '10m ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.005, amount: '1.00M', collateral: 5000.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'whale' as const },
-  { id: 'dt-7', time: '12m ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.005, amount: '18.20K', collateral: 91.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'shark' as const },
+  { id: 'dt-1', time: '1m ago', side: 'Sell' as const, pair: 'SKATE/USDC', price: 0.005, amount: '36.40K', collateral: 182.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'fish' as const },
+  { id: 'dt-2', time: '2m ago', side: 'Sell' as const, pair: 'SKATE/USDC', price: 0.005, amount: '181.80K', collateral: 909.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'fish' as const },
+  { id: 'dt-3', time: '5m ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.005, amount: '1.00M', collateral: 5000.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'dolphin' as const, hasBadge: 'RS' },
+  { id: 'dt-4', time: '6m ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.005, amount: '400.00K', collateral: 2000.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'dolphin' as const, hasBadge: 'RS' },
+  { id: 'dt-5', time: '7m ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.005, amount: '36.20K', collateral: 181.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'fish' as const },
+  { id: 'dt-6', time: '10m ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.005, amount: '1.00M', collateral: 150000.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'whale' as const },
+  { id: 'dt-7', time: '12m ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.005, amount: '18.20K', collateral: 91.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'shrimp' as const },
 ];
