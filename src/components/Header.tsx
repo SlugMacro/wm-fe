@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import mascotSvg from '../assets/images/mascot.svg';
 import logoTopSvg from '../assets/images/logo-top.svg';
@@ -7,6 +7,7 @@ import chainSolanaPng from '../assets/images/chain-solana.png';
 import tokenFeePng from '../assets/images/token-fee.png';
 import tokenSolPng from '../assets/images/token-sol.png';
 import avatarPng from '../assets/images/avatar.png';
+import ConnectWalletModal from './ConnectWalletModal';
 
 interface NavItemProps {
   to: string;
@@ -48,9 +49,9 @@ function CopyIcon() {
   );
 }
 
-function ArrowRightUpIcon() {
+function ArrowRightUpIcon({ size = 16 }: { size?: number }) {
   return (
-    <svg width="16" height="16" viewBox="0 0 12 12" fill="none">
+    <svg width={size} height={size} viewBox="0 0 12 12" fill="none">
       <path d="M3.5 8.5L8.5 3.5M8.5 3.5H4.5M8.5 3.5V7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
@@ -68,14 +69,6 @@ function StakingIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
       <path d="M19 7h-1V2H6v5H5c-1.654 0-3 1.346-3 3v7c0 1.654 1.346 3 3 3h14c1.654 0 3-1.346 3-3v-7c0-1.654-1.346-3-3-3zM8 4h8v3H8V4zm12 13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v7zm-5-4a2 2 0 1 1-4 0 2 2 0 0 1 4 0z" fill="currentColor" />
-    </svg>
-  );
-}
-
-function IncentivesIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="4" fill="#f59e0b" />
     </svg>
   );
 }
@@ -147,10 +140,27 @@ function DropdownMenuItem({ icon, label, danger, onClick }: DropdownMenuItemProp
 
 function AvatarDropdown({ onDisconnect }: { onDisconnect: () => void }) {
   const [open, setOpen] = useState(false);
+  const [visible, setVisible] = useState(false);
   const [copied, setCopied] = useState(false);
   const navigate = useNavigate();
 
   const walletAddress = 'GQ98...iA5Y';
+
+  // Dropdown open/close animation
+  useEffect(() => {
+    if (open) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setVisible(true));
+      });
+    } else {
+      setVisible(false);
+    }
+  }, [open]);
+
+  const handleClose = () => {
+    setVisible(false);
+    setTimeout(() => setOpen(false), 150);
+  };
 
   const handleCopy = () => {
     setCopied(true);
@@ -159,13 +169,13 @@ function AvatarDropdown({ onDisconnect }: { onDisconnect: () => void }) {
 
   const handleNavigate = (path: string) => {
     navigate(path);
-    setOpen(false);
+    handleClose();
   };
 
   return (
     <div className="relative">
       {/* Avatar Button */}
-      <button onClick={() => setOpen(!open)} className="flex items-center p-0.5">
+      <button onClick={() => (open ? handleClose() : setOpen(true))} className="flex items-center p-0.5">
         <div className="flex items-center justify-center overflow-hidden rounded-full border-2 border-[#0a0a0b] bg-[#252527] size-8">
           <img src={avatarPng} alt="Avatar" className="size-8 object-cover" />
         </div>
@@ -174,8 +184,14 @@ function AvatarDropdown({ onDisconnect }: { onDisconnect: () => void }) {
       {/* Dropdown */}
       {open && (
         <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full mt-2 z-50 w-[256px] rounded-xl bg-[#1b1b1c] shadow-[0_0_32px_rgba(0,0,0,0.2)] overflow-hidden">
+          <div className="fixed inset-0 z-40" onClick={handleClose} />
+          <div
+            className={`absolute right-0 top-full mt-2 z-50 w-[256px] rounded-xl bg-[#1b1b1c] shadow-[0_0_32px_rgba(0,0,0,0.2)] overflow-hidden transition-all duration-150 origin-top-right ${
+              visible
+                ? 'opacity-100 scale-100 translate-y-0'
+                : 'opacity-0 scale-95 -translate-y-1'
+            }`}
+          >
             {/* Wallet Info */}
             <div className="flex items-center gap-3 p-4 border-b border-[#252527]">
               <div className="flex items-center p-0.5 shrink-0">
@@ -202,10 +218,10 @@ function AvatarDropdown({ onDisconnect }: { onDisconnect: () => void }) {
                 <a
                   href="#"
                   onClick={(e) => e.preventDefault()}
-                  className="flex items-center gap-0.5 text-xs text-[#7a7a83] hover:text-[#f9f9fa] transition-colors border-b border-[#252527] w-fit"
+                  className="flex items-center gap-0.5 text-xs text-[#7a7a83] hover:text-[#f9f9fa] transition-colors w-fit"
                 >
-                  Open in Explorer
-                  <ArrowRightUpIcon />
+                  <span className="border-b border-[#3a3a3d]">Open in Explorer</span>
+                  <ArrowRightUpIcon size={12} />
                 </a>
               </div>
             </div>
@@ -223,7 +239,7 @@ function AvatarDropdown({ onDisconnect }: { onDisconnect: () => void }) {
                 onClick={() => handleNavigate('/staking')}
               />
               <DropdownMenuItem
-                icon={<IncentivesIcon />}
+                icon={<img src={tokenFeePng} alt="" className="size-4 rounded-full" />}
                 label="Incentives"
                 onClick={() => handleNavigate('/incentives')}
               />
@@ -242,7 +258,7 @@ function AvatarDropdown({ onDisconnect }: { onDisconnect: () => void }) {
                 danger
                 onClick={() => {
                   onDisconnect();
-                  setOpen(false);
+                  handleClose();
                 }}
               />
             </div>
@@ -257,100 +273,113 @@ function AvatarDropdown({ onDisconnect }: { onDisconnect: () => void }) {
 
 export default function Header() {
   const [isConnected, setIsConnected] = useState(true);
+  const [showConnectModal, setShowConnectModal] = useState(false);
 
   return (
-    <header className="flex items-center justify-center border-b border-[#1b1b1c] bg-[#0a0a0b] px-0 py-3">
-      <div className="flex flex-1 items-center gap-4 max-w-[1440px] px-12">
-        {/* Logo + Menu */}
-        <div className="flex flex-1 items-center gap-2">
-          {/* Logo */}
-          <NavLink to="/" className="flex items-center gap-1.5 p-1.5 shrink-0">
-            <img src={mascotSvg} alt="Whales Market" className="w-6 h-6" />
-            <div className="relative" style={{ width: '172px', height: '15px' }}>
-              <img
-                src={logoTopSvg}
-                alt=""
-                className="absolute left-0 top-0"
-                style={{ width: '82.58px', height: '14.52px' }}
-              />
-              <img
-                src={logoBottomSvg}
-                alt=""
-                className="absolute"
-                style={{ width: '82.62px', height: '14px', left: '89.2px', top: '0.26px' }}
-              />
-            </div>
-          </NavLink>
+    <>
+      <header className="flex items-center justify-center border-b border-[#1b1b1c] bg-[#0a0a0b] px-0 py-3">
+        <div className="flex flex-1 items-center gap-4 max-w-[1440px] px-12">
+          {/* Logo + Menu */}
+          <div className="flex flex-1 items-center gap-2">
+            {/* Logo */}
+            <NavLink to="/" className="flex items-center gap-1.5 p-1.5 shrink-0">
+              <img src={mascotSvg} alt="Whales Market" className="w-6 h-6" />
+              <div className="relative" style={{ width: '172px', height: '15px' }}>
+                <img
+                  src={logoTopSvg}
+                  alt=""
+                  className="absolute left-0 top-0"
+                  style={{ width: '82.58px', height: '14.52px' }}
+                />
+                <img
+                  src={logoBottomSvg}
+                  alt=""
+                  className="absolute"
+                  style={{ width: '82.62px', height: '14px', left: '89.2px', top: '0.26px' }}
+                />
+              </div>
+            </NavLink>
 
-          {/* Navigation */}
-          <nav className="flex flex-1 items-center">
-            <NavItem to="/markets" label="Markets" />
-            <NavItem to="/dashboard" label="Dashboard" />
-            <NavItem to="/earn" label="Earn" hasDropdown />
-            <NavItem to="/resources" label="Resources" hasDropdown />
-          </nav>
-        </div>
+            {/* Navigation */}
+            <nav className="flex flex-1 items-center">
+              <NavItem to="/markets" label="Markets" />
+              <NavItem to="/dashboard" label="Dashboard" />
+              <NavItem to="/earn" label="Earn" hasDropdown />
+              <NavItem to="/resources" label="Resources" hasDropdown />
+            </nav>
+          </div>
 
-        {/* Right Actions */}
-        <div className="flex items-center gap-3 shrink-0">
-          {isConnected ? (
-            <>
-              {/* Chain Selector */}
-              <button className="flex items-center gap-1.5 h-9 rounded-lg border border-[#252527] p-2 transition-colors hover:border-[#3a3a3d]">
-                <div className="flex items-center p-0.5">
-                  <img src={chainSolanaPng} alt="Solana" className="w-4 h-4 rounded" />
-                </div>
-                <div className="flex items-center p-0.5">
-                  <ChevronDownIcon className="text-[#7a7a83]" />
-                </div>
+          {/* Right Actions */}
+          <div className="flex items-center gap-3 shrink-0">
+            {isConnected ? (
+              <>
+                {/* Chain Selector */}
+                <button className="flex items-center gap-1.5 h-9 rounded-lg border border-[#252527] p-2 transition-colors hover:border-[#3a3a3d]">
+                  <div className="flex items-center p-0.5">
+                    <img src={chainSolanaPng} alt="Solana" className="w-4 h-4 rounded" />
+                  </div>
+                  <div className="flex items-center p-0.5">
+                    <ChevronDownIcon className="text-[#7a7a83]" />
+                  </div>
+                </button>
+
+                {/* Fee */}
+                <button className="flex items-center gap-1.5 h-9 rounded-lg border border-[#252527] p-2 overflow-hidden transition-colors hover:border-[#3a3a3d]">
+                  <div className="flex items-center p-0.5">
+                    <img src={tokenFeePng} alt="" className="w-4 h-4 rounded-full" />
+                  </div>
+                  <span className="text-sm font-medium text-[#f9f9fa] whitespace-nowrap tabular-nums">0.00</span>
+                  <div className="flex items-center justify-center rounded-full bg-[rgba(22,194,132,0.1)] px-2 py-1">
+                    <span className="text-[10px] font-medium uppercase leading-3 text-[#5bd197]">-0% Fee</span>
+                  </div>
+                </button>
+
+                {/* Balance */}
+                <button className="flex items-center gap-1.5 h-9 rounded-lg border border-[#252527] pl-2 pr-3 py-2 transition-colors hover:border-[#3a3a3d]">
+                  <div className="flex items-center p-0.5">
+                    <img src={tokenSolPng} alt="SOL" className="w-4 h-4 rounded-full" />
+                  </div>
+                  <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">18.32</span>
+                </button>
+
+                {/* Avatar with Dropdown */}
+                <AvatarDropdown onDisconnect={() => setIsConnected(false)} />
+              </>
+            ) : (
+              /* Disconnected state - Connect button */
+              <button
+                onClick={() => setShowConnectModal(true)}
+                className="flex items-center h-9 px-5 rounded-lg bg-[#16c284] text-sm font-medium text-[#0a0a0b] hover:bg-[#13a872] transition-colors"
+              >
+                Connect
               </button>
+            )}
 
-              {/* Fee */}
-              <button className="flex items-center gap-1.5 h-9 rounded-lg border border-[#252527] p-2 overflow-hidden transition-colors hover:border-[#3a3a3d]">
-                <div className="flex items-center p-0.5">
-                  <img src={tokenFeePng} alt="" className="w-4 h-4 rounded-full" />
-                </div>
-                <span className="text-sm font-medium text-[#f9f9fa] whitespace-nowrap tabular-nums">0.00</span>
-                <div className="flex items-center justify-center rounded-full bg-[rgba(22,194,132,0.1)] px-2 py-1">
-                  <span className="text-[10px] font-medium uppercase leading-3 text-[#5bd197]">-0% Fee</span>
-                </div>
-              </button>
+            {/* Divider */}
+            <div className="h-4 w-px bg-[#252527]" />
 
-              {/* Balance */}
-              <button className="flex items-center gap-1.5 h-9 rounded-lg border border-[#252527] pl-2 pr-3 py-2 transition-colors hover:border-[#3a3a3d]">
-                <div className="flex items-center p-0.5">
-                  <img src={tokenSolPng} alt="SOL" className="w-4 h-4 rounded-full" />
-                </div>
-                <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">18.32</span>
-              </button>
-
-              {/* Avatar with Dropdown */}
-              <AvatarDropdown onDisconnect={() => setIsConnected(false)} />
-            </>
-          ) : (
-            /* Disconnected state - Connect button */
-            <button
-              onClick={() => setIsConnected(true)}
-              className="flex items-center h-9 px-5 rounded-lg bg-[#16c284] text-sm font-medium text-[#0a0a0b] hover:bg-[#13a872] transition-colors"
-            >
-              Connect
+            {/* Help */}
+            <button className="flex items-center justify-center rounded-full bg-[#1b1b1c] p-2 text-[#f9f9fa] transition-colors hover:bg-[#252527]">
+              <QuestionIcon />
             </button>
-          )}
 
-          {/* Divider */}
-          <div className="h-4 w-px bg-[#252527]" />
-
-          {/* Help */}
-          <button className="flex items-center justify-center rounded-full bg-[#1b1b1c] p-2 text-[#f9f9fa] transition-colors hover:bg-[#252527]">
-            <QuestionIcon />
-          </button>
-
-          {/* Globe */}
-          <button className="flex items-center justify-center rounded-full bg-[#1b1b1c] p-2 text-[#f9f9fa] transition-colors hover:bg-[#252527]">
-            <GlobeIcon />
-          </button>
+            {/* Globe */}
+            <button className="flex items-center justify-center rounded-full bg-[#1b1b1c] p-2 text-[#f9f9fa] transition-colors hover:bg-[#252527]">
+              <GlobeIcon />
+            </button>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* Connect Wallet Modal */}
+      <ConnectWalletModal
+        isOpen={showConnectModal}
+        onClose={() => setShowConnectModal(false)}
+        onConnect={() => {
+          setShowConnectModal(false);
+          setIsConnected(true);
+        }}
+      />
+    </>
   );
 }
