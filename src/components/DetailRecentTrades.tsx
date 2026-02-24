@@ -197,7 +197,7 @@ export default function DetailRecentTrades({ tokenSymbol: _tokenSymbol }: Detail
         <div className="w-[160px] shrink-0 text-right">
           <span className="text-xs font-normal text-[#7a7a83]">Collateral</span>
         </div>
-        <div className="w-[60px] shrink-0 text-right">
+        <div className="w-[96px] shrink-0 text-right">
           <span className="text-xs font-normal text-[#7a7a83]">Tx.ID</span>
         </div>
       </div>
@@ -270,7 +270,7 @@ export default function DetailRecentTrades({ tokenSymbol: _tokenSymbol }: Detail
                   </div>
                 </div>
                 {/* Tx.ID */}
-                <div className="w-[60px] shrink-0 flex justify-end">
+                <div className="w-[96px] shrink-0 flex justify-end">
                   <button className="inline-flex items-center justify-center w-[44px] h-7 rounded-md border border-[#252527] transition-colors hover:border-[#3a3a3d] hover:bg-[rgba(255,255,255,0.03)]">
                     <ArrowRightUpIcon />
                   </button>
