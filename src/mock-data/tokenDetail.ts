@@ -118,11 +118,36 @@ export const tokenDetails: Record<string, TokenDetail> = {
 export const defaultTokenId = 'karak';
 
 export function generateBuyOrders(_basePrice: number): OrderBookEntry[] {
-  const prices = [0.0018, 0.0020, 0.0021, 0.0022, 0.0024, 0.0025, 0.0028, 0.0030, 0.0035, 0.0036, 0.0038, 0.0038, 0.0040, 0.0042, 0.0044, 0.0045];
-  const amounts = [38.76, 34.88, 99.67, 6.34, 46.51, 195.36, 99.67, 23.26, 139.54, 111.11, 125.00, 55.08, 125.00, 476.19, 190.28, 155.04];
-  const collaterals = [0.50, 0.50, 1.50, 0.10, 0.80, 3.50, 2.00, 0.50, 3.50, 400.00, 500.00, 1.50, 500.00, 2.00, 6.00, 5.00];
-  const fillPercents = [15, 0, 75, 0, 0, 10, 0, 0, 5, 90, 60, 0, 40, 0, 100, 0];
-  const fillTypes: (undefined | 'FULL' | 'PARTIAL')[] = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, 'FULL', undefined];
+  const prices = [
+    0.0018, 0.0020, 0.0021, 0.0022, 0.0024, 0.0025, 0.0028, 0.0030,
+    0.0035, 0.0036, 0.0038, 0.0038, 0.0040, 0.0042, 0.0044, 0.0045,
+    0.0019, 0.0023, 0.0026, 0.0027, 0.0029, 0.0032, 0.0033, 0.0034,
+    0.0037, 0.0039, 0.0041, 0.0043, 0.0046, 0.0047,
+  ];
+  const amounts = [
+    38.76, 34.88, 99.67, 6.34, 46.51, 195.36, 99.67, 23.26,
+    139.54, 111.11, 125.00, 55.08, 125.00, 476.19, 190.28, 155.04,
+    72.50, 18.33, 210.00, 45.60, 88.14, 63.25, 150.00, 92.78,
+    33.10, 280.50, 57.42, 14.88, 320.00, 105.55,
+  ];
+  const collaterals = [
+    0.50, 0.50, 1.50, 0.10, 0.80, 3.50, 2.00, 0.50,
+    3.50, 400.00, 500.00, 1.50, 500.00, 2.00, 6.00, 5.00,
+    1.00, 0.30, 4.20, 0.90, 1.80, 1.50, 3.80, 2.40,
+    0.90, 8.50, 1.70, 0.45, 12.00, 3.60,
+  ];
+  const fillPercents = [
+    15, 0, 75, 0, 0, 10, 0, 0,
+    5, 90, 60, 0, 40, 0, 100, 0,
+    20, 0, 35, 0, 55, 0, 80, 10,
+    0, 45, 0, 0, 25, 0,
+  ];
+  const fillTypes: (undefined | 'FULL' | 'PARTIAL')[] = [
+    undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+    undefined, undefined, undefined, undefined, undefined, undefined, 'FULL', undefined,
+    undefined, undefined, 'PARTIAL', undefined, undefined, undefined, 'FULL', undefined,
+    undefined, undefined, undefined, undefined, undefined, undefined,
+  ];
 
   return prices.map((price, i) => {
     const totalAmount = amounts[i] * 1000;
@@ -145,11 +170,36 @@ export function generateBuyOrders(_basePrice: number): OrderBookEntry[] {
 }
 
 export function generateSellOrders(_basePrice: number): OrderBookEntry[] {
-  const prices = [0.0015, 0.0015, 0.0015, 0.0015, 0.0015, 0.0014, 0.0013, 0.0012, 0.0011, 0.0010, 0.0008, 0.0005, 0.0003, 0.0002, 0.0001];
-  const amounts = [279.08, 139.54, 186.05, 93.03, 186.05, 199.34, 53.67, 12.50, 2.73, 100.00, 174.43, 100.00, 500.00, 500.00, 100.00];
-  const collaterals = [3.00, 1.50, 2.00, 1.00, 2.00, 2.00, 0.50, 15.00, 3.00, 100.00, 1.00, 50.00, 150.00, 100.00, 10.00];
-  const fillPercents = [0, 0, 30, 0, 50, 0, 0, 100, 0, 20, 0, 0, 10, 0, 70];
-  const fillTypes: (undefined | 'FULL' | 'PARTIAL')[] = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, 'FULL', undefined, undefined, undefined, undefined, undefined, undefined, undefined];
+  const prices = [
+    0.0015, 0.0015, 0.0015, 0.0015, 0.0015, 0.0014, 0.0013, 0.0012,
+    0.0011, 0.0010, 0.0008, 0.0005, 0.0003, 0.0002, 0.0001,
+    0.0016, 0.0017, 0.0014, 0.0013, 0.0011, 0.0009, 0.0007, 0.0004,
+    0.0006, 0.0002,
+  ];
+  const amounts = [
+    279.08, 139.54, 186.05, 93.03, 186.05, 199.34, 53.67, 12.50,
+    2.73, 100.00, 174.43, 100.00, 500.00, 500.00, 100.00,
+    85.20, 42.10, 310.00, 67.80, 150.00, 225.50, 38.90, 180.00,
+    95.60, 400.00,
+  ];
+  const collaterals = [
+    3.00, 1.50, 2.00, 1.00, 2.00, 2.00, 0.50, 15.00,
+    3.00, 100.00, 1.00, 50.00, 150.00, 100.00, 10.00,
+    1.20, 0.55, 3.50, 0.65, 1.20, 1.50, 0.20, 0.55,
+    0.45, 0.60,
+  ];
+  const fillPercents = [
+    0, 0, 30, 0, 50, 0, 0, 100,
+    0, 20, 0, 0, 10, 0, 70,
+    15, 0, 40, 0, 60, 0, 25, 0,
+    85, 0,
+  ];
+  const fillTypes: (undefined | 'FULL' | 'PARTIAL')[] = [
+    undefined, undefined, undefined, undefined, undefined, undefined, undefined, 'FULL',
+    undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+    undefined, undefined, 'PARTIAL', undefined, undefined, undefined, undefined, undefined,
+    'FULL', undefined,
+  ];
 
   return prices.map((price, i) => {
     const totalAmount = amounts[i] * 1000;

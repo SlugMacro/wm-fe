@@ -1,6 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { OrderBookEntry, OrderBookTab } from '../types';
 import TokenIcon from './TokenIcon';
+
+const VISIBLE_ROWS = 15;
+const ROW_HEIGHT = 42; // h-10 (40px) + mt-0.5 (2px gap)
+const SCROLLBAR_WIDTH = 4;
 
 function SortIcon({ active, direction }: { active: boolean; direction: 'asc' | 'desc' | null }) {
   return (
@@ -78,6 +82,82 @@ function OrderTooltip({ order, tokenSymbol }: { order: OrderBookEntry; tokenSymb
   );
 }
 
+/** Custom scrollbar state & helpers for an order column */
+function useColumnScroll() {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isHovering, setIsHovering] = useState(false);
+  const [thumbTop, setThumbTop] = useState(0);
+  const [thumbHeight, setThumbHeight] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartRef = useRef({ y: 0, scrollTop: 0 });
+
+  const maxHeight = VISIBLE_ROWS * ROW_HEIGHT;
+
+  const updateThumb = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const { scrollTop, scrollHeight, clientHeight } = el;
+    if (scrollHeight <= clientHeight) {
+      setThumbHeight(0);
+      return;
+    }
+    const ratio = clientHeight / scrollHeight;
+    setThumbHeight(ratio * clientHeight);
+    setThumbTop((scrollTop / scrollHeight) * clientHeight);
+  }, []);
+
+  // Sync thumb on scroll
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const onScroll = () => updateThumb();
+    el.addEventListener('scroll', onScroll, { passive: true });
+    updateThumb();
+    return () => el.removeEventListener('scroll', onScroll);
+  }, [updateThumb]);
+
+  // Drag handlers
+  useEffect(() => {
+    if (!isDragging) return;
+    const onMouseMove = (e: MouseEvent) => {
+      const el = scrollRef.current;
+      if (!el) return;
+      const delta = e.clientY - dragStartRef.current.y;
+      const scrollRatio = el.scrollHeight / el.clientHeight;
+      el.scrollTop = dragStartRef.current.scrollTop + delta * scrollRatio;
+    };
+    const onMouseUp = () => setIsDragging(false);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+  }, [isDragging]);
+
+  const handleThumbMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const el = scrollRef.current;
+    if (!el) return;
+    dragStartRef.current = { y: e.clientY, scrollTop: el.scrollTop };
+    setIsDragging(true);
+  };
+
+  const showScrollbar = (isHovering || isDragging) && thumbHeight > 0;
+
+  return {
+    scrollRef,
+    isHovering,
+    setIsHovering,
+    isDragging,
+    thumbTop,
+    thumbHeight,
+    maxHeight,
+    showScrollbar,
+    handleThumbMouseDown,
+  };
+}
+
 interface OrderBookProps {
   buyOrders: OrderBookEntry[];
   sellOrders: OrderBookEntry[];
@@ -93,6 +173,9 @@ export default function OrderBook({ buyOrders, sellOrders, onSelectOrder, select
   const [sellSortField, setSellSortField] = useState<string | null>(null);
   const [sellSortDir, setSellSortDir] = useState<'asc' | 'desc' | null>(null);
   const [hoveredOrderId, setHoveredOrderId] = useState<string | null>(null);
+
+  const buyScroll = useColumnScroll();
+  const sellScroll = useColumnScroll();
 
   const handleBuySort = (field: string) => {
     if (buySortField === field) {
@@ -181,75 +264,108 @@ export default function OrderBook({ buyOrders, sellOrders, onSelectOrder, select
                 Price ($) <SortIcon active={buySortField === 'price'} direction={buySortField === 'price' ? buySortDir : null} />
               </button>
             </div>
-            <div className="w-24 text-right">
+            <div className="w-28 text-right">
               <button onClick={() => handleBuySort('amount')} className="inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
                 Amount <SortIcon active={buySortField === 'amount'} direction={buySortField === 'amount' ? buySortDir : null} />
               </button>
             </div>
-            <div className="w-24 text-right">
+            <div className="w-28 text-right">
               <button onClick={() => handleBuySort('collateral')} className="inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
                 Collateral <SortIcon active={buySortField === 'collateral'} direction={buySortField === 'collateral' ? buySortDir : null} />
               </button>
             </div>
-            <div className="w-16" />
+            <div className="w-24" />
           </div>
 
-          {/* Rows */}
-          {buyOrders.map(order => {
-            const isSelected = selectedOrderId === order.id;
-            const isHovered = hoveredOrderId === order.id;
-            return (
-              <div
-                key={order.id}
-                className={`relative flex items-center h-10 cursor-pointer transition-colors rounded-md px-2 mt-0.5 ${
-                  isSelected
-                    ? 'bg-[rgba(22,194,132,0.08)] border border-[rgba(22,194,132,0.2)]'
-                    : 'bg-[#0e0e0f] hover:bg-[#131314]'
-                }`}
-                onClick={() => onSelectOrder(order, 'buy')}
-                onMouseEnter={() => setHoveredOrderId(order.id)}
-                onMouseLeave={() => setHoveredOrderId(null)}
-              >
-                {/* Fill percentage background bar */}
-                {order.fillPercent > 0 && (
+          {/* Scrollable rows with custom scrollbar */}
+          <div
+            className="relative"
+            onMouseEnter={() => buyScroll.setIsHovering(true)}
+            onMouseLeave={() => { if (!buyScroll.isDragging) buyScroll.setIsHovering(false); }}
+          >
+            <div
+              ref={buyScroll.scrollRef}
+              className="ob-scroll"
+              style={{ maxHeight: `${buyScroll.maxHeight}px`, overflowY: 'auto' }}
+            >
+              {buyOrders.map(order => {
+                const isSelected = selectedOrderId === order.id;
+                const isHovered = hoveredOrderId === order.id;
+                return (
                   <div
-                    className="absolute inset-y-0 left-0 rounded-sm bg-[rgba(22,194,132,0.06)] pointer-events-none"
-                    style={{ width: `${order.fillPercent}%` }}
-                  />
-                )}
-                {/* Content */}
-                <div className="relative flex items-center w-full z-[1]">
-                  <div className="flex-1 flex items-center gap-1">
-                    <span className={`text-sm font-normal tabular-nums ${isSelected ? 'text-[#5bd197]' : 'text-[#f9f9fa]'}`}>
-                      {order.price.toFixed(4)}
-                    </span>
-                    {order.isOwner && <span className="text-[#7a7a83]"><UserIcon /></span>}
-                  </div>
-                  <div className="w-24 text-right">
-                    <span className="text-sm font-normal text-[#f9f9fa] tabular-nums">{order.amountFormatted}</span>
-                  </div>
-                  <div className="w-24 text-right flex items-center justify-end gap-1">
-                    <span className="text-sm font-normal text-[#f9f9fa] tabular-nums">
-                      {order.collateral < 1 ? order.collateral.toFixed(2) : order.collateral.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </span>
-                    <TokenIcon symbol={order.collateralToken} size="sm" showChain={false} />
-                  </div>
-                  <div className="w-16 flex items-center justify-end gap-1">
-                    {order.fillType && (
-                      <span className="text-[10px] font-medium text-[#7a7a83] uppercase">{order.fillType}</span>
+                    key={order.id}
+                    className={`relative flex items-center h-10 cursor-pointer transition-colors rounded-md px-2 mt-0.5 ${
+                      isSelected
+                        ? 'bg-[rgba(22,194,132,0.08)] border border-[rgba(22,194,132,0.2)]'
+                        : 'bg-[#0e0e0f] hover:bg-[#131314]'
+                    }`}
+                    onClick={() => onSelectOrder(order, 'buy')}
+                    onMouseEnter={() => setHoveredOrderId(order.id)}
+                    onMouseLeave={() => setHoveredOrderId(null)}
+                  >
+                    {/* Fill percentage background bar */}
+                    {order.fillPercent > 0 && (
+                      <div
+                        className="absolute inset-y-0 left-0 rounded-sm bg-[rgba(22,194,132,0.06)] pointer-events-none"
+                        style={{ width: `${order.fillPercent}%` }}
+                      />
                     )}
-                    <button className="rounded px-3 py-1 text-xs font-medium text-[#5bd197] bg-[rgba(22,194,132,0.1)] transition-colors hover:bg-[rgba(22,194,132,0.2)]">
-                      Buy
-                    </button>
+                    {/* Content */}
+                    <div className="relative flex items-center w-full z-[1]">
+                      <div className="flex-1 flex items-center gap-1">
+                        <span className={`text-sm font-normal tabular-nums ${isSelected ? 'text-[#5bd197]' : 'text-[#f9f9fa]'}`}>
+                          {order.price.toFixed(4)}
+                        </span>
+                        {order.isOwner && <span className="text-[#7a7a83]"><UserIcon /></span>}
+                      </div>
+                      <div className="w-28 text-right">
+                        <span className="text-sm font-normal text-[#f9f9fa] tabular-nums">{order.amountFormatted}</span>
+                      </div>
+                      <div className="w-28 text-right flex items-center justify-end gap-1">
+                        <span className="text-sm font-normal text-[#f9f9fa] tabular-nums">
+                          {order.collateral < 1 ? order.collateral.toFixed(2) : order.collateral.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>
+                        <TokenIcon symbol={order.collateralToken} size="sm" showChain={false} />
+                      </div>
+                      <div className="w-24 flex items-center justify-end gap-1">
+                        {order.fillType && (
+                          <span className="text-[10px] font-medium text-[#7a7a83] uppercase">{order.fillType}</span>
+                        )}
+                        <button className="rounded px-3 py-1 text-xs font-medium text-[#5bd197] bg-[rgba(22,194,132,0.1)] transition-colors hover:bg-[rgba(22,194,132,0.2)]">
+                          Buy
+                        </button>
+                      </div>
+                    </div>
+                    {/* Tooltip */}
+                    {isHovered && order.fillPercent > 0 && (
+                      <OrderTooltip order={order} tokenSymbol={tokenSymbol} />
+                    )}
                   </div>
-                </div>
-                {/* Tooltip */}
-                {isHovered && order.fillPercent > 0 && (
-                  <OrderTooltip order={order} tokenSymbol={tokenSymbol} />
-                )}
-              </div>
-            );
-          })}
+                );
+              })}
+            </div>
+
+            {/* Custom 4px scrollbar overlay */}
+            <div
+              className="absolute top-0 right-0 w-[4px] transition-opacity duration-200 pointer-events-none"
+              style={{
+                height: `${buyScroll.maxHeight}px`,
+                opacity: buyScroll.showScrollbar ? 1 : 0,
+              }}
+            >
+              <div
+                className="absolute right-0 rounded-full pointer-events-auto cursor-pointer"
+                style={{
+                  width: `${SCROLLBAR_WIDTH}px`,
+                  height: `${Math.max(buyScroll.thumbHeight, 24)}px`,
+                  top: `${buyScroll.thumbTop}px`,
+                  background: buyScroll.isDragging ? '#3a3a3d' : '#252527',
+                  transition: buyScroll.isDragging ? 'none' : 'background 0.15s',
+                }}
+                onMouseDown={buyScroll.handleThumbMouseDown}
+              />
+            </div>
+          </div>
         </div>
 
         {/* Sell orders */}
@@ -261,77 +377,120 @@ export default function OrderBook({ buyOrders, sellOrders, onSelectOrder, select
                 Price ($) <SortIcon active={sellSortField === 'price'} direction={sellSortField === 'price' ? sellSortDir : null} />
               </button>
             </div>
-            <div className="w-24 text-right">
+            <div className="w-28 text-right">
               <button onClick={() => handleSellSort('amount')} className="inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
                 Amount <SortIcon active={sellSortField === 'amount'} direction={sellSortField === 'amount' ? sellSortDir : null} />
               </button>
             </div>
-            <div className="w-24 text-right">
+            <div className="w-28 text-right">
               <button onClick={() => handleSellSort('collateral')} className="inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
                 Collateral <SortIcon active={sellSortField === 'collateral'} direction={sellSortField === 'collateral' ? sellSortDir : null} />
               </button>
             </div>
-            <div className="w-16" />
+            <div className="w-24" />
           </div>
 
-          {/* Rows */}
-          {sellOrders.map(order => {
-            const isSelected = selectedOrderId === order.id;
-            const isHovered = hoveredOrderId === order.id;
-            return (
-              <div
-                key={order.id}
-                className={`relative flex items-center h-10 cursor-pointer transition-colors rounded-md px-2 mt-0.5 ${
-                  isSelected
-                    ? 'bg-[rgba(255,59,70,0.08)] border border-[rgba(255,59,70,0.2)]'
-                    : 'bg-[#0e0e0f] hover:bg-[#131314]'
-                }`}
-                onClick={() => onSelectOrder(order, 'sell')}
-                onMouseEnter={() => setHoveredOrderId(order.id)}
-                onMouseLeave={() => setHoveredOrderId(null)}
-              >
-                {/* Fill percentage background bar — always from left */}
-                {order.fillPercent > 0 && (
+          {/* Scrollable rows with custom scrollbar */}
+          <div
+            className="relative"
+            onMouseEnter={() => sellScroll.setIsHovering(true)}
+            onMouseLeave={() => { if (!sellScroll.isDragging) sellScroll.setIsHovering(false); }}
+          >
+            <div
+              ref={sellScroll.scrollRef}
+              className="ob-scroll"
+              style={{ maxHeight: `${sellScroll.maxHeight}px`, overflowY: 'auto' }}
+            >
+              {sellOrders.map(order => {
+                const isSelected = selectedOrderId === order.id;
+                const isHovered = hoveredOrderId === order.id;
+                return (
                   <div
-                    className="absolute inset-y-0 left-0 rounded-sm bg-[rgba(255,59,70,0.06)] pointer-events-none"
-                    style={{ width: `${order.fillPercent}%` }}
-                  />
-                )}
-                {/* Content */}
-                <div className="relative flex items-center w-full z-[1]">
-                  <div className="flex-1 flex items-center gap-1">
-                    <span className={`text-sm font-normal tabular-nums ${isSelected ? 'text-[#fd5e67]' : 'text-[#f9f9fa]'}`}>
-                      {order.price.toFixed(4)}
-                    </span>
-                    {order.isOwner && <span className="text-[#7a7a83]"><UserIcon /></span>}
-                  </div>
-                  <div className="w-24 text-right">
-                    <span className="text-sm font-normal text-[#f9f9fa] tabular-nums">{order.amountFormatted}</span>
-                  </div>
-                  <div className="w-24 text-right flex items-center justify-end gap-1">
-                    <span className="text-sm font-normal text-[#f9f9fa] tabular-nums">
-                      {order.collateral < 1 ? order.collateral.toFixed(2) : order.collateral.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </span>
-                    <TokenIcon symbol={order.collateralToken} size="sm" showChain={false} />
-                  </div>
-                  <div className="w-16 flex items-center justify-end gap-1">
-                    {order.fillType && (
-                      <span className="text-[10px] font-medium text-[#7a7a83] uppercase">{order.fillType}</span>
+                    key={order.id}
+                    className={`relative flex items-center h-10 cursor-pointer transition-colors rounded-md px-2 mt-0.5 ${
+                      isSelected
+                        ? 'bg-[rgba(255,59,70,0.08)] border border-[rgba(255,59,70,0.2)]'
+                        : 'bg-[#0e0e0f] hover:bg-[#131314]'
+                    }`}
+                    onClick={() => onSelectOrder(order, 'sell')}
+                    onMouseEnter={() => setHoveredOrderId(order.id)}
+                    onMouseLeave={() => setHoveredOrderId(null)}
+                  >
+                    {/* Fill percentage background bar — always from left */}
+                    {order.fillPercent > 0 && (
+                      <div
+                        className="absolute inset-y-0 left-0 rounded-sm bg-[rgba(255,59,70,0.06)] pointer-events-none"
+                        style={{ width: `${order.fillPercent}%` }}
+                      />
                     )}
-                    <button className="rounded px-3 py-1 text-xs font-medium text-[#fd5e67] bg-[rgba(255,59,70,0.1)] transition-colors hover:bg-[rgba(255,59,70,0.2)]">
-                      Sell
-                    </button>
+                    {/* Content */}
+                    <div className="relative flex items-center w-full z-[1]">
+                      <div className="flex-1 flex items-center gap-1">
+                        <span className={`text-sm font-normal tabular-nums ${isSelected ? 'text-[#fd5e67]' : 'text-[#f9f9fa]'}`}>
+                          {order.price.toFixed(4)}
+                        </span>
+                        {order.isOwner && <span className="text-[#7a7a83]"><UserIcon /></span>}
+                      </div>
+                      <div className="w-28 text-right">
+                        <span className="text-sm font-normal text-[#f9f9fa] tabular-nums">{order.amountFormatted}</span>
+                      </div>
+                      <div className="w-28 text-right flex items-center justify-end gap-1">
+                        <span className="text-sm font-normal text-[#f9f9fa] tabular-nums">
+                          {order.collateral < 1 ? order.collateral.toFixed(2) : order.collateral.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>
+                        <TokenIcon symbol={order.collateralToken} size="sm" showChain={false} />
+                      </div>
+                      <div className="w-24 flex items-center justify-end gap-1">
+                        {order.fillType && (
+                          <span className="text-[10px] font-medium text-[#7a7a83] uppercase">{order.fillType}</span>
+                        )}
+                        <button className="rounded px-3 py-1 text-xs font-medium text-[#fd5e67] bg-[rgba(255,59,70,0.1)] transition-colors hover:bg-[rgba(255,59,70,0.2)]">
+                          Sell
+                        </button>
+                      </div>
+                    </div>
+                    {/* Tooltip */}
+                    {isHovered && order.fillPercent > 0 && (
+                      <OrderTooltip order={order} tokenSymbol={tokenSymbol} />
+                    )}
                   </div>
-                </div>
-                {/* Tooltip */}
-                {isHovered && order.fillPercent > 0 && (
-                  <OrderTooltip order={order} tokenSymbol={tokenSymbol} />
-                )}
-              </div>
-            );
-          })}
+                );
+              })}
+            </div>
+
+            {/* Custom 4px scrollbar overlay */}
+            <div
+              className="absolute top-0 right-0 w-[4px] transition-opacity duration-200 pointer-events-none"
+              style={{
+                height: `${sellScroll.maxHeight}px`,
+                opacity: sellScroll.showScrollbar ? 1 : 0,
+              }}
+            >
+              <div
+                className="absolute right-0 rounded-full pointer-events-auto cursor-pointer"
+                style={{
+                  width: `${SCROLLBAR_WIDTH}px`,
+                  height: `${Math.max(sellScroll.thumbHeight, 24)}px`,
+                  top: `${sellScroll.thumbTop}px`,
+                  background: sellScroll.isDragging ? '#3a3a3d' : '#252527',
+                  transition: sellScroll.isDragging ? 'none' : 'background 0.15s',
+                }}
+                onMouseDown={sellScroll.handleThumbMouseDown}
+              />
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Hide native scrollbar */}
+      <style>{`
+        .ob-scroll {
+          scrollbar-width: none;
+        }
+        .ob-scroll::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 }
