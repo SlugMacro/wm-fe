@@ -189,7 +189,7 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
         )}
 
         {/* === PRICE CHART SECTION === */}
-        <div className="flex pt-6 px-4">
+        <div className="flex">
           {/* Left "Price" label */}
           <div
             className="shrink-0 flex items-center justify-center border-r border-[#252527]"
@@ -212,7 +212,7 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
             onMouseLeave={handleMouseLeave}
           >
             {/* Price info overlay */}
-            <div className="absolute left-2 top-[-16px] z-10 flex items-center gap-2">
+            <div className="absolute left-2 top-1 z-10 flex items-center gap-2">
               <span className="text-xs text-[#7a7a83]">Price</span>
               <span className="text-xs font-medium text-[#f9f9fa] tabular-nums">
                 ${hoverPoint ? hoverPoint.price.toFixed(4) : currentPrice.toFixed(4)}
@@ -223,7 +223,7 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
             </div>
 
             {/* Watermark */}
-            <div className="absolute right-4 top-[-16px] z-10 flex items-center gap-1 opacity-30">
+            <div className="absolute right-4 top-1 z-10 flex items-center gap-1 opacity-30">
               <span className="text-sm">🐋</span>
               <span className="text-[10px] font-medium tracking-wider text-[#7a7a83] uppercase">
                 WHALES MARKET
@@ -377,12 +377,12 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
         </div>
 
         {/* === SEPARATOR LINE === */}
-        <div className="mx-4" style={{ paddingLeft: leftLabelW }}>
+        <div style={{ paddingLeft: leftLabelW }}>
           <div className="border-t border-[#252527]" />
         </div>
 
         {/* === VOLUME CHART SECTION === */}
-        <div className="flex px-4 pb-1">
+        <div className="flex pb-1">
           {/* Left "Volume" label */}
           <div
             className="shrink-0 flex items-center justify-center border-r border-[#252527]"
@@ -489,7 +489,7 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
         </div>
 
         {/* === X-AXIS DATE LABELS === */}
-        <div className="flex px-4 pb-2">
+        <div className="flex pb-2">
           <div style={{ width: leftLabelW }} className="shrink-0" />
           <div className="flex-1 flex justify-between">
             {dateLabels.map((label, i) => (
