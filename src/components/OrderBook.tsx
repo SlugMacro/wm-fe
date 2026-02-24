@@ -229,9 +229,8 @@ export default function OrderBook({ buyOrders, sellOrders, onSelectOrder, select
             <div className="w-28 text-right">
               <span className="text-xs font-medium text-[#7a7a83]">Amount</span>
             </div>
-            <div className="w-28 flex items-center justify-end gap-1">
+            <div className="w-28 text-right">
               <span className="text-xs font-medium text-[#7a7a83]">Collateral</span>
-              <span className="size-6" />
             </div>
             <div className="w-24" />
           </div>
@@ -337,9 +336,8 @@ export default function OrderBook({ buyOrders, sellOrders, onSelectOrder, select
             <div className="w-28 text-right">
               <span className="text-xs font-medium text-[#7a7a83]">Amount</span>
             </div>
-            <div className="w-28 flex items-center justify-end gap-1">
+            <div className="w-28 text-right">
               <span className="text-xs font-medium text-[#7a7a83]">Collateral</span>
-              <span className="size-6" />
             </div>
             <div className="w-24" />
           </div>
