@@ -1,5 +1,8 @@
 import { useState, useMemo, useRef, useCallback } from 'react';
 import type { PriceDataPoint } from '../types';
+import mascotSvg from '../assets/images/mascot.svg';
+import logoTopSvg from '../assets/images/logo-top.svg';
+import logoBottomSvg from '../assets/images/logo-bottom.svg';
 
 type TimeRange = '1d' | '7d' | '30d';
 type ChartType = 'price' | 'fdv';
@@ -34,7 +37,7 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
   // Chart dimensions
   const priceChartH = 220;
   const volumeChartH = 100;
-  const rightAxisW = 96;
+  const rightAxisW = 72;
   const leftLabelW = 32;
 
   // Price bounds
@@ -86,9 +89,10 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
   // Area polygon (add bottom-right and bottom-left)
   const areaPoints = pricePoints + ' 100,100 0,100';
 
-  // Last point position for the green dot — uses currentPrice (giá khớp)
+  // Last point position for the green dot — always at chart endpoint (giá khớp lệnh)
   const lastPointX = 100;
-  const lastPointY = currentPricePct * 100;
+  const lastDataPointPrice = filteredData.length > 0 ? filteredData[filteredData.length - 1].price : currentPrice;
+  const lastPointY = (1 - (lastDataPointPrice - minPrice) / priceRange) * 100;
 
   // Hover handler — calculate data index from mouse X position
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
@@ -128,25 +132,25 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
   return (
     <div className="rounded-lg border border-[#1b1b1c] overflow-hidden">
       {/* Top toolbar */}
-      <div className="flex items-center justify-between px-4 py-2 border-b border-[#1b1b1c]">
+      <div className="flex items-center justify-between px-2 py-2 border-b border-[#1b1b1c]">
         <div className="flex items-center gap-1">
           {(['1d', '7d', '30d'] as TimeRange[]).map(range => (
             <button
               key={range}
               onClick={() => setTimeRange(range)}
-              className={`rounded px-2.5 py-1 text-xs font-medium transition-colors ${
+              className={`rounded px-2 py-0.5 text-[10px] font-medium transition-colors ${
                 timeRange === range ? 'bg-[#1b1b1c] text-[#f9f9fa]' : 'text-[#7a7a83] hover:text-[#f9f9fa]'
               }`}
             >
               {range}
             </button>
           ))}
-          <div className="mx-2 h-4 w-px bg-[#252527]" />
+          <div className="mx-2 h-3 w-px bg-[#252527]" />
           {(['price', 'fdv'] as ChartType[]).map(type => (
             <button
               key={type}
               onClick={() => setChartType(type)}
-              className={`rounded px-2.5 py-1 text-xs font-medium transition-colors ${
+              className={`rounded px-2 py-0.5 text-[10px] font-medium transition-colors ${
                 chartType === type ? 'bg-[#1b1b1c] text-[#f9f9fa]' : 'text-[#7a7a83] hover:text-[#f9f9fa]'
               }`}
             >
@@ -155,8 +159,8 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
           ))}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-[#7a7a83]">Time</span>
-          <span className="text-xs text-[#f9f9fa] tabular-nums">
+          <span className="text-[10px] text-[#7a7a83]">Time</span>
+          <span className="text-[10px] text-[#f9f9fa] tabular-nums">
             {hoverPoint ? formatTime(new Date(hoverPoint.time)) : formatTime(lastTime)}
           </span>
         </div>
@@ -203,13 +207,10 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
             </span>
           </div>
 
-          {/* Price chart area (mouse tracking) */}
+          {/* Price chart area */}
           <div
-            ref={chartAreaRef}
-            className="flex-1 min-w-0 relative cursor-crosshair"
+            className="flex-1 min-w-0 relative"
             style={{ height: priceChartH }}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
           >
             {/* Price info overlay */}
             <div className="absolute left-2 top-1 z-10 flex items-center gap-2">
@@ -222,23 +223,8 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
               </span>
             </div>
 
-            {/* Watermark */}
-            <div className="absolute right-4 top-1 z-10 flex items-center gap-1 opacity-30">
-              <span className="text-sm">🐋</span>
-              <span className="text-[10px] font-medium tracking-wider text-[#7a7a83] uppercase">
-                WHALES MARKET
-              </span>
-            </div>
-
-            <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="priceGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={isPositive ? 'rgba(22,194,132,0.20)' : 'rgba(253,94,103,0.20)'} />
-                  <stop offset="100%" stopColor="rgba(10,10,11,0)" />
-                </linearGradient>
-              </defs>
-
-              {/* Grid lines — dashed for better readability */}
+            {/* Grid lines — full width of flex-1, behind everything */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
               {priceLabels.map((l, i) => (
                 <line
                   key={i}
@@ -248,10 +234,46 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
                   y2={l.pct * 100}
                   stroke="#252527"
                   strokeWidth="1"
-                  strokeDasharray="4 3"
+                  opacity="0.2"
                   vectorEffect="non-scaling-stroke"
                 />
               ))}
+            </svg>
+
+            {/* Watermark — same logo as header, greyed out, half size */}
+            <div className="absolute right-4 top-2 z-10 flex items-center gap-1 opacity-20 grayscale brightness-75">
+              <img src={mascotSvg} alt="" className="w-4 h-4" />
+              <div className="relative" style={{ width: '103px', height: '9px' }}>
+                <img
+                  src={logoTopSvg}
+                  alt=""
+                  className="absolute left-0 top-0"
+                  style={{ width: '49.5px', height: '8.7px' }}
+                />
+                <img
+                  src={logoBottomSvg}
+                  alt=""
+                  className="absolute"
+                  style={{ width: '49.5px', height: '8.4px', left: '53.5px', top: '0.15px' }}
+                />
+              </div>
+            </div>
+
+            {/* SVG area with right padding */}
+            <div
+              ref={chartAreaRef}
+              className="h-full relative cursor-crosshair"
+              style={{ marginRight: 96 }}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+            >
+            <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="priceGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={isPositive ? 'rgba(22,194,132,0.20)' : 'rgba(253,94,103,0.20)'} />
+                  <stop offset="100%" stopColor="rgba(10,10,11,0)" />
+                </linearGradient>
+              </defs>
 
               {/* Area fill */}
               <polygon points={areaPoints} fill="url(#priceGrad)" />
@@ -309,17 +331,26 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
               )}
             </svg>
 
-            {/* Green dot at last data point */}
+            {/* Live price dot at chart endpoint — giá khớp lệnh */}
             <div
-              className="absolute w-3 h-3 rounded-full pointer-events-none z-10"
+              className="absolute pointer-events-none z-10"
               style={{
                 left: `${lastPointX}%`,
                 top: `${lastPointY}%`,
                 transform: 'translate(-50%, -50%)',
-                backgroundColor: lineColor,
-                boxShadow: `0 0 6px ${lineColor}`,
               }}
-            />
+            >
+              {/* Pulsing ring animation */}
+              <span
+                className="absolute inset-0 rounded-full animate-ping"
+                style={{ backgroundColor: lineColor, opacity: 0.4 }}
+              />
+              {/* Solid dot */}
+              <span
+                className="relative block w-3 h-3 rounded-full"
+                style={{ backgroundColor: lineColor, boxShadow: `0 0 8px ${lineColor}` }}
+              />
+            </div>
 
             {/* Hover dot on the price line */}
             {hoverPoint && hoverIndex !== null && (
@@ -334,22 +365,27 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
                 }}
               />
             )}
+            </div>
           </div>
 
           {/* Right Y-axis for price */}
           <div
-            className="shrink-0 relative border-l border-[#252527]"
+            className="shrink-0 relative border-l border-[#252527] py-4"
             style={{ width: rightAxisW, height: priceChartH }}
           >
-            {priceLabels.map((l, i) => (
-              <span
-                key={i}
-                className="absolute text-[10px] text-[#7a7a83] tabular-nums pl-2"
-                style={{ top: `${l.pct * 100}%`, left: 0, transform: 'translateY(-50%)' }}
-              >
-                {l.label}
-              </span>
-            ))}
+            {priceLabels.map((l, i) => {
+              // Hide first and last labels to avoid overlapping border lines
+              if (i === 0 || i === priceLabels.length - 1) return null;
+              return (
+                <span
+                  key={i}
+                  className="absolute text-[10px] text-[#7a7a83] tabular-nums pl-2"
+                  style={{ top: `${l.pct * 100}%`, left: 0, transform: 'translateY(-50%)' }}
+                >
+                  {l.label}
+                </span>
+              );
+            })}
             {/* Current price badge */}
             <div
               className="absolute left-2 rounded px-1.5 py-0.5 text-[10px] font-medium text-[#0a0a0b] tabular-nums"
@@ -382,11 +418,11 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
         </div>
 
         {/* === VOLUME CHART SECTION === */}
-        <div className="flex pb-1">
+        <div className="flex pb-1 border-b border-[#252527]">
           {/* Left "Volume" label */}
           <div
             className="shrink-0 flex items-center justify-center border-r border-[#252527]"
-            style={{ width: leftLabelW, height: volumeChartH + 28 }}
+            style={{ width: leftLabelW, height: volumeChartH }}
           >
             <span
               className="text-[10px] text-[#7a7a83] tracking-wider uppercase"
@@ -397,9 +433,15 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
           </div>
 
           {/* Volume chart content */}
-          <div className="flex-1 min-w-0">
-            {/* Total Vol info */}
-            <div className="flex items-center gap-2 mb-1 mt-2">
+          <div className="flex-1 min-w-0 relative" style={{ height: volumeChartH }}>
+            {/* Volume grid lines — full width */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <line x1="0" y1="0" x2="100" y2="0" stroke="#252527" strokeWidth="1" opacity="0.2" vectorEffect="non-scaling-stroke" />
+              <line x1="0" y1="50" x2="100" y2="50" stroke="#252527" strokeWidth="1" opacity="0.2" vectorEffect="non-scaling-stroke" />
+            </svg>
+
+            {/* Total Vol info — overlaid on chart */}
+            <div className="absolute left-2 top-1 z-10 flex items-center gap-2">
               <span className="text-xs text-[#7a7a83]">Total Vol.</span>
               <span className="text-xs font-medium text-[#f9f9fa] tabular-nums">
                 ${filteredData.reduce((sum, d) => sum + d.volume, 0).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
@@ -409,7 +451,7 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
             {/* Volume bars chart */}
             <div
               className="relative cursor-crosshair"
-              style={{ height: volumeChartH }}
+              style={{ height: volumeChartH, marginRight: 96 }}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
             >
@@ -419,22 +461,6 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
                 viewBox={`0 0 ${filteredData.length} ${maxVolume}`}
                 preserveAspectRatio="none"
               >
-                {/* Volume grid lines */}
-                <line
-                  x1="0" y1={0}
-                  x2={filteredData.length} y2={0}
-                  stroke="#252527" strokeWidth="1"
-                  strokeDasharray="4 3"
-                  vectorEffect="non-scaling-stroke"
-                />
-                <line
-                  x1="0" y1={maxVolume / 2}
-                  x2={filteredData.length} y2={maxVolume / 2}
-                  stroke="#252527" strokeWidth="1"
-                  strokeDasharray="4 3"
-                  vectorEffect="non-scaling-stroke"
-                />
-
                 {/* Volume bars */}
                 {filteredData.map((d, i) => {
                   const prevPrice = i > 0 ? filteredData[i - 1].price : d.price;
@@ -476,8 +502,8 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
 
           {/* Volume right Y-axis */}
           <div
-            className="shrink-0 flex flex-col justify-between border-l border-[#252527]"
-            style={{ width: rightAxisW, height: volumeChartH, marginTop: 28 }}
+            className="shrink-0 flex flex-col justify-between border-l border-[#252527] py-4"
+            style={{ width: rightAxisW, height: volumeChartH }}
           >
             <span className="text-[10px] text-[#7a7a83] tabular-nums pl-2">
               {formatVol(maxVolume)}
@@ -489,7 +515,7 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
         </div>
 
         {/* === X-AXIS DATE LABELS === */}
-        <div className="flex pb-2">
+        <div className="flex py-2">
           <div style={{ width: leftLabelW }} className="shrink-0" />
           <div className="flex-1 flex justify-between">
             {dateLabels.map((label, i) => (

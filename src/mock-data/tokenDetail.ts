@@ -342,7 +342,21 @@ export function generatePriceData(): PriceDataPoint[] {
     const time = new Date(startTime + i * (dayMs / 24)).toISOString();
     const change = (Math.random() - 0.45) * 0.0003;
     price = Math.max(0.001, price + change);
-    const volume = Math.random() * 200000 + 10000;
+
+    // Volume: ~40% chance of 0, rest are low with occasional spikes
+    let volume = 0;
+    const roll = Math.random();
+    if (roll > 0.4) {
+      // 60% chance of having some volume
+      if (roll > 0.92) {
+        // ~8% chance of a spike
+        volume = Math.random() * 80000 + 30000;
+      } else {
+        // Normal low volume
+        volume = Math.random() * 15000 + 500;
+      }
+    }
+
     points.push({ time, price, volume });
   }
   // Ensure last point matches token price
