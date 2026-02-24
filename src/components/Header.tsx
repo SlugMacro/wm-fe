@@ -349,7 +349,7 @@ export default function Header() {
               /* Disconnected state - Connect button */
               <button
                 onClick={() => setShowConnectModal(true)}
-                className="flex items-center h-9 px-5 rounded-lg bg-[#16c284] text-sm font-medium text-[#0a0a0b] hover:bg-[#13a872] transition-colors"
+                className="flex items-center h-9 px-4 rounded-lg bg-[#f9f9fa] text-sm font-medium text-[#0a0a0b] hover:bg-[#e0e0e2] transition-colors"
               >
                 Connect
               </button>
