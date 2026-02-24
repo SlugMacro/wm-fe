@@ -223,8 +223,8 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
               </span>
             </div>
 
-            {/* Grid lines — full width of flex-1, behind everything */}
-            <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+            {/* Grid lines + current price line — full width of flex-1 */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none z-[1]" viewBox="0 0 100 100" preserveAspectRatio="none">
               {priceLabels.map((l, i) => (
                 <line
                   key={i}
@@ -238,6 +238,18 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
                   vectorEffect="non-scaling-stroke"
                 />
               ))}
+              {/* Current price dashed line — follows dot indicator (giá khớp) */}
+              <line
+                x1="0"
+                y1={lastPointY}
+                x2="100"
+                y2={lastPointY}
+                stroke={lineColor}
+                strokeWidth="1"
+                strokeDasharray="4 3"
+                opacity="0.5"
+                vectorEffect="non-scaling-stroke"
+              />
             </svg>
 
             {/* Watermark — same logo as header, greyed out, half size */}
@@ -287,18 +299,7 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
                 vectorEffect="non-scaling-stroke"
               />
 
-              {/* Current price dashed line */}
-              <line
-                x1="0"
-                y1={currentPricePct * 100}
-                x2="100"
-                y2={currentPricePct * 100}
-                stroke={lineColor}
-                strokeWidth="1"
-                strokeDasharray="4 3"
-                opacity="0.5"
-                vectorEffect="non-scaling-stroke"
-              />
+              {/* (current price line moved to full-width SVG layer) */}
 
               {/* Hover crosshair lines */}
               {hoverIndex !== null && (
