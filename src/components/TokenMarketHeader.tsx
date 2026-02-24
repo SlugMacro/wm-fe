@@ -2,30 +2,18 @@ import { useState } from 'react';
 import type { TokenDetail } from '../types';
 import TokenIcon from './TokenIcon';
 
-const chainIcons: Record<string, string> = {
-  solana: '◎',
-  ethereum: '⟠',
-  sui: '💧',
-};
-
-const chainColors: Record<string, string> = {
-  solana: '#9945ff',
-  ethereum: '#627eea',
-  sui: '#4da2ff',
-};
-
-function ExternalLinkIcon() {
+function ArrowRightUpIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-      <path d="M3.5 8.5L8.5 3.5M8.5 3.5H4.5M8.5 3.5V7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <path d="M4 10L10 4M10 4H5.5M10 4V8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 
 function ChevronDownIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <path d="M4.5 6.5L8 10L11.5 6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <path d="M3.5 5.5L7 9L10.5 5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -76,47 +64,45 @@ export default function TokenMarketHeader({ token }: { token: TokenDetail }) {
   ];
 
   return (
-    <div className="flex items-start justify-between border-b-4 border-[#1b1b1c] pb-6">
+    <div className="flex items-center justify-between border-b-[4px] border-[#1b1b1c] py-6">
       {/* Left: Token info + stats */}
-      <div className="flex items-center gap-8">
+      <div className="flex flex-1 items-center gap-8 overflow-hidden">
         {/* Token icon + name */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 shrink-0">
           <TokenIcon symbol={token.tokenSymbol} chain={token.chain} size="md" />
           <div className="flex flex-col">
-            <span className="text-sm font-medium text-[#f9f9fa]">{token.tokenSymbol}</span>
-            <div className="flex items-center gap-2">
-              <div
-                className="flex size-4 items-center justify-center rounded text-[8px]"
-                style={{ backgroundColor: chainColors[token.chain] }}
-              >
-                {chainIcons[token.chain]}
-              </div>
-              <span className="text-sm font-normal text-[#7a7a83]">{token.subtitle}</span>
+            <span className="text-lg font-medium leading-7 text-[#f9f9fa]">{token.tokenSymbol}</span>
+            <div className="py-0.5">
+              <span className="text-xs leading-4 font-normal text-[#7a7a83]">{token.tokenName}</span>
             </div>
           </div>
         </div>
 
         {/* Price */}
-        <div className="flex flex-col">
-          <span className="text-lg font-medium text-[#f9f9fa] tabular-nums">
+        <div className="flex flex-col shrink-0">
+          <span className="text-lg font-medium leading-7 text-[#f9f9fa] tabular-nums">
             ${token.price.toFixed(4)}
           </span>
-          <span className={`text-xs font-normal tabular-nums ${isPositive ? 'text-[#5bd197]' : 'text-[#fd5e67]'}`}>
-            {isPositive ? '+' : ''}{token.priceChange.toFixed(2)}%
-          </span>
+          <div className="py-0.5">
+            <span className={`text-xs leading-4 font-normal tabular-nums ${isPositive ? 'text-[#5bd197]' : 'text-[#fd5e67]'}`}>
+              {isPositive ? '+' : ''}{token.priceChange.toFixed(2)}%
+            </span>
+          </div>
         </div>
 
         {/* Stats */}
-        <div className="flex items-start gap-8">
+        <div className="flex items-center gap-8">
           {stats.map((stat, i) => (
-            <div key={i} className="flex flex-col gap-1">
-              <span className={`text-xs font-normal text-[#7a7a83] ${stat.dashed ? 'border-b border-dashed border-[#2e2e34]' : ''}`}>
-                {stat.label}
-              </span>
-              <div className="flex items-center gap-1">
-                <span className="text-xs font-normal text-[#f9f9fa] tabular-nums">{stat.value}</span>
+            <div key={i} className="flex flex-col shrink-0">
+              <div className="py-1.5">
+                <span className={`text-xs leading-4 font-normal text-[#7a7a83] ${stat.dashed ? 'border-b border-dashed border-[#2e2e34]' : ''}`}>
+                  {stat.label}
+                </span>
+              </div>
+              <div className="flex items-center gap-1 py-0.5">
+                <span className="text-xs leading-4 font-normal text-[#f9f9fa] tabular-nums">{stat.value}</span>
                 {stat.change && (
-                  <span className={`text-xs font-normal tabular-nums ${stat.changeColor}`}>{stat.change}</span>
+                  <span className={`text-xs leading-4 font-normal tabular-nums ${stat.changeColor}`}>{stat.change}</span>
                 )}
               </div>
             </div>
@@ -125,18 +111,18 @@ export default function TokenMarketHeader({ token }: { token: TokenDetail }) {
       </div>
 
       {/* Right: Buttons */}
-      <div className="flex items-center gap-3 pt-1.5">
-        {/* About token button */}
-        <div className="flex items-center">
+      <div className="flex items-center gap-3 shrink-0">
+        {/* About token button group */}
+        <div className="flex items-stretch overflow-hidden rounded-lg border border-[#252527]">
           <button
             onClick={() => setAboutOpen(!aboutOpen)}
-            className="flex items-center gap-2 rounded-l-lg border border-[#252527] px-4 py-2 text-sm font-medium text-[#f9f9fa] transition-colors hover:border-[#3a3a3d]"
+            className="flex items-center gap-1.5 border-r border-[#252527] pl-4 pr-2 py-2 text-sm font-medium leading-5 text-[#f9f9fa] transition-colors hover:bg-[#252527]/50"
           >
             About {token.tokenSymbol}
-            <ExternalLinkIcon />
+            <ArrowRightUpIcon />
           </button>
           <button
-            className="flex items-center justify-center rounded-r-lg border border-l-0 border-[#252527] p-2 text-[#7a7a83] transition-colors hover:border-[#3a3a3d]"
+            className="flex items-center justify-center p-2 text-[#f9f9fa] transition-colors hover:bg-[#252527]/50"
           >
             <ChevronDownIcon />
           </button>
@@ -146,7 +132,7 @@ export default function TokenMarketHeader({ token }: { token: TokenDetail }) {
         <div className="h-[18px] w-px bg-[#252527]" />
 
         {/* Create Order */}
-        <button className="flex items-center justify-center rounded-lg bg-[#f9f9fa] px-4 py-2 text-sm font-medium text-[#0a0a0b] transition-opacity hover:opacity-90">
+        <button className="flex items-center justify-center rounded-lg bg-[#f9f9fa] px-4 py-2 text-sm font-medium leading-5 text-[#0a0a0b] transition-opacity hover:opacity-90">
           Create Order
         </button>
       </div>

@@ -40,7 +40,7 @@ export default function TokenDetailPage() {
   };
 
   return (
-    <div className="mx-auto max-w-[1440px] px-8">
+    <div className="mx-auto max-w-[1440px] px-12">
       {/* Breadcrumb */}
       <Breadcrumb items={breadcrumbItems} />
 
@@ -48,11 +48,11 @@ export default function TokenDetailPage() {
       <TokenMarketHeader token={token} />
 
       {/* Main content: left + right columns */}
-      <div className="flex gap-0 mt-0">
+      <div className="flex">
         {/* Left column */}
-        <div className="flex-1 min-w-0 pr-4 border-r border-[#1b1b1c]">
+        <div className="flex-1 min-w-0">
           {/* Chart */}
-          <div className="py-4">
+          <div className="pt-4">
             <PriceChart
               data={priceData}
               currentPrice={token.price}
@@ -61,7 +61,7 @@ export default function TokenDetailPage() {
           </div>
 
           {/* Order Book */}
-          <div className="py-4">
+          <div className="pt-4">
             <OrderBook
               buyOrders={buyOrders}
               sellOrders={sellOrders}
@@ -70,15 +70,18 @@ export default function TokenDetailPage() {
           </div>
 
           {/* Recent Trades */}
-          <div className="py-4">
+          <div className="pt-4">
             <DetailRecentTrades />
           </div>
         </div>
 
+        {/* Divider */}
+        <div className="mx-4 w-px shrink-0 bg-[#1b1b1c]" />
+
         {/* Right column */}
-        <div className="w-[384px] shrink-0 pl-4">
+        <div className="w-[384px] shrink-0">
           {/* Trade Panel */}
-          <div className="py-4">
+          <div className="pt-4">
             <TradePanel
               tokenSymbol={token.tokenSymbol}
               selectedOrder={selectedOrder}
@@ -86,7 +89,7 @@ export default function TokenDetailPage() {
           </div>
 
           {/* My Orders */}
-          <div className="py-4">
+          <div className="pt-4">
             <MyOrders
               filledOrders={myFilledOrders}
               openOrders={myOpenOrders}
@@ -95,7 +98,10 @@ export default function TokenDetailPage() {
         </div>
       </div>
 
-      {/* Bottom Stats */}
+      {/* Spacer for fixed BottomStats */}
+      <div className="h-12" />
+
+      {/* Bottom Stats — fixed to viewport bottom */}
       <BottomStats />
     </div>
   );
