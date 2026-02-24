@@ -6,7 +6,9 @@ import chainStarknetPng from '../assets/images/chain-starknet.png';
 import chainTonPng from '../assets/images/chain-ton.png';
 import chainSuiPng from '../assets/images/chain-sui.png';
 import chainAptosPng from '../assets/images/chain-aptos.png';
+import walletMetamaskPng from '../assets/images/wallet-metamask.png';
 import walletPhantomPng from '../assets/images/wallet-phantom.png';
+import walletPhantomSolanaPng from '../assets/images/wallet-phantom-solana.png';
 import walletRabbyPng from '../assets/images/wallet-rabby.png';
 import walletTrustPng from '../assets/images/wallet-trust.png';
 import walletCoinbasePng from '../assets/images/wallet-coinbase.png';
@@ -48,15 +50,15 @@ const networks: Network[] = [
 
 const walletsByNetwork: Record<string, Wallet[]> = {
   evm: [
-    { name: 'Phantom', icon: walletPhantomPng, installUrl: '#' },
-    { name: 'Rabby', icon: walletRabbyPng, installUrl: '#' },
+    { name: 'Metamask', icon: walletMetamaskPng, connectable: true },
+    { name: 'Rabby', icon: walletRabbyPng, installUrl: 'https://rabby.io/' },
     { name: 'Trust', icon: walletTrustPng, connectable: true },
     { name: 'Coinbase', icon: walletCoinbasePng, connectable: true },
     { name: 'OKX', icon: walletOkxPng, connectable: true },
   ],
   solana: [
-    { name: 'Phantom', icon: walletPhantomPng, connectable: true },
-    { name: 'Solflare', icon: walletSolflarePng, installUrl: '#' },
+    { name: 'Phantom', icon: walletPhantomSolanaPng, connectable: true },
+    { name: 'Solflare', icon: walletSolflarePng, installUrl: 'https://solflare.com/' },
   ],
   starknet: [
     { name: 'Phantom', icon: walletPhantomPng, connectable: true },
@@ -109,6 +111,10 @@ export default function ConnectWalletModal({ isOpen, onClose, onConnect }: Conne
   }, [onClose]);
 
   const handleWalletClick = useCallback((wallet: Wallet) => {
+    if (wallet.installUrl) {
+      window.open(wallet.installUrl, '_blank');
+      return;
+    }
     if (wallet.connectable) {
       setVisible(false);
       setTimeout(onConnect, 200);
@@ -190,14 +196,10 @@ export default function ConnectWalletModal({ isOpen, onClose, onConnect }: Conne
           {/* Wallet Grid */}
           <div className="flex flex-wrap gap-4">
             {wallets.map((wallet) => (
-              <button
+              <div
                 key={wallet.name}
-                onClick={() => handleWalletClick(wallet)}
-                className={`flex w-[calc(50%-8px)] items-center gap-4 rounded-xl border border-[#252527] p-4 transition-colors ${
-                  wallet.connectable
-                    ? 'cursor-pointer hover:bg-[#252527]'
-                    : 'cursor-default'
-                }`}
+                onClick={() => !wallet.installUrl && handleWalletClick(wallet)}
+                className="flex w-[calc(50%-8px)] items-center gap-4 rounded-xl border border-[#252527] p-4 transition-colors cursor-pointer hover:bg-[#252527]"
               >
                 <img
                   src={wallet.icon}
@@ -208,11 +210,17 @@ export default function ConnectWalletModal({ isOpen, onClose, onConnect }: Conne
                   {wallet.name}
                 </span>
                 {wallet.installUrl && (
-                  <span className="rounded-md bg-[#252527] px-3 py-1.5 text-xs font-medium text-[#7a7a83]">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.open(wallet.installUrl, '_blank');
+                    }}
+                    className="rounded-md bg-[#252527] px-3 py-1.5 text-xs font-medium text-[#7a7a83] transition-colors hover:bg-[#3a3a3d] hover:text-[#f9f9fa] active:bg-[#444448]"
+                  >
                     Install
-                  </span>
+                  </button>
                 )}
-              </button>
+              </div>
             ))}
           </div>
         </div>
