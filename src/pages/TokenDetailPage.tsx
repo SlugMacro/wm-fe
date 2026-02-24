@@ -25,8 +25,8 @@ export default function TokenDetailPage() {
 
   const [selectedOrder, setSelectedOrder] = useState<{ order: OrderBookEntry; side: 'buy' | 'sell' } | null>(null);
 
-  const buyOrders = useMemo(() => generateBuyOrders(token.price), [token.price]);
-  const sellOrders = useMemo(() => generateSellOrders(token.price), [token.price]);
+  const buyOrders = useMemo(() => generateBuyOrders(token.price, token.chain), [token.price, token.chain]);
+  const sellOrders = useMemo(() => generateSellOrders(token.price, token.chain), [token.price, token.chain]);
   const priceData = useMemo(() => generatePriceData(), []);
 
   const breadcrumbItems = [

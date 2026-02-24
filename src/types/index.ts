@@ -103,7 +103,7 @@ export interface OrderBookEntry {
   amountFormatted: string;
   collateral: number;
   collateralIcon: string;
-  collateralToken: 'SOL' | 'USDC' | 'USDT' | 'ETH';
+  collateralToken: 'SOL' | 'USDC' | 'USDT' | 'ETH' | 'SUI';
   isOwner?: boolean;
   fillPercent: number; // 0-100 how much of order is filled
   filledAmount: number; // filled amount in token units

@@ -117,7 +117,15 @@ export const tokenDetails: Record<string, TokenDetail> = {
 
 export const defaultTokenId = 'karak';
 
-export function generateBuyOrders(_basePrice: number): OrderBookEntry[] {
+function getNativeToken(chain: string): { symbol: 'SOL' | 'ETH' | 'SUI'; icon: string } {
+  switch (chain) {
+    case 'ethereum': return { symbol: 'ETH', icon: '/tokens/eth.svg' };
+    case 'sui': return { symbol: 'SUI', icon: '/tokens/sui.svg' };
+    default: return { symbol: 'SOL', icon: '/tokens/sol.svg' };
+  }
+}
+
+export function generateBuyOrders(_basePrice: number, chain = 'solana'): OrderBookEntry[] {
   const prices = [
     0.0018, 0.0020, 0.0021, 0.0022, 0.0024, 0.0025, 0.0028, 0.0030,
     0.0035, 0.0036, 0.0038, 0.0038, 0.0040, 0.0042, 0.0044, 0.0045,
@@ -149,25 +157,27 @@ export function generateBuyOrders(_basePrice: number): OrderBookEntry[] {
     undefined, undefined, undefined, undefined, undefined, undefined,
   ];
 
-  const tokens: ('SOL' | 'USDC')[] = [
-    'SOL', 'USDC', 'SOL', 'SOL', 'USDC', 'SOL', 'USDC', 'SOL',
-    'SOL', 'USDC', 'SOL', 'USDC', 'SOL', 'SOL', 'USDC', 'SOL',
-    'USDC', 'SOL', 'SOL', 'USDC', 'SOL', 'USDC', 'SOL', 'SOL',
-    'USDC', 'SOL', 'USDC', 'SOL', 'SOL', 'USDC',
+  // true = native coin, false = USDC
+  const isNative = [
+    true, false, true, true, false, true, false, true,
+    true, false, true, false, true, true, false, true,
+    false, true, true, false, true, false, true, true,
+    false, true, false, true, true, false,
   ];
+  const native = getNativeToken(chain);
 
   return prices.map((price, i) => {
     const totalAmount = amounts[i] * 1000;
     const filledAmount = totalAmount * fillPercents[i] / 100;
-    const token = tokens[i];
+    const useNative = isNative[i];
     return {
       id: `buy-${i}`,
       price,
       amount: totalAmount,
       amountFormatted: `${amounts[i].toFixed(2)}K`,
       collateral: collaterals[i],
-      collateralIcon: token === 'SOL' ? '/tokens/sol.svg' : '/tokens/usdc.svg',
-      collateralToken: token,
+      collateralIcon: useNative ? native.icon : '/tokens/usdc.svg',
+      collateralToken: useNative ? native.symbol : 'USDC' as const,
       isOwner: i === 0,
       fillPercent: fillPercents[i],
       filledAmount,
@@ -177,7 +187,7 @@ export function generateBuyOrders(_basePrice: number): OrderBookEntry[] {
   });
 }
 
-export function generateSellOrders(_basePrice: number): OrderBookEntry[] {
+export function generateSellOrders(_basePrice: number, chain = 'solana'): OrderBookEntry[] {
   const prices = [
     0.0015, 0.0015, 0.0015, 0.0015, 0.0015, 0.0014, 0.0013, 0.0012,
     0.0011, 0.0010, 0.0008, 0.0005, 0.0003, 0.0002, 0.0001,
@@ -209,25 +219,27 @@ export function generateSellOrders(_basePrice: number): OrderBookEntry[] {
     'FULL', undefined,
   ];
 
-  const tokens: ('SOL' | 'USDC')[] = [
-    'USDC', 'SOL', 'SOL', 'USDC', 'SOL', 'USDC', 'SOL', 'SOL',
-    'USDC', 'SOL', 'USDC', 'SOL', 'SOL', 'USDC', 'SOL',
-    'SOL', 'USDC', 'SOL', 'USDC', 'SOL', 'USDC', 'SOL', 'USDC',
-    'SOL', 'USDC',
+  // true = native coin, false = USDC
+  const isNative = [
+    false, true, true, false, true, false, true, true,
+    false, true, false, true, true, false, true,
+    true, false, true, false, true, false, true, false,
+    true, false,
   ];
+  const native = getNativeToken(chain);
 
   return prices.map((price, i) => {
     const totalAmount = amounts[i] * 1000;
     const filledAmount = totalAmount * fillPercents[i] / 100;
-    const token = tokens[i];
+    const useNative = isNative[i];
     return {
       id: `sell-${i}`,
       price,
       amount: totalAmount,
       amountFormatted: `${amounts[i].toFixed(2)}K`,
       collateral: collaterals[i],
-      collateralIcon: token === 'SOL' ? '/tokens/sol.svg' : '/tokens/usdc.svg',
-      collateralToken: token,
+      collateralIcon: useNative ? native.icon : '/tokens/usdc.svg',
+      collateralToken: useNative ? native.symbol : 'USDC' as const,
       isOwner: i === 2,
       fillPercent: fillPercents[i],
       filledAmount,
