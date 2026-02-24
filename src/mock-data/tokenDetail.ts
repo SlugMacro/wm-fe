@@ -121,32 +121,54 @@ export function generateBuyOrders(_basePrice: number): OrderBookEntry[] {
   const prices = [0.0018, 0.0020, 0.0021, 0.0022, 0.0024, 0.0025, 0.0028, 0.0030, 0.0035, 0.0036, 0.0038, 0.0038, 0.0040, 0.0042, 0.0044, 0.0045];
   const amounts = [38.76, 34.88, 99.67, 6.34, 46.51, 195.36, 99.67, 23.26, 139.54, 111.11, 125.00, 55.08, 125.00, 476.19, 190.28, 155.04];
   const collaterals = [0.50, 0.50, 1.50, 0.10, 0.80, 3.50, 2.00, 0.50, 3.50, 400.00, 500.00, 1.50, 500.00, 2.00, 6.00, 5.00];
+  const fillPercents = [15, 0, 75, 0, 0, 10, 0, 0, 5, 90, 60, 0, 40, 0, 100, 0];
+  const fillTypes: (undefined | 'FULL' | 'PARTIAL')[] = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, 'FULL', undefined];
 
-  return prices.map((price, i) => ({
-    id: `buy-${i}`,
-    price,
-    amount: amounts[i] * 1000,
-    amountFormatted: `${amounts[i].toFixed(2)}K`,
-    collateral: collaterals[i],
-    collateralIcon: '/tokens/sol.svg',
-    isOwner: i === 0,
-  }));
+  return prices.map((price, i) => {
+    const totalAmount = amounts[i] * 1000;
+    const filledAmount = totalAmount * fillPercents[i] / 100;
+    return {
+      id: `buy-${i}`,
+      price,
+      amount: totalAmount,
+      amountFormatted: `${amounts[i].toFixed(2)}K`,
+      collateral: collaterals[i],
+      collateralIcon: '/tokens/sol.svg',
+      collateralToken: 'SOL' as const,
+      isOwner: i === 0,
+      fillPercent: fillPercents[i],
+      filledAmount,
+      totalAmount,
+      fillType: fillTypes[i],
+    };
+  });
 }
 
 export function generateSellOrders(_basePrice: number): OrderBookEntry[] {
   const prices = [0.0015, 0.0015, 0.0015, 0.0015, 0.0015, 0.0014, 0.0013, 0.0012, 0.0011, 0.0010, 0.0008, 0.0005, 0.0003, 0.0002, 0.0001];
   const amounts = [279.08, 139.54, 186.05, 93.03, 186.05, 199.34, 53.67, 12.50, 2.73, 100.00, 174.43, 100.00, 500.00, 500.00, 100.00];
   const collaterals = [3.00, 1.50, 2.00, 1.00, 2.00, 2.00, 0.50, 15.00, 3.00, 100.00, 1.00, 50.00, 150.00, 100.00, 10.00];
+  const fillPercents = [0, 0, 30, 0, 50, 0, 0, 100, 0, 20, 0, 0, 10, 0, 70];
+  const fillTypes: (undefined | 'FULL' | 'PARTIAL')[] = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, 'FULL', undefined, undefined, undefined, undefined, undefined, undefined, undefined];
 
-  return prices.map((price, i) => ({
-    id: `sell-${i}`,
-    price,
-    amount: amounts[i] * 1000,
-    amountFormatted: `${amounts[i].toFixed(2)}K`,
-    collateral: collaterals[i],
-    collateralIcon: '/tokens/sol.svg',
-    isOwner: i === 2,
-  }));
+  return prices.map((price, i) => {
+    const totalAmount = amounts[i] * 1000;
+    const filledAmount = totalAmount * fillPercents[i] / 100;
+    return {
+      id: `sell-${i}`,
+      price,
+      amount: totalAmount,
+      amountFormatted: `${amounts[i].toFixed(2)}K`,
+      collateral: collaterals[i],
+      collateralIcon: '/tokens/sol.svg',
+      collateralToken: 'SOL' as const,
+      isOwner: i === 2,
+      fillPercent: fillPercents[i],
+      filledAmount,
+      totalAmount,
+      fillType: fillTypes[i],
+    };
+  });
 }
 
 export const myFilledOrders: MyOrder[] = [
@@ -240,4 +262,15 @@ export const detailRecentTrades = [
   { id: 'dt-5', time: '7m ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.005, amount: '36.20K', collateral: 181.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'fish' as const },
   { id: 'dt-6', time: '10m ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.005, amount: '1.00M', collateral: 150000.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'whale' as const },
   { id: 'dt-7', time: '12m ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.005, amount: '18.20K', collateral: 91.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'shrimp' as const },
+  { id: 'dt-8', time: '15m ago', side: 'Sell' as const, pair: 'SKATE/USDC', price: 0.0049, amount: '55.00K', collateral: 269.5, collateralIcon: '/tokens/usdc.svg', tierIcon: 'fish' as const },
+  { id: 'dt-9', time: '18m ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.0051, amount: '120.00K', collateral: 612.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'dolphin' as const },
+  { id: 'dt-10', time: '22m ago', side: 'Sell' as const, pair: 'SKATE/USDC', price: 0.005, amount: '75.00K', collateral: 375.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'fish' as const },
+  { id: 'dt-11', time: '25m ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.0052, amount: '500.00K', collateral: 2600.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'shark' as const, hasBadge: 'RS' },
+  { id: 'dt-12', time: '30m ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.005, amount: '10.00K', collateral: 50.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'shrimp' as const },
+  { id: 'dt-13', time: '35m ago', side: 'Sell' as const, pair: 'SKATE/USDC', price: 0.0048, amount: '200.00K', collateral: 960.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'dolphin' as const },
+  { id: 'dt-14', time: '40m ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.005, amount: '2.00M', collateral: 300000.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'whale' as const },
+  { id: 'dt-15', time: '45m ago', side: 'Sell' as const, pair: 'SKATE/USDC', price: 0.0049, amount: '88.50K', collateral: 433.65, collateralIcon: '/tokens/usdc.svg', tierIcon: 'fish' as const },
+  { id: 'dt-16', time: '50m ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.0051, amount: '15.00K', collateral: 76.5, collateralIcon: '/tokens/usdc.svg', tierIcon: 'shrimp' as const },
+  { id: 'dt-17', time: '55m ago', side: 'Sell' as const, pair: 'SKATE/USDC', price: 0.005, amount: '60.00K', collateral: 300.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'fish' as const },
+  { id: 'dt-18', time: '1h ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.0052, amount: '350.00K', collateral: 1820.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'shark' as const },
 ];

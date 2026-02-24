@@ -113,6 +113,7 @@ const TOKEN_COLORS: Record<string, string> = {
   OP: '#ef4444',
   APT: '#000000',
   SUI: '#4da2ff',
+  ETH: '#627eea',
 };
 
 // Chain badge images map

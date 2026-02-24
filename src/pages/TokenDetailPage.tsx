@@ -36,8 +36,16 @@ export default function TokenDetailPage() {
   ];
 
   const handleSelectOrder = (order: OrderBookEntry, side: 'buy' | 'sell') => {
-    setSelectedOrder({ order, side });
+    // Toggle off if same order is clicked again
+    if (selectedOrder?.order.id === order.id) {
+      setSelectedOrder(null);
+    } else {
+      setSelectedOrder({ order, side });
+    }
   };
+
+  // Determine collateral token based on chain
+  const collateralToken = token.chain === 'ethereum' ? 'ETH' : token.chain === 'sui' ? 'SUI' : 'SOL';
 
   return (
     <div className="mx-auto max-w-[1440px] px-12">
@@ -66,12 +74,14 @@ export default function TokenDetailPage() {
               buyOrders={buyOrders}
               sellOrders={sellOrders}
               onSelectOrder={handleSelectOrder}
+              selectedOrderId={selectedOrder?.order.id ?? null}
+              tokenSymbol={token.tokenSymbol}
             />
           </div>
 
           {/* Recent Trades */}
           <div className="pt-4">
-            <DetailRecentTrades />
+            <DetailRecentTrades tokenSymbol={token.tokenSymbol} />
           </div>
         </div>
 
@@ -85,6 +95,7 @@ export default function TokenDetailPage() {
             <TradePanel
               tokenSymbol={token.tokenSymbol}
               selectedOrder={selectedOrder}
+              collateralToken={collateralToken}
             />
           </div>
 
