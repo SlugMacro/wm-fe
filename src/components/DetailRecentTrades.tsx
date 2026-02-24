@@ -180,12 +180,12 @@ export default function DetailRecentTrades({ tokenSymbol: _tokenSymbol }: Detail
       {/* Table header */}
       <div className="flex items-center border-b border-[#1b1b1c] h-9 px-2">
         <div className="flex-1 min-w-0 flex items-center">
-          <div className="w-[88px] shrink-0">
+          <div className="w-[128px] shrink-0">
             <span className="text-xs font-normal text-[#7a7a83]">Time</span>
           </div>
           <span className="text-xs font-normal text-[#7a7a83]">Side</span>
         </div>
-        <div className="w-[180px] shrink-0 text-left">
+        <div className="w-[140px] shrink-0 text-left">
           <span className="text-xs font-normal text-[#7a7a83]">Pair</span>
         </div>
         <div className="w-[120px] shrink-0 text-right">
@@ -227,7 +227,7 @@ export default function DetailRecentTrades({ tokenSymbol: _tokenSymbol }: Detail
               >
                 {/* Time + Side */}
                 <div className="flex-1 min-w-0 flex items-center">
-                  <div className="w-[88px] shrink-0">
+                  <div className="w-[128px] shrink-0">
                     <span className={`text-sm font-normal ${trade.isNew ? 'text-[#5bd197]' : 'text-[#7a7a83]'}`}>
                       {trade.time}
                     </span>
@@ -244,7 +244,7 @@ export default function DetailRecentTrades({ tokenSymbol: _tokenSymbol }: Detail
                   </div>
                 </div>
                 {/* Pair */}
-                <div className="w-[180px] shrink-0 text-left">
+                <div className="w-[140px] shrink-0 text-left">
                   <span className="text-sm font-medium text-[#f9f9fa]">{trade.pair}</span>
                 </div>
                 {/* Price — yellow for RS orders */}
