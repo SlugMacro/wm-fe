@@ -34,8 +34,8 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
   // Chart dimensions
   const priceChartH = 220;
   const volumeChartH = 100;
-  const rightAxisW = 60;
-  const leftLabelW = 24;
+  const rightAxisW = 96;
+  const leftLabelW = 32;
 
   // Price bounds
   const prices = filteredData.map(d => d.price);
@@ -86,11 +86,9 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
   // Area polygon (add bottom-right and bottom-left)
   const areaPoints = pricePoints + ' 100,100 0,100';
 
-  // Last point position for the green dot
+  // Last point position for the green dot — uses currentPrice (giá khớp)
   const lastPointX = 100;
-  const lastPointY = filteredData.length > 0
-    ? (1 - (filteredData[filteredData.length - 1].price - minPrice) / priceRange) * 100
-    : 50;
+  const lastPointY = currentPricePct * 100;
 
   // Hover handler — calculate data index from mouse X position
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
@@ -194,7 +192,7 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
         <div className="flex pt-6 px-4">
           {/* Left "Price" label */}
           <div
-            className="shrink-0 flex items-center justify-center"
+            className="shrink-0 flex items-center justify-center border-r border-[#252527]"
             style={{ width: leftLabelW, height: priceChartH }}
           >
             <span
@@ -340,21 +338,21 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
 
           {/* Right Y-axis for price */}
           <div
-            className="shrink-0 relative"
+            className="shrink-0 relative border-l border-[#252527]"
             style={{ width: rightAxisW, height: priceChartH }}
           >
             {priceLabels.map((l, i) => (
               <span
                 key={i}
-                className="absolute text-[10px] text-[#7a7a83] tabular-nums text-right pr-1"
-                style={{ top: `${l.pct * 100}%`, right: 0, transform: 'translateY(-50%)' }}
+                className="absolute text-[10px] text-[#7a7a83] tabular-nums pl-2"
+                style={{ top: `${l.pct * 100}%`, left: 0, transform: 'translateY(-50%)' }}
               >
                 {l.label}
               </span>
             ))}
             {/* Current price badge */}
             <div
-              className="absolute right-0 rounded px-1.5 py-0.5 text-[10px] font-medium text-[#0a0a0b] tabular-nums"
+              className="absolute left-2 rounded px-1.5 py-0.5 text-[10px] font-medium text-[#0a0a0b] tabular-nums"
               style={{
                 top: `${currentPricePct * 100}%`,
                 transform: 'translateY(-50%)',
@@ -366,7 +364,7 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
             {/* Hover price label */}
             {hoverPoint && hoverIndex !== null && (
               <div
-                className="absolute right-0 rounded px-1.5 py-0.5 text-[10px] font-medium text-[#f9f9fa] tabular-nums bg-[#333]"
+                className="absolute left-2 rounded px-1.5 py-0.5 text-[10px] font-medium text-[#f9f9fa] tabular-nums bg-[#333]"
                 style={{
                   top: `${hoverPriceY}%`,
                   transform: 'translateY(-50%)',
@@ -387,7 +385,7 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
         <div className="flex px-4 pb-1">
           {/* Left "Volume" label */}
           <div
-            className="shrink-0 flex items-center justify-center"
+            className="shrink-0 flex items-center justify-center border-r border-[#252527]"
             style={{ width: leftLabelW, height: volumeChartH + 28 }}
           >
             <span
@@ -478,13 +476,13 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
 
           {/* Volume right Y-axis */}
           <div
-            className="shrink-0 flex flex-col justify-between"
+            className="shrink-0 flex flex-col justify-between border-l border-[#252527]"
             style={{ width: rightAxisW, height: volumeChartH, marginTop: 28 }}
           >
-            <span className="text-[10px] text-[#7a7a83] tabular-nums text-right pr-1">
+            <span className="text-[10px] text-[#7a7a83] tabular-nums pl-2">
               {formatVol(maxVolume)}
             </span>
-            <span className="text-[10px] text-[#7a7a83] tabular-nums text-right pr-1">
+            <span className="text-[10px] text-[#7a7a83] tabular-nums pl-2">
               {formatVol(maxVolume / 2)}
             </span>
           </div>
