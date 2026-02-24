@@ -127,7 +127,7 @@ export default function Header() {
         {/* Right Actions */}
         <div className="flex items-center gap-3 shrink-0">
           {/* Chain Selector */}
-          <button className="flex items-center gap-1.5 rounded-lg border border-[#252527] p-2 transition-colors hover:border-[#3a3a3d]">
+          <button className="flex items-center gap-1.5 h-9 rounded-lg border border-[#252527] p-2 transition-colors hover:border-[#3a3a3d]">
             <div className="flex items-center p-0.5">
               <img
                 src={chainSolanaPng}
@@ -160,7 +160,7 @@ export default function Header() {
           </button>
 
           {/* Balance */}
-          <button className="flex items-center gap-1.5 rounded-lg border border-[#252527] pl-2 pr-3 py-2 transition-colors hover:border-[#3a3a3d]">
+          <button className="flex items-center gap-1.5 h-9 rounded-lg border border-[#252527] pl-2 pr-3 py-2 transition-colors hover:border-[#3a3a3d]">
             <div className="flex items-center p-0.5">
               <img
                 src={tokenSolPng}
