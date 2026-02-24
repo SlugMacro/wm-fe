@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Breadcrumb from '../components/Breadcrumb';
 import TokenMarketHeader from '../components/TokenMarketHeader';
@@ -8,7 +8,7 @@ import TradePanel from '../components/TradePanel';
 import MyOrders from '../components/MyOrders';
 import DetailRecentTrades from '../components/DetailRecentTrades';
 import BottomStats from '../components/BottomStats';
-import type { OrderBookEntry } from '../types';
+import type { OrderBookEntry, PriceDataPoint } from '../types';
 import {
   tokenDetails,
   defaultTokenId,
@@ -33,10 +33,26 @@ export default function TokenDetailPage() {
   const [sellOrders, setSellOrders] = useState<OrderBookEntry[]>(() =>
     generateSellOrders(token.price, token.chain)
   );
-  const priceData = useMemo(() => generatePriceData(), []);
+  const [priceData, setPriceData] = useState<PriceDataPoint[]>(() => generatePriceData());
 
-  // When a trade executes in Recent Trades, update a matching order's fill
+  // When a trade executes in Recent Trades, update a matching order's fill AND chart
   const handleTradeExecuted = useCallback((side: 'Buy' | 'Sell') => {
+    // Add new price data point to chart — Buy pushes price up, Sell pushes down
+    setPriceData(prev => {
+      const lastPoint = prev[prev.length - 1];
+      const priceShift = side === 'Buy'
+        ? Math.random() * 0.0002 + 0.0001
+        : -(Math.random() * 0.0002 + 0.0001);
+      const newPrice = Math.max(0.001, lastPoint.price + priceShift);
+      const newVolume = Math.random() * 150000 + 20000;
+      const newPoint: PriceDataPoint = {
+        time: new Date().toISOString(),
+        price: newPrice,
+        volume: newVolume,
+      };
+      return [...prev, newPoint];
+    });
+
     const setOrders = side === 'Buy' ? setBuyOrders : setSellOrders;
 
     setOrders(prevOrders => {
