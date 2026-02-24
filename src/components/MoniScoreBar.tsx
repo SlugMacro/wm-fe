@@ -21,7 +21,7 @@ export default function MoniScoreBar({ score, maxScore = 50000 }: MoniScoreBarPr
         </div>
         {/* Score dot */}
         <div
-          className="absolute w-2 h-2 rounded-full bg-[#16c284] border border-[#0a0a0b]"
+          className="absolute w-2 h-2 rounded-full bg-[#f9f9fa] border border-[#0a0a0b]"
           style={{ left: `${pct}%`, transform: 'translateX(-50%)' }}
         />
       </div>

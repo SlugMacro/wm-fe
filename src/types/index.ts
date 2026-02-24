@@ -38,8 +38,7 @@ export type MarketTab = 'live' | 'upcoming' | 'ended';
 
 // Upcoming market types
 export interface InvestorAvatar {
-  color: string;
-  label: string; // single letter for the avatar
+  image: string; // path to avatar image
 }
 
 export interface UpcomingMarket {

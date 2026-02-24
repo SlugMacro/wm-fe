@@ -111,9 +111,29 @@ function LiveTokenCell({ market }: { market: LiveMarket }) {
 }
 
 function UpcomingTokenCell({ market }: { market: UpcomingMarket }) {
+  // Chain badge mapping
+  const chainColors: Record<string, string> = {
+    solana: '#9945ff',
+    ethereum: '#627eea',
+    sui: '#4da2ff',
+  };
+
   return (
     <div className="flex items-center gap-3">
-      <TokenIcon symbol={market.tokenSymbol} chain={market.chain} size="md" />
+      {/* Token icon with chain badge */}
+      <div className="relative size-11 shrink-0">
+        <img
+          src={market.tokenIcon}
+          alt={market.tokenSymbol}
+          className="size-9 rounded-full object-cover absolute top-1 left-1"
+        />
+        <div
+          className="absolute bottom-0 left-0 size-4 rounded border-2 border-[#0a0a0b] flex items-center justify-center"
+          style={{ backgroundColor: chainColors[market.chain] || '#627eea' }}
+        >
+          <span className="text-[7px] font-bold text-white uppercase">{market.chain[0]}</span>
+        </div>
+      </div>
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-1.5">
           <span className="text-sm font-medium text-[#f9f9fa]">{market.tokenSymbol}</span>
@@ -183,10 +203,10 @@ function InvestorAvatarsCell({ investors, extra }: { investors: InvestorAvatar[]
       {investors.map((inv, i) => (
         <div
           key={i}
-          className="shrink-0 size-5 rounded-full flex items-center justify-center text-[8px] font-bold text-white border border-[#0a0a0b] -mr-1.5"
-          style={{ backgroundColor: inv.color, zIndex: investors.length - i }}
+          className="shrink-0 size-5 rounded-full overflow-hidden border border-[#0a0a0b] -mr-1.5"
+          style={{ zIndex: investors.length - i }}
         >
-          {inv.label}
+          <img src={inv.image} alt="" className="size-full object-cover" />
         </div>
       ))}
       {extra > 0 && (
