@@ -10,6 +10,9 @@ import tokenUsdc from '../assets/images/token-usdc.png';
 import tokenUsdt from '../assets/images/token-usdt.png';
 import tokenPengu from '../assets/images/token-pengu.png';
 import tokenIka from '../assets/images/token-ika.png';
+import tokenNexo from '../assets/images/token-nexo.png';
+import tokenArc from '../assets/images/token-arc.png';
+import tokenDrift from '../assets/images/token-drift.png';
 
 // Chain badge images (downloaded from Figma design)
 import chainSolana from '../assets/images/chain-solana.png';
@@ -29,6 +32,9 @@ const TOKEN_IMAGES: Record<string, string> = {
   USDT: tokenUsdt,
   PENGU: tokenPengu,
   IKA: tokenIka,
+  NEXO: tokenNexo,
+  ARC: tokenArc,
+  DRIFT: tokenDrift,
 };
 
 // Fallback brand colors for tokens without local images
