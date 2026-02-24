@@ -201,10 +201,10 @@ export default function OrderBook({ buyOrders, sellOrders, onSelectOrder, select
             return (
               <div
                 key={order.id}
-                className={`relative flex items-center h-10 cursor-pointer transition-colors rounded-sm ${
+                className={`relative flex items-center h-10 cursor-pointer transition-colors rounded-md px-2 mt-1 ${
                   isSelected
-                    ? 'bg-[rgba(22,194,132,0.08)] border border-[rgba(22,194,132,0.2)] -mx-px'
-                    : 'hover:bg-[rgba(22,194,132,0.05)]'
+                    ? 'bg-[rgba(22,194,132,0.08)] border border-[rgba(22,194,132,0.2)]'
+                    : 'bg-[#131314] hover:bg-[rgba(22,194,132,0.05)]'
                 }`}
                 onClick={() => onSelectOrder(order, 'buy')}
                 onMouseEnter={() => setHoveredOrderId(order.id)}
@@ -281,10 +281,10 @@ export default function OrderBook({ buyOrders, sellOrders, onSelectOrder, select
             return (
               <div
                 key={order.id}
-                className={`relative flex items-center h-10 cursor-pointer transition-colors rounded-sm ${
+                className={`relative flex items-center h-10 cursor-pointer transition-colors rounded-md px-2 mt-1 ${
                   isSelected
-                    ? 'bg-[rgba(255,59,70,0.08)] border border-[rgba(255,59,70,0.2)] -mx-px'
-                    : 'hover:bg-[rgba(255,59,70,0.05)]'
+                    ? 'bg-[rgba(255,59,70,0.08)] border border-[rgba(255,59,70,0.2)]'
+                    : 'bg-[#131314] hover:bg-[rgba(255,59,70,0.05)]'
                 }`}
                 onClick={() => onSelectOrder(order, 'sell')}
                 onMouseEnter={() => setHoveredOrderId(order.id)}
