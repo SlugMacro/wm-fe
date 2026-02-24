@@ -212,14 +212,22 @@ export default function DetailRecentTrades({ tokenSymbol: _tokenSymbol }: Detail
         })}
       </div>
 
-      {/* Scoped styles: hidden by default, overlay scroll on hover — no layout shift */}
+      {/* Scoped styles: hidden default → overlay on hover (no layout shift) */}
       <style>{`
         .detail-trades-scroll {
           overflow-y: hidden;
+          scrollbar-width: thin;
+          scrollbar-color: transparent transparent;
         }
         .detail-trades-scroll:hover {
-          overflow-y: overlay; /* Chromium: scrollbar overlays content, no shift */
-          overflow-y: auto;    /* Firefox fallback */
+          overflow-y: auto;
+          scrollbar-color: #252527 transparent;
+        }
+        /* Chromium: overlay sits on top of content → zero layout shift */
+        @supports (overflow: overlay) {
+          .detail-trades-scroll:hover {
+            overflow-y: overlay;
+          }
         }
         .detail-trades-scroll::-webkit-scrollbar {
           width: 4px;
@@ -233,13 +241,6 @@ export default function DetailRecentTrades({ tokenSymbol: _tokenSymbol }: Detail
         }
         .detail-trades-scroll::-webkit-scrollbar-thumb:hover {
           background: #3a3a3d;
-        }
-        .detail-trades-scroll {
-          scrollbar-width: thin;
-          scrollbar-color: transparent transparent;
-        }
-        .detail-trades-scroll:hover {
-          scrollbar-color: #252527 transparent;
         }
         @keyframes detailSlideIn {
           0% {
