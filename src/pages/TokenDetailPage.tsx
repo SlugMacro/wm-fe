@@ -158,6 +158,7 @@ export default function TokenDetailPage() {
               data={priceData}
               currentPrice={livePrice}
               priceChange={livePriceChange}
+              impliedFdv={token.impliedFdv}
             />
           </div>
 

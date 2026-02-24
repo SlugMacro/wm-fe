@@ -11,9 +11,31 @@ interface PriceChartProps {
   data: PriceDataPoint[];
   currentPrice: number;
   priceChange: number;
+  impliedFdv?: string;
 }
 
-export default function PriceChart({ data, currentPrice, priceChange }: PriceChartProps) {
+/** Parse FDV string like "$38.1M" → 38100000, "$48.3K" → 48300 */
+function parseFdvString(s: string): number {
+  const cleaned = s.replace(/[$,]/g, '');
+  const match = cleaned.match(/^([\d.]+)(K|M|B)?$/i);
+  if (!match) return 0;
+  const num = parseFloat(match[1]);
+  const suffix = (match[2] || '').toUpperCase();
+  if (suffix === 'B') return num * 1_000_000_000;
+  if (suffix === 'M') return num * 1_000_000;
+  if (suffix === 'K') return num * 1_000;
+  return num;
+}
+
+/** Format FDV number: 38100000 → "$38.10M", 48300 → "$48.30K" */
+function formatFdvValue(v: number): string {
+  if (v >= 1_000_000_000) return `$${(v / 1_000_000_000).toFixed(2)}B`;
+  if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(2)}M`;
+  if (v >= 1_000) return `$${(v / 1_000).toFixed(2)}K`;
+  return `$${v.toFixed(2)}`;
+}
+
+export default function PriceChart({ data, currentPrice, priceChange, impliedFdv }: PriceChartProps) {
   const [timeRange, setTimeRange] = useState<TimeRange>('7d');
   const [chartType, setChartType] = useState<ChartType>('price');
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
@@ -50,13 +72,33 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
   const volumes = filteredData.map(d => d.volume);
   const maxVolume = Math.max(...volumes);
 
+  // FDV computation: totalSupply = impliedFdvNumber / currentPrice
+  const fdvNumber = impliedFdv ? parseFdvString(impliedFdv) : 0;
+  const totalSupply = currentPrice > 0 ? fdvNumber / currentPrice : 0;
+
+  // FDV bounds (derived from price × totalSupply)
+  const minFdv = minPrice * totalSupply;
+  const maxFdv = maxPrice * totalSupply;
+  const fdvRange = maxFdv - minFdv || 1;
+
   // Y-axis price scale (6 labels for better readability)
   const priceLabels = Array.from({ length: 6 }, (_, i) => {
     const val = maxPrice - (i / 5) * priceRange;
     return { pct: i / 5, label: val.toFixed(4) };
   });
 
+  // Y-axis FDV scale (6 labels)
+  const fdvLabels = Array.from({ length: 6 }, (_, i) => {
+    const val = maxFdv - (i / 5) * fdvRange;
+    return { pct: i / 5, label: formatFdvValue(val) };
+  });
+
+  // Active labels based on chart type
+  const activeLabels = chartType === 'fdv' ? fdvLabels : priceLabels;
+
   const currentPricePct = Math.max(0, Math.min(1, 1 - (currentPrice - minPrice) / priceRange));
+  const currentFdv = currentPrice * totalSupply;
+  const currentFdvPct = Math.max(0, Math.min(1, 1 - (currentFdv - minFdv) / fdvRange));
 
   const isPositive = priceChange >= 0;
   const lineColor = isPositive ? '#5bd197' : '#fd5e67';
@@ -79,20 +121,24 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
   const formatTime = (d: Date) =>
     `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
 
-  // Generate polyline points for price chart
-  const pricePoints = filteredData.map((d, i) => {
+  // Generate polyline points for chart (works for both price and FDV since same normalized positions)
+  const chartPoints = filteredData.map((d, i) => {
     const x = (i / Math.max(filteredData.length - 1, 1)) * 100;
-    const y = (1 - (d.price - minPrice) / priceRange) * 100;
+    const y = chartType === 'fdv'
+      ? (1 - (d.price * totalSupply - minFdv) / fdvRange) * 100
+      : (1 - (d.price - minPrice) / priceRange) * 100;
     return `${x},${y}`;
   }).join(' ');
 
   // Area polygon (add bottom-right and bottom-left)
-  const areaPoints = pricePoints + ' 100,100 0,100';
+  const areaPoints = chartPoints + ' 100,100 0,100';
 
   // Last point position for the green dot — always at chart endpoint (giá khớp lệnh)
   const lastPointX = 100;
   const lastDataPointPrice = filteredData.length > 0 ? filteredData[filteredData.length - 1].price : currentPrice;
-  const lastPointY = (1 - (lastDataPointPrice - minPrice) / priceRange) * 100;
+  const lastPointY = chartType === 'fdv'
+    ? (1 - (lastDataPointPrice * totalSupply - minFdv) / fdvRange) * 100
+    : (1 - (lastDataPointPrice - minPrice) / priceRange) * 100;
 
   // Hover handler — calculate data index from mouse X position
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
@@ -112,7 +158,12 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
   // Hover computed values
   const hoverPoint = hoverIndex !== null ? filteredData[hoverIndex] : null;
   const hoverX = hoverIndex !== null ? (hoverIndex / Math.max(filteredData.length - 1, 1)) * 100 : 0;
-  const hoverPriceY = hoverPoint ? (1 - (hoverPoint.price - minPrice) / priceRange) * 100 : 0;
+  const hoverPriceY = hoverPoint
+    ? chartType === 'fdv'
+      ? (1 - (hoverPoint.price * totalSupply - minFdv) / fdvRange) * 100
+      : (1 - (hoverPoint.price - minPrice) / priceRange) * 100
+    : 0;
+  const hoverFdv = hoverPoint ? hoverPoint.price * totalSupply : 0;
 
   // Volume Y-axis labels
   const formatVol = (v: number) => v >= 1000 ? `${(v / 1000).toFixed(0)}K` : v.toFixed(0);
@@ -178,9 +229,9 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
               {formatTime(new Date(hoverPoint.time))}
             </div>
             <div className="flex items-center justify-between gap-4 mb-1">
-              <span className="text-[10px] text-[#7a7a83]">Price</span>
+              <span className="text-[10px] text-[#7a7a83]">{chartType === 'fdv' ? 'FDV' : 'Price'}</span>
               <span className="text-xs font-medium text-[#f9f9fa] tabular-nums">
-                ${hoverPoint.price.toFixed(4)}
+                {chartType === 'fdv' ? formatFdvValue(hoverPoint.price * totalSupply) : `$${hoverPoint.price.toFixed(4)}`}
               </span>
             </div>
             <div className="flex items-center justify-between gap-4">
@@ -203,7 +254,7 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
               className="text-[10px] text-[#7a7a83] tracking-wider uppercase"
               style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
             >
-              Price
+              {chartType === 'fdv' ? 'FDV' : 'Price'}
             </span>
           </div>
 
@@ -212,11 +263,13 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
             className="flex-1 min-w-0 relative"
             style={{ height: priceChartH }}
           >
-            {/* Price info overlay */}
+            {/* Price/FDV info overlay */}
             <div className="absolute left-2 top-1 z-10 flex items-center gap-2">
-              <span className="text-xs text-[#7a7a83]">Price</span>
+              <span className="text-xs text-[#7a7a83]">{chartType === 'fdv' ? 'FDV' : 'Price'}</span>
               <span className="text-xs font-medium text-[#f9f9fa] tabular-nums">
-                ${hoverPoint ? hoverPoint.price.toFixed(4) : currentPrice.toFixed(4)}
+                {chartType === 'fdv'
+                  ? formatFdvValue(hoverPoint ? hoverPoint.price * totalSupply : currentFdv)
+                  : `$${hoverPoint ? hoverPoint.price.toFixed(4) : currentPrice.toFixed(4)}`}
               </span>
               <span className={`text-xs tabular-nums ${isPositive ? 'text-[#5bd197]' : 'text-[#fd5e67]'}`}>
                 {isPositive ? '+' : ''}{priceChange.toFixed(2)}%
@@ -225,7 +278,7 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
 
             {/* Grid lines + current price line — full width of flex-1 */}
             <svg className="absolute inset-0 w-full h-full pointer-events-none z-[1]" viewBox="0 0 100 100" preserveAspectRatio="none">
-              {priceLabels.map((l, i) => (
+              {activeLabels.map((l, i) => (
                 <line
                   key={i}
                   x1="0"
@@ -290,9 +343,9 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
               {/* Area fill */}
               <polygon points={areaPoints} fill="url(#priceGrad)" />
 
-              {/* Price line */}
+              {/* Price/FDV line */}
               <polyline
-                points={pricePoints}
+                points={chartPoints}
                 fill="none"
                 stroke={lineColor}
                 strokeWidth="1.5"
@@ -374,9 +427,9 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
             className="shrink-0 relative border-l border-[#252527] py-4"
             style={{ width: rightAxisW, height: priceChartH }}
           >
-            {priceLabels.map((l, i) => {
+            {activeLabels.map((l, i) => {
               // Hide first and last labels to avoid overlapping border lines
-              if (i === 0 || i === priceLabels.length - 1) return null;
+              if (i === 0 || i === activeLabels.length - 1) return null;
               return (
                 <span
                   key={i}
@@ -387,18 +440,18 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
                 </span>
               );
             })}
-            {/* Current price badge */}
+            {/* Current price/FDV badge */}
             <div
               className="absolute left-2 rounded px-1.5 py-0.5 text-[10px] font-medium text-[#0a0a0b] tabular-nums"
               style={{
-                top: `${currentPricePct * 100}%`,
+                top: `${(chartType === 'fdv' ? currentFdvPct : currentPricePct) * 100}%`,
                 transform: 'translateY(-50%)',
                 backgroundColor: isPositive ? '#16c284' : '#fd5e67',
               }}
             >
-              {currentPrice.toFixed(4)}
+              {chartType === 'fdv' ? formatFdvValue(currentFdv) : currentPrice.toFixed(4)}
             </div>
-            {/* Hover price label */}
+            {/* Hover price/FDV label */}
             {hoverPoint && hoverIndex !== null && (
               <div
                 className="absolute left-2 rounded px-1.5 py-0.5 text-[10px] font-medium text-[#f9f9fa] tabular-nums bg-[#333]"
@@ -407,7 +460,7 @@ export default function PriceChart({ data, currentPrice, priceChange }: PriceCha
                   transform: 'translateY(-50%)',
                 }}
               >
-                {hoverPoint.price.toFixed(4)}
+                {chartType === 'fdv' ? formatFdvValue(hoverFdv) : hoverPoint.price.toFixed(4)}
               </div>
             )}
           </div>
