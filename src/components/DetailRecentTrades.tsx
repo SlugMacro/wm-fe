@@ -47,6 +47,8 @@ const SAMPLE_NEW_TRADES: Omit<DetailTrade, 'id' | 'time'>[] = [
 const VISIBLE_ROWS = 15; // rows visible without scrolling
 const MAX_TRADES = 30; // total trades kept in state (rest scrollable)
 const NEW_TRADE_INTERVAL = 45_000; // 45 seconds
+const ROW_HEIGHT = 48;
+const SCROLLBAR_WIDTH = 4;
 
 interface DetailRecentTradesProps {
   tokenSymbol?: string;
@@ -62,6 +64,30 @@ export default function DetailRecentTrades({ tokenSymbol: _tokenSymbol }: Detail
   );
   const nextIdRef = useRef(detailRecentTrades.length + 1);
   const sampleIndexRef = useRef(0);
+
+  // Scroll state for custom scrollbar
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isHovering, setIsHovering] = useState(false);
+  const [thumbTop, setThumbTop] = useState(0);
+  const [thumbHeight, setThumbHeight] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartRef = useRef({ y: 0, scrollTop: 0 });
+
+  const maxHeight = VISIBLE_ROWS * ROW_HEIGHT;
+
+  // Sync custom thumb position with scroll
+  const updateThumb = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const { scrollTop, scrollHeight, clientHeight } = el;
+    if (scrollHeight <= clientHeight) {
+      setThumbHeight(0);
+      return;
+    }
+    const ratio = clientHeight / scrollHeight;
+    setThumbHeight(ratio * clientHeight);
+    setThumbTop((scrollTop / scrollHeight) * clientHeight);
+  }, []);
 
   // Add new trade periodically
   const addNewTrade = useCallback(() => {
@@ -105,6 +131,45 @@ export default function DetailRecentTrades({ tokenSymbol: _tokenSymbol }: Detail
     return () => clearInterval(timer);
   }, []);
 
+  // Listen to scroll events for thumb sync
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const onScroll = () => updateThumb();
+    el.addEventListener('scroll', onScroll, { passive: true });
+    updateThumb();
+    return () => el.removeEventListener('scroll', onScroll);
+  }, [updateThumb, trades]);
+
+  // Drag handlers for custom scrollbar thumb
+  useEffect(() => {
+    if (!isDragging) return;
+    const onMouseMove = (e: MouseEvent) => {
+      const el = scrollRef.current;
+      if (!el) return;
+      const delta = e.clientY - dragStartRef.current.y;
+      const scrollRatio = el.scrollHeight / el.clientHeight;
+      el.scrollTop = dragStartRef.current.scrollTop + delta * scrollRatio;
+    };
+    const onMouseUp = () => setIsDragging(false);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+  }, [isDragging]);
+
+  const handleThumbMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const el = scrollRef.current;
+    if (!el) return;
+    dragStartRef.current = { y: e.clientY, scrollTop: el.scrollTop };
+    setIsDragging(true);
+  };
+
+  const showScrollbar = (isHovering || isDragging) && thumbHeight > 0;
+
   return (
     <div>
       {/* Header — no Show All button */}
@@ -112,7 +177,7 @@ export default function DetailRecentTrades({ tokenSymbol: _tokenSymbol }: Detail
         <h2 className="text-xl font-medium leading-7 text-[#f9f9fa]">Recent Trades</h2>
       </div>
 
-      {/* Table header — no sort icons, wider Time+Side matching market page */}
+      {/* Table header */}
       <div className="flex items-center border-b border-[#1b1b1c] h-9 px-2">
         <div className="flex-1 min-w-0 flex items-center">
           <div className="w-[128px] shrink-0">
@@ -137,110 +202,113 @@ export default function DetailRecentTrades({ tokenSymbol: _tokenSymbol }: Detail
         </div>
       </div>
 
-      {/* Scrollable rows — hidden by default, overlay scroll on hover (no layout shift) */}
+      {/* Scroll area: native scrollbar hidden, custom 4px scrollbar overlays */}
       <div
-        className="detail-trades-scroll"
-        style={{ maxHeight: `${VISIBLE_ROWS * 48}px` }}
+        className="relative"
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => { if (!isDragging) setIsHovering(false); }}
       >
-        {trades.map(trade => {
-          // RS (resell) orders have yellow price
-          const isRS = trade.hasBadge === 'RS';
-          const priceColor = isRS
-            ? 'text-[#eab308]'
-            : 'text-[#f9f9fa]';
+        <div
+          ref={scrollRef}
+          className="detail-trades-scroll"
+          style={{ maxHeight: `${maxHeight}px`, overflowY: 'auto' }}
+        >
+          {trades.map(trade => {
+            const isRS = trade.hasBadge === 'RS';
+            const priceColor = isRS ? 'text-[#eab308]' : 'text-[#f9f9fa]';
 
-          return (
-            <div
-              key={trade.id}
-              className={`flex items-center border-b border-[#1b1b1c] h-[48px] px-2 transition-all hover:bg-[rgba(255,255,255,0.02)] ${
-                trade.isNew ? 'bg-[rgba(91,209,151,0.05)]' : ''
-              }`}
-              style={trade.isNew ? { animation: 'detailSlideIn 0.4s ease-out' } : undefined}
-            >
-              {/* Time + Side — flex-1 matching market page layout */}
-              <div className="flex-1 min-w-0 flex items-center">
-                <div className="w-[128px] shrink-0">
-                  <span className={`text-sm font-normal ${trade.isNew ? 'text-[#5bd197]' : 'text-[#7a7a83]'}`}>
-                    {trade.time}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className={`text-sm font-medium ${trade.side === 'Buy' ? 'text-[#5bd197]' : 'text-[#fd5e67]'}`}>
-                    {trade.side}
-                  </span>
-                  {trade.hasBadge && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-[#eab308] px-2 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b]">
-                      {trade.hasBadge}
+            return (
+              <div
+                key={trade.id}
+                className={`flex items-center border-b border-[#1b1b1c] h-[48px] px-2 transition-all hover:bg-[rgba(255,255,255,0.02)] ${
+                  trade.isNew ? 'bg-[rgba(91,209,151,0.05)]' : ''
+                }`}
+                style={trade.isNew ? { animation: 'detailSlideIn 0.4s ease-out' } : undefined}
+              >
+                {/* Time + Side */}
+                <div className="flex-1 min-w-0 flex items-center">
+                  <div className="w-[128px] shrink-0">
+                    <span className={`text-sm font-normal ${trade.isNew ? 'text-[#5bd197]' : 'text-[#7a7a83]'}`}>
+                      {trade.time}
                     </span>
-                  )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-sm font-medium ${trade.side === 'Buy' ? 'text-[#5bd197]' : 'text-[#fd5e67]'}`}>
+                      {trade.side}
+                    </span>
+                    {trade.hasBadge && (
+                      <span className="inline-flex items-center justify-center rounded-full bg-[#eab308] px-2 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b]">
+                        {trade.hasBadge}
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
-              {/* Pair */}
-              <div className="w-[200px] shrink-0 text-left">
-                <span className="text-sm font-medium text-[#f9f9fa]">{trade.pair}</span>
-              </div>
-              {/* Price — yellow for RS orders */}
-              <div className="w-[100px] shrink-0 text-right">
-                <span className={`text-sm font-medium tabular-nums ${priceColor}`}>
-                  {trade.price.toFixed(4)}
-                </span>
-              </div>
-              {/* Amount */}
-              <div className="w-[100px] shrink-0 text-right">
-                <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">{trade.amount}</span>
-              </div>
-              {/* Collateral */}
-              <div className="w-[140px] shrink-0">
-                <div className="flex items-center justify-end gap-2">
-                  <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">
-                    {trade.collateral >= 1000
-                      ? `${(trade.collateral / 1000).toFixed(2)}K`
-                      : trade.collateral.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                {/* Pair */}
+                <div className="w-[200px] shrink-0 text-left">
+                  <span className="text-sm font-medium text-[#f9f9fa]">{trade.pair}</span>
+                </div>
+                {/* Price — yellow for RS orders */}
+                <div className="w-[100px] shrink-0 text-right">
+                  <span className={`text-sm font-medium tabular-nums ${priceColor}`}>
+                    {trade.price.toFixed(4)}
                   </span>
-                  <TokenIcon symbol={getCollateralSymbol(trade.collateralIcon)} size="sm" showChain={false} />
-                  <TierIcon tier={trade.tierIcon} />
+                </div>
+                {/* Amount */}
+                <div className="w-[100px] shrink-0 text-right">
+                  <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">{trade.amount}</span>
+                </div>
+                {/* Collateral */}
+                <div className="w-[140px] shrink-0">
+                  <div className="flex items-center justify-end gap-2">
+                    <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">
+                      {trade.collateral >= 1000
+                        ? `${(trade.collateral / 1000).toFixed(2)}K`
+                        : trade.collateral.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                    <TokenIcon symbol={getCollateralSymbol(trade.collateralIcon)} size="sm" showChain={false} />
+                    <TierIcon tier={trade.tierIcon} />
+                  </div>
+                </div>
+                {/* Tx.ID */}
+                <div className="w-[60px] shrink-0 flex justify-end">
+                  <button className="inline-flex items-center justify-center w-[44px] h-7 rounded-md border border-[#252527] transition-colors hover:border-[#3a3a3d] hover:bg-[rgba(255,255,255,0.03)]">
+                    <ArrowRightUpIcon />
+                  </button>
                 </div>
               </div>
-              {/* Tx.ID */}
-              <div className="w-[60px] shrink-0 flex justify-end">
-                <button className="inline-flex items-center justify-center w-[44px] h-7 rounded-md border border-[#252527] transition-colors hover:border-[#3a3a3d] hover:bg-[rgba(255,255,255,0.03)]">
-                  <ArrowRightUpIcon />
-                </button>
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
+
+        {/* Custom 4px scrollbar — absolutely positioned, overlays content */}
+        <div
+          className="absolute top-0 right-0 w-[4px] transition-opacity duration-200 pointer-events-none"
+          style={{
+            height: `${maxHeight}px`,
+            opacity: showScrollbar ? 1 : 0,
+          }}
+        >
+          <div
+            className="absolute right-0 rounded-full pointer-events-auto cursor-pointer"
+            style={{
+              width: `${SCROLLBAR_WIDTH}px`,
+              height: `${Math.max(thumbHeight, 24)}px`,
+              top: `${thumbTop}px`,
+              background: isDragging ? '#3a3a3d' : '#252527',
+              transition: isDragging ? 'none' : 'background 0.15s',
+            }}
+            onMouseDown={handleThumbMouseDown}
+          />
+        </div>
       </div>
 
-      {/* Scoped styles: hidden default → overlay on hover (no layout shift) */}
+      {/* Hide native scrollbar + animation keyframes */}
       <style>{`
         .detail-trades-scroll {
-          overflow-y: hidden;
-          scrollbar-width: thin;
-          scrollbar-color: transparent transparent;
-        }
-        .detail-trades-scroll:hover {
-          overflow-y: auto;
-          scrollbar-color: #252527 transparent;
-        }
-        /* Chromium: overlay sits on top of content → zero layout shift */
-        @supports (overflow: overlay) {
-          .detail-trades-scroll:hover {
-            overflow-y: overlay;
-          }
+          scrollbar-width: none;
         }
         .detail-trades-scroll::-webkit-scrollbar {
-          width: 4px;
-        }
-        .detail-trades-scroll::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .detail-trades-scroll::-webkit-scrollbar-thumb {
-          background: #252527;
-          border-radius: 2px;
-        }
-        .detail-trades-scroll::-webkit-scrollbar-thumb:hover {
-          background: #3a3a3d;
+          display: none;
         }
         @keyframes detailSlideIn {
           0% {
