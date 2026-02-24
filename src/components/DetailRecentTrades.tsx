@@ -137,9 +137,9 @@ export default function DetailRecentTrades({ tokenSymbol: _tokenSymbol }: Detail
         </div>
       </div>
 
-      {/* Scrollable rows — always overflow-y:scroll to reserve gutter, thumb hidden until hover */}
+      {/* Scrollable rows — hidden by default, overlay scroll on hover (no layout shift) */}
       <div
-        className="detail-trades-scroll overflow-y-scroll"
+        className="detail-trades-scroll"
         style={{ maxHeight: `${VISIBLE_ROWS * 48}px` }}
       >
         {trades.map(trade => {
@@ -212,8 +212,15 @@ export default function DetailRecentTrades({ tokenSymbol: _tokenSymbol }: Detail
         })}
       </div>
 
-      {/* Scoped styles: 4px scrollbar, thumb invisible until container hover */}
+      {/* Scoped styles: hidden by default, overlay scroll on hover — no layout shift */}
       <style>{`
+        .detail-trades-scroll {
+          overflow-y: hidden;
+        }
+        .detail-trades-scroll:hover {
+          overflow-y: overlay; /* Chromium: scrollbar overlays content, no shift */
+          overflow-y: auto;    /* Firefox fallback */
+        }
         .detail-trades-scroll::-webkit-scrollbar {
           width: 4px;
         }
@@ -221,14 +228,10 @@ export default function DetailRecentTrades({ tokenSymbol: _tokenSymbol }: Detail
           background: transparent;
         }
         .detail-trades-scroll::-webkit-scrollbar-thumb {
-          background: transparent;
-          border-radius: 2px;
-          transition: background 0.2s;
-        }
-        .detail-trades-scroll:hover::-webkit-scrollbar-thumb {
           background: #252527;
+          border-radius: 2px;
         }
-        .detail-trades-scroll:hover::-webkit-scrollbar-thumb:hover {
+        .detail-trades-scroll::-webkit-scrollbar-thumb:hover {
           background: #3a3a3d;
         }
         .detail-trades-scroll {
