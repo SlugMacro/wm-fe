@@ -44,7 +44,8 @@ const SAMPLE_NEW_TRADES: Omit<DetailTrade, 'id' | 'time'>[] = [
   { side: 'Buy', pair: 'SKATE/USDC', price: 0.0053, amount: '150.00K', collateral: 50000.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'whale' },
 ];
 
-const MAX_VISIBLE = 15;
+const VISIBLE_ROWS = 15; // rows visible without scrolling
+const MAX_TRADES = 30; // total trades kept in state (rest scrollable)
 const NEW_TRADE_INTERVAL = 45_000; // 45 seconds
 
 interface DetailRecentTradesProps {
@@ -77,7 +78,7 @@ export default function DetailRecentTrades({ tokenSymbol: _tokenSymbol }: Detail
     };
     nextIdRef.current += 1;
 
-    setTrades((prev) => [newTrade, ...prev.slice(0, MAX_VISIBLE - 1)]);
+    setTrades((prev) => [newTrade, ...prev.slice(0, MAX_TRADES - 1)]);
 
     // Remove isNew flag after animation
     setTimeout(() => {
@@ -104,9 +105,6 @@ export default function DetailRecentTrades({ tokenSymbol: _tokenSymbol }: Detail
     }, 10_000);
     return () => clearInterval(timer);
   }, []);
-
-  // Show first 15 trades visible, rest accessible via scroll
-  const visibleTrades = trades.slice(0, MAX_VISIBLE);
 
   return (
     <div>
@@ -140,13 +138,14 @@ export default function DetailRecentTrades({ tokenSymbol: _tokenSymbol }: Detail
         </div>
       </div>
 
-      {/* Scrollable rows — scroll only visible on hover, 4px width, subtle color */}
+      {/* Scrollable rows — shows ~15 rows (720px), scroll appears on hover to reveal more */}
       <div
-        className={`detail-trades-scroll max-h-[720px] transition-all ${isHovering ? 'overflow-y-auto' : 'overflow-hidden'}`}
+        className={`detail-trades-scroll transition-all ${isHovering ? 'overflow-y-auto' : 'overflow-hidden'}`}
+        style={{ maxHeight: `${VISIBLE_ROWS * 48}px` }}
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
-        {visibleTrades.map(trade => {
+        {trades.map(trade => {
           // RS (resell) orders have yellow price
           const isRS = trade.hasBadge === 'RS';
           const priceColor = isRS
