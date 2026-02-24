@@ -5,6 +5,7 @@ import TokenDetailPage from './pages/TokenDetailPage';
 import DashboardPage from './pages/DashboardPage';
 import EarnPage from './pages/EarnPage';
 import ResourcesPage from './pages/ResourcesPage';
+import ComingSoonPage from './pages/ComingSoonPage';
 
 export default function App() {
   return (
@@ -16,6 +17,9 @@ export default function App() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/earn" element={<EarnPage />} />
         <Route path="/resources" element={<ResourcesPage />} />
+        <Route path="/staking" element={<ComingSoonPage />} />
+        <Route path="/incentives" element={<ComingSoonPage />} />
+        <Route path="/referral" element={<ComingSoonPage />} />
       </Route>
     </Routes>
   );
