@@ -60,7 +60,6 @@ export default function DetailRecentTrades({ tokenSymbol: _tokenSymbol }: Detail
       createdAt: now - parseTimeToSeconds(t.time) * 1000,
     }))
   );
-  const [isHovering, setIsHovering] = useState(false);
   const nextIdRef = useRef(detailRecentTrades.length + 1);
   const sampleIndexRef = useRef(0);
 
@@ -138,12 +137,10 @@ export default function DetailRecentTrades({ tokenSymbol: _tokenSymbol }: Detail
         </div>
       </div>
 
-      {/* Scrollable rows — shows ~15 rows (720px), scroll appears on hover to reveal more */}
+      {/* Scrollable rows — always overflow-y:scroll to reserve gutter, thumb hidden until hover */}
       <div
-        className={`detail-trades-scroll transition-all ${isHovering ? 'overflow-y-auto' : 'overflow-hidden'}`}
+        className="detail-trades-scroll overflow-y-scroll"
         style={{ maxHeight: `${VISIBLE_ROWS * 48}px` }}
-        onMouseEnter={() => setIsHovering(true)}
-        onMouseLeave={() => setIsHovering(false)}
       >
         {trades.map(trade => {
           // RS (resell) orders have yellow price
@@ -215,7 +212,7 @@ export default function DetailRecentTrades({ tokenSymbol: _tokenSymbol }: Detail
         })}
       </div>
 
-      {/* Scoped styles: 4px thin scrollbar + animation */}
+      {/* Scoped styles: 4px scrollbar, thumb invisible until container hover */}
       <style>{`
         .detail-trades-scroll::-webkit-scrollbar {
           width: 4px;
@@ -224,14 +221,21 @@ export default function DetailRecentTrades({ tokenSymbol: _tokenSymbol }: Detail
           background: transparent;
         }
         .detail-trades-scroll::-webkit-scrollbar-thumb {
-          background: #252527;
+          background: transparent;
           border-radius: 2px;
+          transition: background 0.2s;
         }
-        .detail-trades-scroll::-webkit-scrollbar-thumb:hover {
+        .detail-trades-scroll:hover::-webkit-scrollbar-thumb {
+          background: #252527;
+        }
+        .detail-trades-scroll:hover::-webkit-scrollbar-thumb:hover {
           background: #3a3a3d;
         }
         .detail-trades-scroll {
           scrollbar-width: thin;
+          scrollbar-color: transparent transparent;
+        }
+        .detail-trades-scroll:hover {
           scrollbar-color: #252527 transparent;
         }
         @keyframes detailSlideIn {
