@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { MarketTab, SortConfig, SortField } from '../types';
+import type { MarketTab, SortConfig, SortField, UpcomingSortField, UpcomingMarket, InvestorAvatar } from '../types';
 import { liveMarkets, upcomingMarkets, endedMarkets, marketTabCounts } from '../mock-data/markets';
 import { formatPrice, formatVolume, formatPercent } from '../utils/formatNumber';
 import MiniChart from './MiniChart';
+import MoniScoreBar from './MoniScoreBar';
 import TokenIcon from './TokenIcon';
 import { useMarketLiveUpdates, type FlashDirection, type LiveMarket } from '../hooks/useMarketLiveUpdates';
 
@@ -90,7 +91,26 @@ function SettlementCell({ market }: { market: LiveMarket }) {
   );
 }
 
-function TokenCell({ market }: { market: LiveMarket }) {
+function LiveTokenCell({ market }: { market: LiveMarket }) {
+  return (
+    <div className="flex items-center gap-3">
+      <TokenIcon symbol={market.tokenSymbol} chain={market.chain} size="md" />
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-1.5">
+          <span className="text-sm font-medium text-[#f9f9fa]">{market.tokenSymbol}</span>
+          {market.settlementStatus === 'new-market' && (
+            <span className="inline-flex items-center rounded-full bg-[rgba(59,130,246,0.1)] px-2 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#60a5fa]">
+              New Market
+            </span>
+          )}
+        </div>
+        <span className="text-xs font-normal text-[#7a7a83]">{market.tokenName}</span>
+      </div>
+    </div>
+  );
+}
+
+function UpcomingTokenCell({ market }: { market: UpcomingMarket }) {
   return (
     <div className="flex items-center gap-3">
       <TokenIcon symbol={market.tokenSymbol} chain={market.chain} size="md" />
@@ -112,7 +132,6 @@ function TokenCell({ market }: { market: LiveMarket }) {
 function PriceCell({ price, change, flash }: { price: number; change: number; flash: FlashDirection }) {
   const isPositive = change >= 0;
 
-  // Flash color class
   const flashClass = flash === 'up'
     ? 'animate-[flashGreen_1.2s_ease-out]'
     : flash === 'down'
@@ -152,6 +171,54 @@ function VolumeCell({ volume, change, flash }: { volume: number; change: number;
   );
 }
 
+/* ───── Upcoming-specific cells ───── */
+
+function InvestorAvatarsCell({ investors, extra }: { investors: InvestorAvatar[]; extra: number }) {
+  if (investors.length === 0) {
+    return <span className="text-sm font-normal text-[#7a7a83]">-</span>;
+  }
+
+  return (
+    <div className="flex items-start pr-[6px]">
+      {investors.map((inv, i) => (
+        <div
+          key={i}
+          className="shrink-0 size-5 rounded-full flex items-center justify-center text-[8px] font-bold text-white border border-[#0a0a0b] -mr-1.5"
+          style={{ backgroundColor: inv.color, zIndex: investors.length - i }}
+        >
+          {inv.label}
+        </div>
+      ))}
+      {extra > 0 && (
+        <div className="shrink-0 w-9 h-5 rounded-lg bg-[#1b1b1c] border border-[#0a0a0b] flex items-center justify-center -mr-1.5 z-0">
+          <span className="text-[10px] font-medium leading-3 text-[#f9f9fa]">+{extra}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NarrativeBadges({ narratives }: { narratives: string[] }) {
+  if (narratives.length === 0) {
+    return <span className="text-sm font-normal text-[#7a7a83]">-</span>;
+  }
+
+  return (
+    <div className="flex items-start gap-1 flex-wrap">
+      {narratives.map((tag, i) => (
+        <span
+          key={i}
+          className="inline-flex items-center justify-center rounded-full bg-[#1b1b1c] px-2 py-1 text-[10px] font-medium uppercase leading-3 text-[#7a7a83]"
+        >
+          {tag}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+/* ───── Main Component ───── */
+
 export default function LiveMarketTable() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<MarketTab>('live');
@@ -161,12 +228,12 @@ export default function LiveMarketTable() {
   const liveData = useMarketLiveUpdates(liveMarkets);
 
   const tabs: { key: MarketTab; label: string; count: number }[] = [
-    { key: 'live', label: 'Live', count: marketTabCounts.live },
+    { key: 'live', label: 'Live Market', count: marketTabCounts.live },
     { key: 'upcoming', label: 'Upcoming', count: marketTabCounts.upcoming },
     { key: 'ended', label: 'Ended', count: marketTabCounts.ended },
   ];
 
-  const handleSort = (field: SortField) => {
+  const handleSort = (field: SortField | UpcomingSortField) => {
     setSortConfig((prev) => {
       if (prev.field === field) {
         if (prev.direction === 'asc') return { field, direction: 'desc' };
@@ -176,22 +243,18 @@ export default function LiveMarketTable() {
     });
   };
 
-  const getMarkets = (): LiveMarket[] => {
-    // Use live-updated data for 'live' tab, static for others
-    const staticToLive = (arr: typeof upcomingMarkets): LiveMarket[] =>
-      arr.map((m) => ({ ...m, flash: null as FlashDirection }));
+  /* ─── Live / Ended tab data ─── */
+  const getLiveEndedMarkets = (): LiveMarket[] => {
+    const staticToLive = (arr: readonly { id: string; tokenSymbol: string; tokenName: string; tokenIcon: string; chain: 'solana' | 'ethereum' | 'sui'; lastPrice: number; priceChange24h: number; volume24h: number; volumeChange24h: number; totalVolume: number; totalVolumeChange: number; impliedFdv: string; settleTime: string | null; status: string; settlementStatus?: string; chartData: number[]; chartColor: 'green' | 'red' }[]): LiveMarket[] =>
+      arr.map((m) => ({ ...m, status: m.status as 'live' | 'upcoming' | 'ended', settlementStatus: m.settlementStatus as 'in-progress' | 'upcoming' | 'new-market' | undefined, flash: null as FlashDirection }));
 
-    const map: Record<MarketTab, LiveMarket[]> = {
-      live: liveData,
-      upcoming: staticToLive(upcomingMarkets),
-      ended: staticToLive(endedMarkets),
-    };
-    const data = [...map[activeTab]];
+    const data = activeTab === 'live' ? [...liveData] : [...staticToLive(endedMarkets)];
 
     if (sortConfig.field && sortConfig.direction) {
+      const field = sortConfig.field as SortField;
       data.sort((a, b) => {
-        const aVal = a[sortConfig.field!] as number;
-        const bVal = b[sortConfig.field!] as number;
+        const aVal = a[field] as number;
+        const bVal = b[field] as number;
         if (typeof aVal === 'number' && typeof bVal === 'number') {
           return sortConfig.direction === 'asc' ? aVal - bVal : bVal - aVal;
         }
@@ -202,7 +265,23 @@ export default function LiveMarketTable() {
     return data;
   };
 
-  const markets = getMarkets();
+  /* ─── Upcoming tab data ─── */
+  const getUpcomingMarkets = (): UpcomingMarket[] => {
+    const data = [...upcomingMarkets];
+
+    if (sortConfig.field && sortConfig.direction) {
+      const field = sortConfig.field as UpcomingSortField;
+      if (field === 'watchers' || field === 'moniScore') {
+        data.sort((a, b) => {
+          const aVal = a[field];
+          const bVal = b[field];
+          return sortConfig.direction === 'asc' ? aVal - bVal : bVal - aVal;
+        });
+      }
+    }
+
+    return data;
+  };
 
   const sortableHeaders: { label: string; field: SortField; width: string }[] = [
     { label: 'Last Price ($)', field: 'lastPrice', width: 'w-[180px]' },
@@ -210,6 +289,8 @@ export default function LiveMarketTable() {
     { label: 'Total Vol. ($)', field: 'totalVolume', width: 'w-[180px]' },
     { label: 'Implied FDV ($)', field: 'impliedFdv', width: 'w-[180px]' },
   ];
+
+  const isUpcoming = activeTab === 'upcoming';
 
   return (
     <div>
@@ -242,76 +323,161 @@ export default function LiveMarketTable() {
 
       {/* Table */}
       <div className="w-full">
-        {/* Header */}
-        <div className="flex items-center border-b border-[#1b1b1c] h-9 px-2">
-          <div className="flex-1 min-w-0">
-            <span className="text-xs font-normal text-[#7a7a83]">Token</span>
-          </div>
-          <div className="w-[112px] shrink-0" />
-          {sortableHeaders.map((header) => (
-            <div key={header.field} className={`${header.width} shrink-0 text-right`}>
-              <button
-                onClick={() => handleSort(header.field)}
-                className="inline-flex items-center gap-0.5 text-xs font-normal text-[#7a7a83] hover:text-[#f9f9fa] transition-colors"
+        {isUpcoming ? (
+          /* ════════════ UPCOMING TABLE ════════════ */
+          <>
+            {/* Upcoming Header */}
+            <div className="flex items-center border-b border-[#1b1b1c] h-9 px-2">
+              <div className="flex-1 min-w-0">
+                <span className="text-xs font-normal text-[#7a7a83]">Token</span>
+              </div>
+              <div className="w-[192px] shrink-0">
+                <button
+                  onClick={() => handleSort('watchers')}
+                  className="inline-flex items-center gap-0.5 text-xs font-normal text-[#7a7a83] hover:text-[#f9f9fa] transition-colors"
+                >
+                  Watchers
+                  <SortIcon
+                    active={sortConfig.field === 'watchers'}
+                    direction={sortConfig.field === 'watchers' ? sortConfig.direction : null}
+                  />
+                </button>
+              </div>
+              <div className="w-[192px] shrink-0">
+                <span className="text-xs font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34]">
+                  Investors & Backers
+                </span>
+              </div>
+              <div className="w-[192px] shrink-0">
+                <span className="text-xs font-normal text-[#7a7a83]">
+                  Narrative
+                </span>
+              </div>
+              <div className="w-[192px] shrink-0">
+                <button
+                  onClick={() => handleSort('moniScore')}
+                  className="inline-flex items-center gap-0.5 text-xs font-normal text-[#7a7a83] hover:text-[#f9f9fa] transition-colors border-b border-dashed border-[#2e2e34]"
+                >
+                  Moni Score
+                  <SortIcon
+                    active={sortConfig.field === 'moniScore'}
+                    direction={sortConfig.field === 'moniScore' ? sortConfig.direction : null}
+                  />
+                </button>
+              </div>
+            </div>
+
+            {/* Upcoming Rows */}
+            {getUpcomingMarkets().map((market) => (
+              <div
+                key={market.id}
+                onClick={() => navigate(`/markets/${market.id}`)}
+                className="flex items-center border-b border-[#1b1b1c] h-[76px] px-2 cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.02)]"
               >
-                {header.label}
-                <SortIcon
-                  active={sortConfig.field === header.field}
-                  direction={sortConfig.field === header.field ? sortConfig.direction : null}
-                />
-              </button>
-            </div>
-          ))}
-          <div className="w-[180px] shrink-0 text-right">
-            <span className="text-xs font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34]">
-              Settle Time (UTC)
-            </span>
-          </div>
-        </div>
+                {/* Token */}
+                <div className="flex-1 min-w-0 flex items-center">
+                  <UpcomingTokenCell market={market} />
+                </div>
 
-        {/* Rows */}
-        {markets.map((market) => (
-          <div
-            key={market.id}
-            onClick={() => navigate(`/markets/${market.id}`)}
-            className="flex items-center border-b border-[#1b1b1c] h-[76px] px-2 cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.02)]"
-          >
-            {/* Token */}
-            <div className="flex-1 min-w-0 flex items-center">
-              <TokenCell market={market} />
+                {/* Watchers */}
+                <div className="w-[192px] shrink-0">
+                  <span className="text-sm font-normal text-[#f9f9fa] tabular-nums">
+                    {market.watchers.toLocaleString('en-US')}
+                  </span>
+                </div>
+
+                {/* Investors & Backers */}
+                <div className="w-[192px] shrink-0">
+                  <InvestorAvatarsCell investors={market.investors} extra={market.investorExtra} />
+                </div>
+
+                {/* Narrative */}
+                <div className="w-[192px] shrink-0">
+                  <NarrativeBadges narratives={market.narratives} />
+                </div>
+
+                {/* Moni Score */}
+                <div className="w-[192px] shrink-0">
+                  <MoniScoreBar score={market.moniScore} />
+                </div>
+              </div>
+            ))}
+          </>
+        ) : (
+          /* ════════════ LIVE / ENDED TABLE ════════════ */
+          <>
+            {/* Header */}
+            <div className="flex items-center border-b border-[#1b1b1c] h-9 px-2">
+              <div className="flex-1 min-w-0">
+                <span className="text-xs font-normal text-[#7a7a83]">Token</span>
+              </div>
+              <div className="w-[112px] shrink-0" />
+              {sortableHeaders.map((header) => (
+                <div key={header.field} className={`${header.width} shrink-0 text-right`}>
+                  <button
+                    onClick={() => handleSort(header.field)}
+                    className="inline-flex items-center gap-0.5 text-xs font-normal text-[#7a7a83] hover:text-[#f9f9fa] transition-colors"
+                  >
+                    {header.label}
+                    <SortIcon
+                      active={sortConfig.field === header.field}
+                      direction={sortConfig.field === header.field ? sortConfig.direction : null}
+                    />
+                  </button>
+                </div>
+              ))}
+              <div className="w-[180px] shrink-0 text-right">
+                <span className="text-xs font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34]">
+                  Settle Time (UTC)
+                </span>
+              </div>
             </div>
 
-            {/* Chart */}
-            <div className="w-[112px] shrink-0 flex items-center pr-4">
-              <MiniChart data={market.chartData} color={market.chartColor} />
-            </div>
+            {/* Rows */}
+            {getLiveEndedMarkets().map((market) => (
+              <div
+                key={market.id}
+                onClick={() => navigate(`/markets/${market.id}`)}
+                className="flex items-center border-b border-[#1b1b1c] h-[76px] px-2 cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.02)]"
+              >
+                {/* Token */}
+                <div className="flex-1 min-w-0 flex items-center">
+                  <LiveTokenCell market={market} />
+                </div>
 
-            {/* Last Price */}
-            <div className="w-[180px] shrink-0">
-              <PriceCell price={market.lastPrice} change={market.priceChange24h} flash={market.flash} />
-            </div>
+                {/* Chart */}
+                <div className="w-[112px] shrink-0 flex items-center pr-4">
+                  <MiniChart data={market.chartData} color={market.chartColor} />
+                </div>
 
-            {/* 24h Vol */}
-            <div className="w-[180px] shrink-0">
-              <VolumeCell volume={market.volume24h} change={market.volumeChange24h} flash={market.flash} />
-            </div>
+                {/* Last Price */}
+                <div className="w-[180px] shrink-0">
+                  <PriceCell price={market.lastPrice} change={market.priceChange24h} flash={market.flash} />
+                </div>
 
-            {/* Total Vol */}
-            <div className="w-[180px] shrink-0">
-              <VolumeCell volume={market.totalVolume} change={market.totalVolumeChange} flash={null} />
-            </div>
+                {/* 24h Vol */}
+                <div className="w-[180px] shrink-0">
+                  <VolumeCell volume={market.volume24h} change={market.volumeChange24h} flash={market.flash} />
+                </div>
 
-            {/* Implied FDV */}
-            <div className="w-[180px] shrink-0 text-right">
-              <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">{market.impliedFdv}</span>
-            </div>
+                {/* Total Vol */}
+                <div className="w-[180px] shrink-0">
+                  <VolumeCell volume={market.totalVolume} change={market.totalVolumeChange} flash={null} />
+                </div>
 
-            {/* Settle Time */}
-            <div className="w-[180px] shrink-0">
-              <SettlementCell market={market} />
-            </div>
-          </div>
-        ))}
+                {/* Implied FDV */}
+                <div className="w-[180px] shrink-0 text-right">
+                  <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">{market.impliedFdv}</span>
+                </div>
+
+                {/* Settle Time */}
+                <div className="w-[180px] shrink-0">
+                  <SettlementCell market={market} />
+                </div>
+              </div>
+            ))}
+          </>
+        )}
       </div>
     </div>
   );

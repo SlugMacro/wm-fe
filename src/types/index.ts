@@ -36,11 +36,33 @@ export interface RecentTrade {
 
 export type MarketTab = 'live' | 'upcoming' | 'ended';
 
+// Upcoming market types
+export interface InvestorAvatar {
+  color: string;
+  label: string; // single letter for the avatar
+}
+
+export interface UpcomingMarket {
+  id: string;
+  tokenSymbol: string;
+  tokenName: string;
+  tokenIcon: string;
+  chain: 'solana' | 'ethereum' | 'sui';
+  status: 'upcoming';
+  settlementStatus?: 'new-market';
+  watchers: number;
+  investors: InvestorAvatar[];
+  investorExtra: number; // +N count shown after avatars, 0 = none
+  narratives: string[]; // e.g. ['GAMEFI', 'NFT']
+  moniScore: number; // 0-50000 range
+}
+
 export type SortField = 'lastPrice' | 'volume24h' | 'totalVolume' | 'impliedFdv';
+export type UpcomingSortField = 'watchers' | 'moniScore';
 export type SortDirection = 'asc' | 'desc' | null;
 
 export interface SortConfig {
-  field: SortField | null;
+  field: SortField | UpcomingSortField | null;
   direction: SortDirection;
 }
 
