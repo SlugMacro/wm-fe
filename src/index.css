@@ -21,3 +21,16 @@ html, body, #root {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Price flash animations for live market updates */
+@keyframes flashGreen {
+  0% { color: #5bd197; }
+  40% { color: #5bd197; }
+  100% { color: #f9f9fa; }
+}
+
+@keyframes flashRed {
+  0% { color: #fd5e67; }
+  40% { color: #fd5e67; }
+  100% { color: #f9f9fa; }
+}

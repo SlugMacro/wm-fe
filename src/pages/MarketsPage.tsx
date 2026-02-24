@@ -21,7 +21,10 @@ export default function MarketsPage() {
         <RecentTradesTable />
       </div>
 
-      {/* Bottom Stats */}
+      {/* Spacer for fixed BottomStats */}
+      <div className="h-12" />
+
+      {/* Bottom Stats — fixed to viewport bottom */}
       <BottomStats />
     </div>
   );

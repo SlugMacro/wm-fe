@@ -65,7 +65,7 @@ const SAMPLE_NEW_TRADES: Omit<RecentTrade, 'id' | 'time'>[] = [
   { side: 'Sell', pair: 'SKATE/SOL', pairIcon: '', pairChain: 'solana', market: 'Pre-market', price: 0.0048, amount: '15.00K', collateral: 50000.0, collateralIcon: '/tokens/sol.svg', tierIcon: 'shark' },
 ];
 
-const MAX_VISIBLE = 10;
+const MAX_VISIBLE = 15;
 const NEW_TRADE_INTERVAL = 60_000; // 1 minute
 const TIME_UPDATE_INTERVAL = 10_000; // update displayed times every 10s
 

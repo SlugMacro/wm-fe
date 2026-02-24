@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { Market, MarketTab, SortConfig, SortField } from '../types';
+import type { MarketTab, SortConfig, SortField } from '../types';
 import { liveMarkets, upcomingMarkets, endedMarkets, marketTabCounts } from '../mock-data/markets';
 import { formatPrice, formatVolume, formatPercent } from '../utils/formatNumber';
 import MiniChart from './MiniChart';
 import TokenIcon from './TokenIcon';
+import { useMarketLiveUpdates, type FlashDirection, type LiveMarket } from '../hooks/useMarketLiveUpdates';
 
 function SortIcon({ active, direction }: { active: boolean; direction: 'asc' | 'desc' | null }) {
   return (
@@ -19,7 +20,7 @@ function SortIcon({ active, direction }: { active: boolean; direction: 'asc' | '
   );
 }
 
-function SettlementCell({ market }: { market: Market }) {
+function SettlementCell({ market }: { market: LiveMarket }) {
   const [countdown, setCountdown] = useState('');
 
   const calculateCountdown = useCallback(() => {
@@ -89,7 +90,7 @@ function SettlementCell({ market }: { market: Market }) {
   );
 }
 
-function TokenCell({ market }: { market: Market }) {
+function TokenCell({ market }: { market: LiveMarket }) {
   return (
     <div className="flex items-center gap-3">
       <TokenIcon symbol={market.tokenSymbol} chain={market.chain} size="md" />
@@ -108,11 +109,21 @@ function TokenCell({ market }: { market: Market }) {
   );
 }
 
-function PriceCell({ price, change }: { price: number; change: number }) {
+function PriceCell({ price, change, flash }: { price: number; change: number; flash: FlashDirection }) {
   const isPositive = change >= 0;
+
+  // Flash color class
+  const flashClass = flash === 'up'
+    ? 'animate-[flashGreen_1.2s_ease-out]'
+    : flash === 'down'
+      ? 'animate-[flashRed_1.2s_ease-out]'
+      : '';
+
   return (
     <div className="flex flex-col items-end gap-1">
-      <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">${formatPrice(price)}</span>
+      <span className={`text-sm font-medium tabular-nums transition-colors ${flashClass} ${flash === 'up' ? 'text-[#5bd197]' : flash === 'down' ? 'text-[#fd5e67]' : 'text-[#f9f9fa]'}`}>
+        ${formatPrice(price)}
+      </span>
       <span className={`text-xs font-normal tabular-nums ${isPositive ? 'text-[#5bd197]' : 'text-[#fd5e67]'}`}>
         {formatPercent(change)}
       </span>
@@ -120,11 +131,20 @@ function PriceCell({ price, change }: { price: number; change: number }) {
   );
 }
 
-function VolumeCell({ volume, change }: { volume: number; change: number }) {
+function VolumeCell({ volume, change, flash }: { volume: number; change: number; flash: FlashDirection }) {
   const isPositive = change >= 0;
+
+  const flashClass = flash === 'up'
+    ? 'animate-[flashGreen_1.2s_ease-out]'
+    : flash === 'down'
+      ? 'animate-[flashRed_1.2s_ease-out]'
+      : '';
+
   return (
     <div className="flex flex-col items-end gap-1">
-      <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">{formatVolume(volume)}</span>
+      <span className={`text-sm font-medium tabular-nums transition-colors ${flashClass} ${flash ? 'text-[#f9f9fa]' : 'text-[#f9f9fa]'}`}>
+        {formatVolume(volume)}
+      </span>
       <span className={`text-xs font-normal tabular-nums ${isPositive ? 'text-[#5bd197]' : 'text-[#fd5e67]'}`}>
         {formatPercent(change)}
       </span>
@@ -136,6 +156,9 @@ export default function LiveMarketTable() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<MarketTab>('live');
   const [sortConfig, setSortConfig] = useState<SortConfig>({ field: null, direction: null });
+
+  // Live-updating markets (only for live tab)
+  const liveData = useMarketLiveUpdates(liveMarkets);
 
   const tabs: { key: MarketTab; label: string; count: number }[] = [
     { key: 'live', label: 'Live', count: marketTabCounts.live },
@@ -153,11 +176,15 @@ export default function LiveMarketTable() {
     });
   };
 
-  const getMarkets = (): Market[] => {
-    const map: Record<MarketTab, Market[]> = {
-      live: liveMarkets,
-      upcoming: upcomingMarkets,
-      ended: endedMarkets,
+  const getMarkets = (): LiveMarket[] => {
+    // Use live-updated data for 'live' tab, static for others
+    const staticToLive = (arr: typeof upcomingMarkets): LiveMarket[] =>
+      arr.map((m) => ({ ...m, flash: null as FlashDirection }));
+
+    const map: Record<MarketTab, LiveMarket[]> = {
+      live: liveData,
+      upcoming: staticToLive(upcomingMarkets),
+      ended: staticToLive(endedMarkets),
     };
     const data = [...map[activeTab]];
 
@@ -261,17 +288,17 @@ export default function LiveMarketTable() {
 
             {/* Last Price */}
             <div className="w-[180px] shrink-0">
-              <PriceCell price={market.lastPrice} change={market.priceChange24h} />
+              <PriceCell price={market.lastPrice} change={market.priceChange24h} flash={market.flash} />
             </div>
 
             {/* 24h Vol */}
             <div className="w-[180px] shrink-0">
-              <VolumeCell volume={market.volume24h} change={market.volumeChange24h} />
+              <VolumeCell volume={market.volume24h} change={market.volumeChange24h} flash={market.flash} />
             </div>
 
             {/* Total Vol */}
             <div className="w-[180px] shrink-0">
-              <VolumeCell volume={market.totalVolume} change={market.totalVolumeChange} />
+              <VolumeCell volume={market.totalVolume} change={market.totalVolumeChange} flash={null} />
             </div>
 
             {/* Implied FDV */}

@@ -2,7 +2,7 @@ import { ExternalLink } from 'lucide-react';
 
 export default function BottomStats() {
   return (
-    <div className="flex items-center justify-between border-t border-[#1b1b1c] py-3">
+    <div className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-between bg-[#0a0a0b] px-12 py-3">
       {/* Left - Live data */}
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-1.5">
