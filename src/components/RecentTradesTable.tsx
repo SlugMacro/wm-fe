@@ -202,9 +202,9 @@ export default function RecentTradesTable() {
                 </div>
               </div>
 
-              {/* Price */}
+              {/* Price — yellow for RS (resell) orders */}
               <div className="w-[180px] shrink-0 text-right">
-                <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">
+                <span className={`text-sm font-medium tabular-nums ${trade.hasBadge === 'RS' ? 'text-[#eab308]' : 'text-[#f9f9fa]'}`}>
                   {trade.price.toFixed(4)}
                 </span>
               </div>
