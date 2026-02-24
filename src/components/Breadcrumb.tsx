@@ -21,19 +21,19 @@ export default function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
         return (
           <span key={index} className="flex items-center gap-2">
             {index > 0 && (
-              <span className="text-[#b4b4ba]">
+              <span className="text-[#7a7a83]">
                 <ChevronRightIcon />
               </span>
             )}
             {item.to && !isLast ? (
               <Link
                 to={item.to}
-                className="text-xs font-normal text-[#b4b4ba] transition-colors hover:text-[#f9f9fa]"
+                className="text-xs font-normal text-[#7a7a83] transition-colors hover:text-[#f9f9fa]"
               >
                 {item.label}
               </Link>
             ) : (
-              <span className={`text-xs font-normal ${isLast ? 'text-[#f9f9fa]' : 'text-[#b4b4ba]'}`}>
+              <span className={`text-xs font-normal ${isLast ? 'text-[#f9f9fa]' : 'text-[#7a7a83]'}`}>
                 {item.label}
               </span>
             )}

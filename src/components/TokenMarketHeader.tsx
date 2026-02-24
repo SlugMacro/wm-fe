@@ -93,7 +93,7 @@ export default function TokenMarketHeader({ token }: { token: TokenDetail }) {
         {/* Stats */}
         <div className="flex items-center gap-8">
           {stats.map((stat, i) => (
-            <div key={i} className="flex flex-col gap-1 shrink-0">
+            <div key={i} className="flex flex-col gap-1.5 shrink-0">
               {stat.tooltip ? (
                 <span className="relative group cursor-help inline-flex self-start">
                   <span className={`text-xs leading-4 font-normal text-[#7a7a83] ${stat.dashed ? 'border-b border-dashed border-[#2e2e34]' : ''}`}>
