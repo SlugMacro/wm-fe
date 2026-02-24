@@ -1,121 +1,32 @@
 import type { TokenDetail, OrderBookEntry, MyOrder, PriceDataPoint } from '../types';
+import { liveMarkets } from './markets';
 
-export const tokenDetails: Record<string, TokenDetail> = {
-  karak: {
-    id: 'karak',
-    tokenSymbol: 'Karak',
-    tokenName: 'Restaking XPs',
-    tokenIcon: '/tokens/karak.svg',
-    chain: 'solana',
-    subtitle: 'Restaking XPs',
-    price: 0.0045,
-    priceChange: 0.13,
-    volume24h: 16389.76,
-    volumeChange24h: 1159.36,
-    totalVolume: 38581.28,
-    impliedFdv: '$835.31M',
-    settleTime: '2025-08-20T20:00:00Z',
-    category: 'Pre-market',
-  },
-  skate: {
-    id: 'skate',
-    tokenSymbol: 'SKATE',
-    tokenName: 'Skate Chain',
-    tokenIcon: '/tokens/skate.svg',
-    chain: 'solana',
-    subtitle: 'Pre-market Token',
-    price: 0.005,
-    priceChange: 63.8,
-    volume24h: 445.86,
-    volumeChange24h: 1159.36,
-    totalVolume: 21904.26,
-    impliedFdv: '$48.3K',
-    settleTime: null,
-    category: 'Pre-market',
-  },
-  zbt: {
-    id: 'zbt',
-    tokenSymbol: 'ZBT',
-    tokenName: 'ZeroBase',
-    tokenIcon: '/tokens/zbt.svg',
-    chain: 'solana',
-    subtitle: 'Pre-market Token',
-    price: 0.055,
-    priceChange: 162.18,
-    volume24h: 7375.62,
-    volumeChange24h: -16.18,
-    totalVolume: 25197.18,
-    impliedFdv: '$38.1M',
-    settleTime: '2025-09-15T12:00:00Z',
-    category: 'Pre-market',
-  },
-  era: {
-    id: 'era',
-    tokenSymbol: 'ERA',
-    tokenName: 'Caldera',
-    tokenIcon: '/tokens/era.svg',
-    chain: 'ethereum',
-    subtitle: 'Pre-market Token',
-    price: 0.0464,
-    priceChange: 98.31,
-    volume24h: 418326.12,
-    volumeChange24h: -32.16,
-    totalVolume: 7483875.48,
-    impliedFdv: '$22.2M',
-    settleTime: '2026-05-30T13:00:00Z',
-    category: 'Pre-market',
-  },
-  grass: {
-    id: 'grass',
-    tokenSymbol: 'GRASS',
-    tokenName: 'Grass',
-    tokenIcon: '/tokens/grass.svg',
-    chain: 'solana',
-    subtitle: 'Pre-market Token',
-    price: 0.11,
-    priceChange: 124.52,
-    volume24h: 10418.71,
-    volumeChange24h: 228.25,
-    totalVolume: 64110.29,
-    impliedFdv: '$36.1M',
-    settleTime: null,
-    category: 'Pre-market',
-  },
-  loud: {
-    id: 'loud',
-    tokenSymbol: 'LOUD',
-    tokenName: 'Loud',
-    tokenIcon: '/tokens/loud.svg',
-    chain: 'solana',
-    subtitle: 'Pre-market Token',
-    price: 0.9638,
-    priceChange: -22.6,
-    volume24h: 18312.61,
-    volumeChange24h: 49.13,
-    totalVolume: 628875.43,
-    impliedFdv: '$8.3M',
-    settleTime: null,
-    category: 'Pre-market',
-  },
-  mmt: {
-    id: 'mmt',
-    tokenSymbol: 'MMT',
-    tokenName: 'Momentum',
-    tokenIcon: '/tokens/mmt.svg',
-    chain: 'sui',
-    subtitle: 'Pre-market Token',
-    price: 0.65,
-    priceChange: 48.32,
-    volume24h: 0,
-    volumeChange24h: -100,
-    totalVolume: 7244.16,
-    impliedFdv: '$9.1M',
-    settleTime: null,
-    category: 'Pre-market',
-  },
-};
+// Derive tokenDetails from liveMarkets — single source of truth
+export const tokenDetails: Record<string, TokenDetail> = Object.fromEntries(
+  liveMarkets.map((m) => [
+    m.id,
+    {
+      id: m.id,
+      tokenSymbol: m.tokenSymbol,
+      tokenName: m.tokenName,
+      tokenIcon: m.tokenIcon,
+      chain: m.chain,
+      subtitle: 'Pre-market Token',
+      price: m.lastPrice,
+      priceChange: m.priceChange24h,
+      volume24h: m.volume24h,
+      volumeChange24h: m.volumeChange24h,
+      totalVolume: m.totalVolume,
+      totalVolumeChange: m.totalVolumeChange,
+      impliedFdv: `$${m.impliedFdv}`,
+      settleTime: m.settleTime,
+      category: 'Pre-market' as const,
+      chartData: m.chartData,
+    },
+  ])
+);
 
-export const defaultTokenId = 'karak';
+export const defaultTokenId = 'zbt';
 
 function getNativeToken(chain: string): { symbol: 'SOL' | 'ETH' | 'SUI'; icon: string } {
   switch (chain) {
@@ -271,9 +182,9 @@ export const myFilledOrders: MyOrder[] = [
   {
     id: 'fo-1',
     side: 'Buy',
-    pair: 'Karak/SOL',
+    pair: 'ZBT/SOL',
     date: '23/02/2024 15:33:15',
-    price: 0.005,
+    price: 0.055,
     amount: '1.00K',
     collateral: '1.5 SOL',
     canResell: true,
@@ -281,12 +192,12 @@ export const myFilledOrders: MyOrder[] = [
   {
     id: 'fo-2',
     side: 'Buy',
-    pair: 'Karak/SOL',
+    pair: 'ZBT/SOL',
     hasBadge: 'RS',
     date: '23/02/2024 15:33:15',
-    price: 0.005,
-    entryPrice: 0.004,
-    originalPrice: 0.005,
+    price: 0.055,
+    entryPrice: 0.042,
+    originalPrice: 0.055,
     amount: '1.00K',
     collateral: '1.3 SOL',
     canResell: true,
@@ -294,9 +205,9 @@ export const myFilledOrders: MyOrder[] = [
   {
     id: 'fo-3',
     side: 'Buy',
-    pair: 'Karak/SOL',
+    pair: 'ZBT/SOL',
     date: '23/02/2024 15:33:15',
-    price: 0.005,
+    price: 0.055,
     amount: '1.00K',
     collateral: '1.8 SOL',
     canResell: true,
@@ -304,18 +215,18 @@ export const myFilledOrders: MyOrder[] = [
   {
     id: 'fo-4',
     side: 'Sell',
-    pair: 'Karak/SOL',
+    pair: 'ZBT/SOL',
     date: '23/02/2024 15:33:15',
-    price: 0.005,
+    price: 0.055,
     amount: '1.00K',
     collateral: '1.5 SOL',
   },
   {
     id: 'fo-5',
     side: 'Sell',
-    pair: 'Karak/SOL',
+    pair: 'ZBT/SOL',
     date: '23/02/2024 15:33:15',
-    price: 0.005,
+    price: 0.055,
     amount: '1.00K',
     collateral: '1.5 SOL',
   },
@@ -324,48 +235,93 @@ export const myFilledOrders: MyOrder[] = [
 export const myOpenOrders: MyOrder[] = Array.from({ length: 12 }, (_, i) => ({
   id: `oo-${i}`,
   side: (i % 2 === 0 ? 'Buy' : 'Sell') as 'Buy' | 'Sell',
-  pair: 'Karak/SOL',
+  pair: 'ZBT/SOL',
   date: '23/02/2024 15:33:15',
-  price: 0.005,
+  price: 0.055,
   amount: `${(Math.random() * 5 + 0.5).toFixed(2)}K`,
   collateral: `${(Math.random() * 3 + 0.5).toFixed(1)} SOL`,
 }));
 
-export function generatePriceData(): PriceDataPoint[] {
+export function generatePriceData(basePrice = 0.055, chartData?: number[]): PriceDataPoint[] {
   const points: PriceDataPoint[] = [];
   const now = Date.now();
   const dayMs = 86400000;
+  const totalPoints = 168;
   const startTime = now - 7 * dayMs;
 
-  let price = 0.003;
-  for (let i = 0; i < 168; i++) {
-    const time = new Date(startTime + i * (dayMs / 24)).toISOString();
-    const change = (Math.random() - 0.45) * 0.0003;
-    price = Math.max(0.001, price + change);
+  if (chartData && chartData.length >= 2) {
+    // Use chartData as shape template — interpolate 12 anchor points into 168 detailed points
+    const chartMin = Math.min(...chartData);
+    const chartMax = Math.max(...chartData);
+    const chartRange = chartMax - chartMin || 1;
 
-    // Volume: ~40% chance of 0, rest are low with occasional spikes
-    let volume = 0;
-    const roll = Math.random();
-    if (roll > 0.4) {
-      // 60% chance of having some volume
-      if (roll > 0.92) {
-        // ~8% chance of a spike
-        volume = Math.random() * 80000 + 30000;
-      } else {
-        // Normal low volume
-        volume = Math.random() * 15000 + 500;
+    // Normalize chartData to 0..1
+    const normalized = chartData.map((v) => (v - chartMin) / chartRange);
+
+    // Map normalized values to actual price range
+    // The last chartData point should map to basePrice
+    // Scale so the range is ~30% of basePrice
+    const priceRange = basePrice * 0.35;
+    const lastNorm = normalized[normalized.length - 1];
+    // offset so that normalized=lastNorm maps to basePrice
+    const priceOffset = basePrice - lastNorm * priceRange;
+
+    for (let i = 0; i < totalPoints; i++) {
+      const time = new Date(startTime + i * (dayMs / 24)).toISOString();
+
+      // Find position in chartData (0..chartData.length-1)
+      const chartPos = (i / (totalPoints - 1)) * (chartData.length - 1);
+      const idx = Math.floor(chartPos);
+      const frac = chartPos - idx;
+      const nextIdx = Math.min(idx + 1, chartData.length - 1);
+
+      // Linear interpolation between chart anchor points
+      const interpolated = normalized[idx] + (normalized[nextIdx] - normalized[idx]) * frac;
+
+      // Map to price + small noise for realism
+      const noise = (Math.random() - 0.5) * basePrice * 0.01;
+      const price = Math.max(basePrice * 0.05, priceOffset + interpolated * priceRange + noise);
+
+      // Volume
+      let volume = 0;
+      const roll = Math.random();
+      if (roll > 0.4) {
+        volume = roll > 0.92
+          ? Math.random() * 80000 + 30000
+          : Math.random() * 15000 + 500;
       }
-    }
 
-    points.push({ time, price, volume });
+      points.push({ time, price, volume });
+    }
+    // Ensure last point matches token price exactly
+    points[points.length - 1].price = basePrice;
+  } else {
+    // Fallback: random walk toward basePrice
+    let price = basePrice * (0.6 + Math.random() * 0.2);
+    const step = (basePrice - price) / totalPoints;
+    for (let i = 0; i < totalPoints; i++) {
+      const time = new Date(startTime + i * (dayMs / 24)).toISOString();
+      const noise = (Math.random() - 0.5) * basePrice * 0.04;
+      price = Math.max(basePrice * 0.1, price + step + noise);
+
+      let volume = 0;
+      const roll = Math.random();
+      if (roll > 0.4) {
+        volume = roll > 0.92
+          ? Math.random() * 80000 + 30000
+          : Math.random() * 15000 + 500;
+      }
+
+      points.push({ time, price, volume });
+    }
+    points[points.length - 1].price = basePrice;
   }
-  // Ensure last point matches token price
-  points[points.length - 1].price = 0.0045;
+
   return points;
 }
 
 /** Generate recent trades dynamically based on token symbol and chain */
-export function generateDetailRecentTrades(tokenSymbol: string, chain = 'solana') {
+export function generateDetailRecentTrades(tokenSymbol: string, chain = 'solana', basePrice = 0.055) {
   const native = getNativeToken(chain);
   const sym = tokenSymbol.toUpperCase();
 
@@ -423,7 +379,7 @@ export function generateDetailRecentTrades(tokenSymbol: string, chain = 'solana'
       time: formatTime(timeMins),
       side,
       pair,
-      price: 0.005 + (priceOffsets[i] || 0),
+      price: basePrice + (priceOffsets[i] || 0),
       amount,
       collateral,
       collateralIcon: isNative ? native.icon : '/tokens/usdc.svg',

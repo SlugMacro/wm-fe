@@ -65,15 +65,16 @@ const SCROLLBAR_WIDTH = 4;
 interface DetailRecentTradesProps {
   tokenSymbol?: string;
   chain?: string;
+  basePrice?: number;
   onTradeExecuted?: (side: 'Buy' | 'Sell') => void;
 }
 
-export default function DetailRecentTrades({ tokenSymbol = 'SKATE', chain = 'solana', onTradeExecuted }: DetailRecentTradesProps) {
+export default function DetailRecentTrades({ tokenSymbol = 'SKATE', chain = 'solana', basePrice = 0.055, onTradeExecuted }: DetailRecentTradesProps) {
   const native = getChainNative(chain);
   const sampleTrades = useMemo(() => buildSampleTrades(tokenSymbol, native.symbol, native.icon), [tokenSymbol, native.symbol, native.icon]);
 
   const now = Date.now();
-  const initialTrades = useMemo(() => generateDetailRecentTrades(tokenSymbol, chain), [tokenSymbol, chain]);
+  const initialTrades = useMemo(() => generateDetailRecentTrades(tokenSymbol, chain, basePrice), [tokenSymbol, chain, basePrice]);
   const [trades, setTrades] = useState<DetailTrade[]>(() =>
     initialTrades.map((t) => ({
       ...t,

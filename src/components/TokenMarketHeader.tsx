@@ -44,12 +44,14 @@ export default function TokenMarketHeader({ token }: { token: TokenDetail }) {
     {
       label: '24h Vol.',
       value: formatVol(token.volume24h),
-      change: token.volumeChange24h !== 0 ? `+${token.volumeChange24h.toFixed(2)}%` : undefined,
+      change: token.volumeChange24h !== 0 ? `${token.volumeChange24h >= 0 ? '+' : ''}${token.volumeChange24h.toFixed(2)}%` : undefined,
       changeColor: token.volumeChange24h >= 0 ? 'text-[#5bd197]' : 'text-[#fd5e67]',
     },
     {
       label: 'Total Vol.',
       value: formatVol(token.totalVolume),
+      change: token.totalVolumeChange !== 0 ? `${token.totalVolumeChange >= 0 ? '+' : ''}${token.totalVolumeChange.toFixed(2)}%` : undefined,
+      changeColor: token.totalVolumeChange >= 0 ? 'text-[#5bd197]' : 'text-[#fd5e67]',
     },
     {
       label: 'Implied FDV',
@@ -64,17 +66,15 @@ export default function TokenMarketHeader({ token }: { token: TokenDetail }) {
   ];
 
   return (
-    <div className="flex items-center justify-between border-b-[4px] border-[#1b1b1c] py-6">
+    <div className="flex items-center justify-between border-b-[4px] border-[#1b1b1c] py-4">
       {/* Left: Token info + stats */}
-      <div className="flex flex-1 items-center gap-8 overflow-hidden">
+      <div className="flex flex-1 items-end gap-8 overflow-hidden">
         {/* Token icon + name */}
         <div className="flex items-center gap-2 shrink-0">
           <TokenIcon symbol={token.tokenSymbol} chain={token.chain} size="md" />
           <div className="flex flex-col">
             <span className="text-lg font-medium leading-7 text-[#f9f9fa]">{token.tokenSymbol}</span>
-            <div className="py-0.5">
-              <span className="text-xs leading-4 font-normal text-[#7a7a83]">{token.tokenName}</span>
-            </div>
+            <span className="text-xs leading-4 font-normal text-[#7a7a83]">{token.tokenName}</span>
           </div>
         </div>
 
@@ -83,23 +83,19 @@ export default function TokenMarketHeader({ token }: { token: TokenDetail }) {
           <span className="text-lg font-medium leading-7 text-[#f9f9fa] tabular-nums">
             ${token.price.toFixed(4)}
           </span>
-          <div className="py-0.5">
-            <span className={`text-xs leading-4 font-normal tabular-nums ${isPositive ? 'text-[#5bd197]' : 'text-[#fd5e67]'}`}>
-              {isPositive ? '+' : ''}{token.priceChange.toFixed(2)}%
-            </span>
-          </div>
+          <span className={`text-xs leading-4 font-normal tabular-nums ${isPositive ? 'text-[#5bd197]' : 'text-[#fd5e67]'}`}>
+            {isPositive ? '+' : ''}{token.priceChange.toFixed(2)}%
+          </span>
         </div>
 
         {/* Stats */}
         <div className="flex items-center gap-8">
           {stats.map((stat, i) => (
-            <div key={i} className="flex flex-col shrink-0">
-              <div className="py-1.5">
-                <span className={`text-xs leading-4 font-normal text-[#7a7a83] ${stat.dashed ? 'border-b border-dashed border-[#2e2e34]' : ''}`}>
-                  {stat.label}
-                </span>
-              </div>
-              <div className="flex items-center gap-1 py-0.5">
+            <div key={i} className="flex flex-col gap-1 shrink-0">
+              <span className={`text-xs leading-4 font-normal text-[#7a7a83] ${stat.dashed ? 'border-b border-dashed border-[#2e2e34]' : ''}`}>
+                {stat.label}
+              </span>
+              <div className="flex items-center gap-1">
                 <span className="text-xs leading-4 font-normal text-[#f9f9fa] tabular-nums">{stat.value}</span>
                 {stat.change && (
                   <span className={`text-xs leading-4 font-normal tabular-nums ${stat.changeColor}`}>{stat.change}</span>

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import Breadcrumb from '../components/Breadcrumb';
 import TokenMarketHeader from '../components/TokenMarketHeader';
@@ -33,7 +33,7 @@ export default function TokenDetailPage() {
   const [sellOrders, setSellOrders] = useState<OrderBookEntry[]>(() =>
     generateSellOrders(token.price, token.chain)
   );
-  const [priceData, setPriceData] = useState<PriceDataPoint[]>(() => generatePriceData());
+  const [priceData, setPriceData] = useState<PriceDataPoint[]>(() => generatePriceData(token.price, token.chartData));
 
   // When a trade executes in Recent Trades, update a matching order's fill AND chart
   const handleTradeExecuted = useCallback((side: 'Buy' | 'Sell') => {
@@ -117,6 +117,26 @@ export default function TokenDetailPage() {
     }
   };
 
+  // Live price derived from latest trade data
+  const livePrice = useMemo(() => {
+    if (priceData.length === 0) return token.price;
+    return priceData[priceData.length - 1].price;
+  }, [priceData, token.price]);
+
+  // Live price change % = (current - first) / first * 100
+  const livePriceChange = useMemo(() => {
+    if (priceData.length < 2) return token.priceChange;
+    const firstPrice = priceData[0].price;
+    return ((livePrice - firstPrice) / firstPrice) * 100;
+  }, [priceData, livePrice, token.priceChange]);
+
+  // Live token object with updated price for header
+  const liveToken = useMemo(() => ({
+    ...token,
+    price: livePrice,
+    priceChange: livePriceChange,
+  }), [token, livePrice, livePriceChange]);
+
   // Determine collateral token based on chain
   const collateralToken = token.chain === 'ethereum' ? 'ETH' : token.chain === 'sui' ? 'SUI' : 'SOL';
 
@@ -126,7 +146,7 @@ export default function TokenDetailPage() {
       <Breadcrumb items={breadcrumbItems} />
 
       {/* Market Header */}
-      <TokenMarketHeader token={token} />
+      <TokenMarketHeader token={liveToken} />
 
       {/* Main content: left + right columns */}
       <div className="flex">
@@ -136,8 +156,8 @@ export default function TokenDetailPage() {
           <div className="pt-4">
             <PriceChart
               data={priceData}
-              currentPrice={token.price}
-              priceChange={token.priceChange}
+              currentPrice={livePrice}
+              priceChange={livePriceChange}
             />
           </div>
 
@@ -155,7 +175,7 @@ export default function TokenDetailPage() {
 
           {/* Recent Trades */}
           <div className="pt-4">
-            <DetailRecentTrades tokenSymbol={token.tokenSymbol} chain={token.chain} onTradeExecuted={handleTradeExecuted} />
+            <DetailRecentTrades tokenSymbol={token.tokenSymbol} chain={token.chain} basePrice={token.price} onTradeExecuted={handleTradeExecuted} />
           </div>
         </div>
 

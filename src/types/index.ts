@@ -91,9 +91,11 @@ export interface TokenDetail {
   volume24h: number;
   volumeChange24h: number;
   totalVolume: number;
+  totalVolumeChange: number;
   impliedFdv: string;
   settleTime: string | null;
   category: 'Pre-market' | 'Points';
+  chartData: number[];
 }
 
 export interface OrderBookEntry {

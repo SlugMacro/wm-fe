@@ -15,7 +15,7 @@ function ChevronRightIcon() {
 
 export default function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
   return (
-    <nav className="flex items-center gap-2 py-4">
+    <nav className="flex items-center gap-2 pt-4">
       {items.map((item, index) => {
         const isLast = index === items.length - 1;
         return (
