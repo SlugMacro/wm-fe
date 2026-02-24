@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { detailRecentTrades } from '../mock-data/tokenDetail';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { generateDetailRecentTrades } from '../mock-data/tokenDetail';
 import TokenIcon from './TokenIcon';
 import TierIcon from './TierIcon';
 
@@ -35,14 +35,26 @@ interface DetailTrade {
   isNew?: boolean;
 }
 
-// Pool of sample trades for the new-trade animation — mix collateral types
-const SAMPLE_NEW_TRADES: Omit<DetailTrade, 'id' | 'time'>[] = [
-  { side: 'Buy', pair: 'SKATE/USDC', price: 0.0052, amount: '20.00K', collateral: 75.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'shrimp' },
-  { side: 'Sell', pair: 'SKATE/SOL', price: 0.0048, amount: '45.00K', collateral: 2.16, collateralIcon: '/tokens/sol.svg', tierIcon: 'fish' },
-  { side: 'Buy', hasBadge: 'RS', pair: 'SKATE/USDC', price: 0.0051, amount: '2.50K', collateral: 302.5, collateralIcon: '/tokens/usdc.svg', tierIcon: 'dolphin' },
-  { side: 'Sell', pair: 'SKATE/SOL', price: 0.005, amount: '7.04K', collateral: 1.92, collateralIcon: '/tokens/sol.svg', tierIcon: 'fish' },
-  { side: 'Buy', pair: 'SKATE/USDC', price: 0.0053, amount: '150.00K', collateral: 50000.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'whale' },
-];
+// Generate sample trades dynamically based on token
+function buildSampleTrades(tokenSymbol: string, nativeSymbol: string, nativeIcon: string): Omit<DetailTrade, 'id' | 'time'>[] {
+  const sym = tokenSymbol.toUpperCase();
+  return [
+    { side: 'Buy', pair: `${sym}/USDC`, price: 0.0052, amount: '20.00K', collateral: 75.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'shrimp' },
+    { side: 'Sell', pair: `${sym}/${nativeSymbol}`, price: 0.0048, amount: '45.00K', collateral: 2.16, collateralIcon: nativeIcon, tierIcon: 'fish' },
+    { side: 'Buy', hasBadge: 'RS', pair: `${sym}/USDC`, price: 0.0051, amount: '2.50K', collateral: 302.5, collateralIcon: '/tokens/usdc.svg', tierIcon: 'dolphin' },
+    { side: 'Sell', pair: `${sym}/${nativeSymbol}`, price: 0.005, amount: '7.04K', collateral: 1.92, collateralIcon: nativeIcon, tierIcon: 'fish' },
+    { side: 'Buy', pair: `${sym}/USDC`, price: 0.0053, amount: '150.00K', collateral: 50000.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'whale' },
+  ];
+}
+
+// Map chain to native token info
+function getChainNative(chain: string): { symbol: string; icon: string } {
+  switch (chain) {
+    case 'ethereum': return { symbol: 'ETH', icon: '/tokens/eth.svg' };
+    case 'sui': return { symbol: 'SUI', icon: '/tokens/sui.svg' };
+    default: return { symbol: 'SOL', icon: '/tokens/sol.svg' };
+  }
+}
 
 const VISIBLE_ROWS = 15; // rows visible without scrolling
 const MAX_TRADES = 30; // total trades kept in state (rest scrollable)
@@ -52,17 +64,22 @@ const SCROLLBAR_WIDTH = 4;
 
 interface DetailRecentTradesProps {
   tokenSymbol?: string;
+  chain?: string;
 }
 
-export default function DetailRecentTrades({ tokenSymbol: _tokenSymbol }: DetailRecentTradesProps) {
+export default function DetailRecentTrades({ tokenSymbol = 'SKATE', chain = 'solana' }: DetailRecentTradesProps) {
+  const native = getChainNative(chain);
+  const sampleTrades = useMemo(() => buildSampleTrades(tokenSymbol, native.symbol, native.icon), [tokenSymbol, native.symbol, native.icon]);
+
   const now = Date.now();
+  const initialTrades = useMemo(() => generateDetailRecentTrades(tokenSymbol, chain), [tokenSymbol, chain]);
   const [trades, setTrades] = useState<DetailTrade[]>(() =>
-    detailRecentTrades.map((t) => ({
+    initialTrades.map((t) => ({
       ...t,
       createdAt: now - parseTimeToSeconds(t.time) * 1000,
     }))
   );
-  const nextIdRef = useRef(detailRecentTrades.length + 1);
+  const nextIdRef = useRef(initialTrades.length + 1);
   const sampleIndexRef = useRef(0);
 
   // Scroll state for custom scrollbar
@@ -91,7 +108,7 @@ export default function DetailRecentTrades({ tokenSymbol: _tokenSymbol }: Detail
 
   // Add new trade periodically
   const addNewTrade = useCallback(() => {
-    const sample = SAMPLE_NEW_TRADES[sampleIndexRef.current % SAMPLE_NEW_TRADES.length];
+    const sample = sampleTrades[sampleIndexRef.current % sampleTrades.length];
     sampleIndexRef.current += 1;
 
     const newTrade: DetailTrade = {
@@ -111,7 +128,7 @@ export default function DetailRecentTrades({ tokenSymbol: _tokenSymbol }: Detail
         prev.map((t) => (t.id === newTrade.id ? { ...t, isNew: false } : t))
       );
     }, 600);
-  }, []);
+  }, [sampleTrades]);
 
   useEffect(() => {
     const timer = setInterval(addNewTrade, NEW_TRADE_INTERVAL);

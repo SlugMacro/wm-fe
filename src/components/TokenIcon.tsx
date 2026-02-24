@@ -130,11 +130,12 @@ const CHAIN_IMAGES: Record<string, string> = {
 interface TokenIconProps {
   symbol: string;
   chain?: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg';
   showChain?: boolean;
 }
 
 const SIZES = {
+  xs: { container: 'size-4', image: 'size-4', badge: 'size-2', badgeText: 'text-[4px]', text: 'text-[6px]' },
   sm: { container: 'size-6', image: 'size-5', badge: 'size-3', badgeText: 'text-[5px]', text: 'text-[8px]' },
   md: { container: 'size-[44px]', image: 'size-9', badge: 'size-4', badgeText: 'text-[6px]', text: 'text-[10px]' },
   lg: { container: 'size-12', image: 'size-10', badge: 'size-5', badgeText: 'text-[7px]', text: 'text-xs' },

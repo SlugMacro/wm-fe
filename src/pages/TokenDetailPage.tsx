@@ -81,7 +81,7 @@ export default function TokenDetailPage() {
 
           {/* Recent Trades */}
           <div className="pt-4">
-            <DetailRecentTrades tokenSymbol={token.tokenSymbol} />
+            <DetailRecentTrades tokenSymbol={token.tokenSymbol} chain={token.chain} />
           </div>
         </div>
 

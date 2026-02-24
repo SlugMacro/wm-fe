@@ -350,35 +350,71 @@ export function generatePriceData(): PriceDataPoint[] {
   return points;
 }
 
-export const detailRecentTrades = [
-  { id: 'dt-1', time: '1m ago', side: 'Sell' as const, pair: 'SKATE/USDC', price: 0.005, amount: '36.40K', collateral: 182.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'fish' as const },
-  { id: 'dt-2', time: '2m ago', side: 'Sell' as const, pair: 'SKATE/SOL', price: 0.005, amount: '181.80K', collateral: 4.95, collateralIcon: '/tokens/sol.svg', tierIcon: 'fish' as const },
-  { id: 'dt-3', time: '5m ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.005, amount: '1.00M', collateral: 5000.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'dolphin' as const, hasBadge: 'RS' },
-  { id: 'dt-4', time: '6m ago', side: 'Buy' as const, pair: 'SKATE/SOL', price: 0.005, amount: '400.00K', collateral: 10.9, collateralIcon: '/tokens/sol.svg', tierIcon: 'dolphin' as const, hasBadge: 'RS' },
-  { id: 'dt-5', time: '7m ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.005, amount: '36.20K', collateral: 181.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'fish' as const },
-  { id: 'dt-6', time: '10m ago', side: 'Buy' as const, pair: 'SKATE/SOL', price: 0.005, amount: '1.00M', collateral: 817.43, collateralIcon: '/tokens/sol.svg', tierIcon: 'whale' as const },
-  { id: 'dt-7', time: '12m ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.005, amount: '18.20K', collateral: 91.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'shrimp' as const },
-  { id: 'dt-8', time: '15m ago', side: 'Sell' as const, pair: 'SKATE/SOL', price: 0.0049, amount: '55.00K', collateral: 1.47, collateralIcon: '/tokens/sol.svg', tierIcon: 'fish' as const },
-  { id: 'dt-9', time: '18m ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.0051, amount: '120.00K', collateral: 612.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'dolphin' as const },
-  { id: 'dt-10', time: '22m ago', side: 'Sell' as const, pair: 'SKATE/USDC', price: 0.005, amount: '75.00K', collateral: 375.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'fish' as const },
-  { id: 'dt-11', time: '25m ago', side: 'Buy' as const, pair: 'SKATE/SOL', price: 0.0052, amount: '500.00K', collateral: 14.18, collateralIcon: '/tokens/sol.svg', tierIcon: 'shark' as const, hasBadge: 'RS' },
-  { id: 'dt-12', time: '30m ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.005, amount: '10.00K', collateral: 50.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'shrimp' as const },
-  { id: 'dt-13', time: '35m ago', side: 'Sell' as const, pair: 'SKATE/SOL', price: 0.0048, amount: '200.00K', collateral: 5.24, collateralIcon: '/tokens/sol.svg', tierIcon: 'dolphin' as const },
-  { id: 'dt-14', time: '40m ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.005, amount: '2.00M', collateral: 300000.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'whale' as const },
-  { id: 'dt-15', time: '45m ago', side: 'Sell' as const, pair: 'SKATE/USDC', price: 0.0049, amount: '88.50K', collateral: 433.65, collateralIcon: '/tokens/usdc.svg', tierIcon: 'fish' as const },
-  { id: 'dt-16', time: '50m ago', side: 'Buy' as const, pair: 'SKATE/SOL', price: 0.0051, amount: '15.00K', collateral: 0.42, collateralIcon: '/tokens/sol.svg', tierIcon: 'shrimp' as const },
-  { id: 'dt-17', time: '55m ago', side: 'Sell' as const, pair: 'SKATE/USDC', price: 0.005, amount: '60.00K', collateral: 300.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'fish' as const },
-  { id: 'dt-18', time: '1h ago', side: 'Buy' as const, pair: 'SKATE/SOL', price: 0.0052, amount: '350.00K', collateral: 9.93, collateralIcon: '/tokens/sol.svg', tierIcon: 'shark' as const },
-  { id: 'dt-19', time: '1h 5m ago', side: 'Sell' as const, pair: 'SKATE/USDC', price: 0.0050, amount: '42.00K', collateral: 210.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'fish' as const },
-  { id: 'dt-20', time: '1h 8m ago', side: 'Buy' as const, pair: 'SKATE/SOL', price: 0.0049, amount: '85.00K', collateral: 2.27, collateralIcon: '/tokens/sol.svg', tierIcon: 'fish' as const },
-  { id: 'dt-21', time: '1h 12m ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.0051, amount: '250.00K', collateral: 1275.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'shark' as const, hasBadge: 'RS' },
-  { id: 'dt-22', time: '1h 15m ago', side: 'Sell' as const, pair: 'SKATE/SOL', price: 0.0048, amount: '30.00K', collateral: 0.79, collateralIcon: '/tokens/sol.svg', tierIcon: 'shrimp' as const },
-  { id: 'dt-23', time: '1h 20m ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.0050, amount: '500.00K', collateral: 2500.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'shark' as const },
-  { id: 'dt-24', time: '1h 25m ago', side: 'Sell' as const, pair: 'SKATE/USDC', price: 0.0049, amount: '65.00K', collateral: 318.5, collateralIcon: '/tokens/usdc.svg', tierIcon: 'fish' as const },
-  { id: 'dt-25', time: '1h 30m ago', side: 'Buy' as const, pair: 'SKATE/SOL', price: 0.0050, amount: '1.50M', collateral: 40.91, collateralIcon: '/tokens/sol.svg', tierIcon: 'whale' as const },
-  { id: 'dt-26', time: '1h 35m ago', side: 'Sell' as const, pair: 'SKATE/USDC', price: 0.0048, amount: '22.00K', collateral: 105.6, collateralIcon: '/tokens/usdc.svg', tierIcon: 'shrimp' as const },
-  { id: 'dt-27', time: '1h 40m ago', side: 'Buy' as const, pair: 'SKATE/SOL', price: 0.0051, amount: '180.00K', collateral: 5.01, collateralIcon: '/tokens/sol.svg', tierIcon: 'dolphin' as const },
-  { id: 'dt-28', time: '1h 48m ago', side: 'Sell' as const, pair: 'SKATE/USDC', price: 0.0050, amount: '95.00K', collateral: 475.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'fish' as const },
-  { id: 'dt-29', time: '1h 55m ago', side: 'Buy' as const, pair: 'SKATE/SOL', price: 0.0052, amount: '700.00K', collateral: 19.86, collateralIcon: '/tokens/sol.svg', tierIcon: 'shark' as const },
-  { id: 'dt-30', time: '2h ago', side: 'Buy' as const, pair: 'SKATE/USDC', price: 0.0049, amount: '50.00K', collateral: 245.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'fish' as const },
-];
+/** Generate recent trades dynamically based on token symbol and chain */
+export function generateDetailRecentTrades(tokenSymbol: string, chain = 'solana') {
+  const native = getNativeToken(chain);
+  const sym = tokenSymbol.toUpperCase();
+
+  // Template: [side, isNative, amount, collateral, tierIcon, hasBadge?, timeMins]
+  const templates: [
+    'Buy' | 'Sell', boolean, string, number, 'whale' | 'shark' | 'dolphin' | 'fish' | 'shrimp', string | undefined, number
+  ][] = [
+    ['Sell', false, '36.40K', 182.0, 'fish', undefined, 1],
+    ['Sell', true, '181.80K', 4.95, 'fish', undefined, 2],
+    ['Buy', false, '1.00M', 5000.0, 'dolphin', 'RS', 5],
+    ['Buy', true, '400.00K', 10.9, 'dolphin', 'RS', 6],
+    ['Buy', false, '36.20K', 181.0, 'fish', undefined, 7],
+    ['Buy', true, '1.00M', 817.43, 'whale', undefined, 10],
+    ['Buy', false, '18.20K', 91.0, 'shrimp', undefined, 12],
+    ['Sell', true, '55.00K', 1.47, 'fish', undefined, 15],
+    ['Buy', false, '120.00K', 612.0, 'dolphin', undefined, 18],
+    ['Sell', false, '75.00K', 375.0, 'fish', undefined, 22],
+    ['Buy', true, '500.00K', 14.18, 'shark', 'RS', 25],
+    ['Buy', false, '10.00K', 50.0, 'shrimp', undefined, 30],
+    ['Sell', true, '200.00K', 5.24, 'dolphin', undefined, 35],
+    ['Buy', false, '2.00M', 300000.0, 'whale', undefined, 40],
+    ['Sell', false, '88.50K', 433.65, 'fish', undefined, 45],
+    ['Buy', true, '15.00K', 0.42, 'shrimp', undefined, 50],
+    ['Sell', false, '60.00K', 300.0, 'fish', undefined, 55],
+    ['Buy', true, '350.00K', 9.93, 'shark', undefined, 60],
+    ['Sell', false, '42.00K', 210.0, 'fish', undefined, 65],
+    ['Buy', true, '85.00K', 2.27, 'fish', undefined, 68],
+    ['Buy', false, '250.00K', 1275.0, 'shark', 'RS', 72],
+    ['Sell', true, '30.00K', 0.79, 'shrimp', undefined, 75],
+    ['Buy', false, '500.00K', 2500.0, 'shark', undefined, 80],
+    ['Sell', false, '65.00K', 318.5, 'fish', undefined, 85],
+    ['Buy', true, '1.50M', 40.91, 'whale', undefined, 90],
+    ['Sell', false, '22.00K', 105.6, 'shrimp', undefined, 95],
+    ['Buy', true, '180.00K', 5.01, 'dolphin', undefined, 100],
+    ['Sell', false, '95.00K', 475.0, 'fish', undefined, 108],
+    ['Buy', true, '700.00K', 19.86, 'shark', undefined, 115],
+    ['Buy', false, '50.00K', 245.0, 'fish', undefined, 120],
+  ];
+
+  // Price variations around a base
+  const priceOffsets = [0, 0, 0, 0, 0, 0, 0, -0.0001, 0.0001, 0, 0.0002, 0, -0.0002, 0, -0.0001, 0.0001, 0, 0.0002, 0, -0.0001, 0.0001, -0.0002, 0, -0.0001, 0, -0.0002, 0.0001, 0, 0.0002, -0.0001];
+
+  function formatTime(mins: number): string {
+    if (mins < 60) return `${mins}m ago`;
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return m === 0 ? `${h}h ago` : `${h}h ${m}m ago`;
+  }
+
+  return templates.map(([side, isNative, amount, collateral, tierIcon, hasBadge, timeMins], i) => {
+    const collateralToken = isNative ? native.symbol : 'USDC';
+    const pair = `${sym}/${collateralToken}`;
+    return {
+      id: `dt-${i + 1}`,
+      time: formatTime(timeMins),
+      side,
+      pair,
+      price: 0.005 + (priceOffsets[i] || 0),
+      amount,
+      collateral,
+      collateralIcon: isNative ? native.icon : '/tokens/usdc.svg',
+      tierIcon,
+      ...(hasBadge ? { hasBadge } : {}),
+    };
+  });
+}

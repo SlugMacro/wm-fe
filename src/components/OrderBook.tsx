@@ -283,7 +283,7 @@ export default function OrderBook({ buyOrders, sellOrders, onSelectOrder, select
                         <span className="text-sm font-normal text-[#f9f9fa] tabular-nums">
                           {order.collateral < 1 ? order.collateral.toFixed(2) : order.collateral.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
-                        <TokenIcon symbol={order.collateralToken} size="sm" showChain={false} />
+                        <TokenIcon symbol={order.collateralToken} size="xs" showChain={false} />
                       </div>
                       <div className="w-24 flex items-center justify-end gap-1">
                         {order.fillType === 'FULL' && (
@@ -390,7 +390,7 @@ export default function OrderBook({ buyOrders, sellOrders, onSelectOrder, select
                         <span className="text-sm font-normal text-[#f9f9fa] tabular-nums">
                           {order.collateral < 1 ? order.collateral.toFixed(2) : order.collateral.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
-                        <TokenIcon symbol={order.collateralToken} size="sm" showChain={false} />
+                        <TokenIcon symbol={order.collateralToken} size="xs" showChain={false} />
                       </div>
                       <div className="w-24 flex items-center justify-end gap-1">
                         {order.fillType === 'FULL' && (
