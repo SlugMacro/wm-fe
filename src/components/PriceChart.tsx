@@ -222,7 +222,7 @@ export default function PriceChart({ data, currentPrice, priceChange, impliedFdv
         {/* Hover tooltip */}
         {hoverPoint && hoverIndex !== null && (
           <div
-            className="absolute z-30 pointer-events-none rounded-md border border-[#252527] bg-[#141415] px-3 py-2 shadow-lg"
+            className="absolute z-30 pointer-events-none rounded-md border border-[#1b1b1c] bg-[#141415] px-3 py-2 shadow-lg"
             style={getTooltipStyle()}
           >
             <div className="text-[10px] text-[#7a7a83] mb-1.5">
@@ -244,10 +244,10 @@ export default function PriceChart({ data, currentPrice, priceChange, impliedFdv
         )}
 
         {/* === PRICE CHART SECTION === */}
-        <div className="flex border-b border-[#252527]">
+        <div className="flex border-b border-[#1b1b1c]">
           {/* Left "Price" label */}
           <div
-            className="shrink-0 flex items-center justify-center border-r border-[#252527]"
+            className="shrink-0 flex items-center justify-center border-r border-[#1b1b1c]"
             style={{ width: leftLabelW, height: priceChartH }}
           >
             <span
@@ -424,7 +424,7 @@ export default function PriceChart({ data, currentPrice, priceChange, impliedFdv
 
           {/* Right Y-axis for price */}
           <div
-            className="shrink-0 relative border-l border-[#252527] py-4"
+            className="shrink-0 relative border-l border-[#1b1b1c] py-4"
             style={{ width: rightAxisW, height: priceChartH }}
           >
             {activeLabels.map((l, i) => {
@@ -467,10 +467,10 @@ export default function PriceChart({ data, currentPrice, priceChange, impliedFdv
         </div>
 
         {/* === VOLUME CHART SECTION === */}
-        <div className="flex border-b border-[#252527]">
+        <div className="flex border-b border-[#1b1b1c]">
           {/* Left "Volume" label */}
           <div
-            className="shrink-0 flex items-center justify-center border-r border-[#252527]"
+            className="shrink-0 flex items-center justify-center border-r border-[#1b1b1c]"
             style={{ width: leftLabelW, height: volumeChartH }}
           >
             <span
@@ -551,7 +551,7 @@ export default function PriceChart({ data, currentPrice, priceChange, impliedFdv
 
           {/* Volume right Y-axis */}
           <div
-            className="shrink-0 flex flex-col justify-between border-l border-[#252527] py-4"
+            className="shrink-0 flex flex-col justify-between border-l border-[#1b1b1c] py-4"
             style={{ width: rightAxisW, height: volumeChartH }}
           >
             <span className="text-[10px] text-[#7a7a83] tabular-nums pl-2">
