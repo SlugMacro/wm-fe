@@ -126,7 +126,7 @@ export const upcomingMarkets: UpcomingMarket[] = [
     tokenIcon: '/tokens/nexo.png',
     chain: 'solana',
     status: 'upcoming',
-    watchers: 4572,
+    watchers: 8241,
     investors: [
       { image: '/investors/inv1.png' },
       { image: '/investors/inv2.png' },
@@ -145,7 +145,7 @@ export const upcomingMarkets: UpcomingMarket[] = [
     tokenIcon: '/tokens/arc.png',
     chain: 'solana',
     status: 'upcoming',
-    watchers: 4572,
+    watchers: 5473,
     investors: [],
     investorExtra: 0,
     narratives: ['GAMEFI', 'NFT'],
@@ -158,7 +158,7 @@ export const upcomingMarkets: UpcomingMarket[] = [
     tokenIcon: '/tokens/drift.png',
     chain: 'ethereum',
     status: 'upcoming',
-    watchers: 4572,
+    watchers: 3128,
     investors: [
       { image: '/investors/inv6.png' },
       { image: '/investors/inv7.png' },

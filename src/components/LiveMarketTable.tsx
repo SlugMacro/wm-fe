@@ -321,7 +321,7 @@ export default function LiveMarketTable() {
           return (
             <button
               key={tab.key}
-              onClick={() => { setActiveTab(tab.key); setSortConfig({ field: null, direction: null }); }}
+              onClick={() => { setActiveTab(tab.key); setSortConfig(tab.key === 'upcoming' ? { field: 'watchers', direction: 'desc' } : { field: null, direction: null }); }}
               className="flex items-center gap-2 transition-colors"
             >
               <span className={`text-xl font-medium leading-7 ${isActive ? 'text-[#f9f9fa]' : 'text-[#7a7a83] hover:text-[#f9f9fa]'}`}>
