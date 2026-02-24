@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Breadcrumb from '../components/Breadcrumb';
 import TokenMarketHeader from '../components/TokenMarketHeader';
@@ -24,10 +24,67 @@ export default function TokenDetailPage() {
   const token = tokenDetails[tokenId ?? defaultTokenId] ?? tokenDetails[defaultTokenId];
 
   const [selectedOrder, setSelectedOrder] = useState<{ order: OrderBookEntry; side: 'buy' | 'sell' } | null>(null);
+  const [flashedOrderId, setFlashedOrderId] = useState<string | null>(null);
 
-  const buyOrders = useMemo(() => generateBuyOrders(token.price, token.chain), [token.price, token.chain]);
-  const sellOrders = useMemo(() => generateSellOrders(token.price, token.chain), [token.price, token.chain]);
+  // Orders as mutable state — updated when trades execute
+  const [buyOrders, setBuyOrders] = useState<OrderBookEntry[]>(() =>
+    generateBuyOrders(token.price, token.chain)
+  );
+  const [sellOrders, setSellOrders] = useState<OrderBookEntry[]>(() =>
+    generateSellOrders(token.price, token.chain)
+  );
   const priceData = useMemo(() => generatePriceData(), []);
+
+  // When a trade executes in Recent Trades, update a matching order's fill
+  const handleTradeExecuted = useCallback((side: 'Buy' | 'Sell') => {
+    const setOrders = side === 'Buy' ? setBuyOrders : setSellOrders;
+
+    setOrders(prevOrders => {
+      // Find eligible orders: not FULL, not already 100% filled
+      const eligible = prevOrders
+        .map((order, index) => ({ order, index }))
+        .filter(({ order }) => order.fillType !== 'FULL' && order.fillPercent < 100);
+
+      if (eligible.length === 0) return prevOrders;
+
+      // Pick a random eligible order
+      const chosen = eligible[Math.floor(Math.random() * eligible.length)];
+      const increment = Math.random() * 25 + 15; // 15-40% increment
+      const newFillPercent = Math.min(100, chosen.order.fillPercent + increment);
+      const newFilledAmount = (newFillPercent / 100) * chosen.order.totalAmount;
+
+      const updated = [...prevOrders];
+      updated[chosen.index] = {
+        ...chosen.order,
+        fillPercent: newFillPercent,
+        filledAmount: newFilledAmount,
+      };
+
+      // Flash the affected order
+      setFlashedOrderId(chosen.order.id);
+      setTimeout(() => setFlashedOrderId(null), 600);
+
+      // If order hit 100%, schedule removal after fade-out animation
+      if (newFillPercent >= 100) {
+        const orderId = chosen.order.id;
+        setTimeout(() => {
+          setOrders(prev => prev.filter(o => o.id !== orderId));
+        }, 800);
+      }
+
+      return updated;
+    });
+  }, []);
+
+  // Clear selected order if it gets removed from the book
+  useEffect(() => {
+    if (selectedOrder) {
+      const allOrders = selectedOrder.side === 'buy' ? buyOrders : sellOrders;
+      if (!allOrders.find(o => o.id === selectedOrder.order.id)) {
+        setSelectedOrder(null);
+      }
+    }
+  }, [buyOrders, sellOrders, selectedOrder]);
 
   const breadcrumbItems = [
     { label: 'Whales.Market', to: '/markets' },
@@ -76,12 +133,13 @@ export default function TokenDetailPage() {
               onSelectOrder={handleSelectOrder}
               selectedOrderId={selectedOrder?.order.id ?? null}
               tokenSymbol={token.tokenSymbol}
+              flashedOrderId={flashedOrderId}
             />
           </div>
 
           {/* Recent Trades */}
           <div className="pt-4">
-            <DetailRecentTrades tokenSymbol={token.tokenSymbol} chain={token.chain} />
+            <DetailRecentTrades tokenSymbol={token.tokenSymbol} chain={token.chain} onTradeExecuted={handleTradeExecuted} />
           </div>
         </div>
 

@@ -65,9 +65,10 @@ const SCROLLBAR_WIDTH = 4;
 interface DetailRecentTradesProps {
   tokenSymbol?: string;
   chain?: string;
+  onTradeExecuted?: (side: 'Buy' | 'Sell') => void;
 }
 
-export default function DetailRecentTrades({ tokenSymbol = 'SKATE', chain = 'solana' }: DetailRecentTradesProps) {
+export default function DetailRecentTrades({ tokenSymbol = 'SKATE', chain = 'solana', onTradeExecuted }: DetailRecentTradesProps) {
   const native = getChainNative(chain);
   const sampleTrades = useMemo(() => buildSampleTrades(tokenSymbol, native.symbol, native.icon), [tokenSymbol, native.symbol, native.icon]);
 
@@ -122,13 +123,16 @@ export default function DetailRecentTrades({ tokenSymbol = 'SKATE', chain = 'sol
 
     setTrades((prev) => [newTrade, ...prev.slice(0, MAX_TRADES - 1)]);
 
+    // Notify parent to update order book fill
+    onTradeExecuted?.(sample.side);
+
     // Remove isNew flag after animation
     setTimeout(() => {
       setTrades((prev) =>
         prev.map((t) => (t.id === newTrade.id ? { ...t, isNew: false } : t))
       );
     }, 600);
-  }, [sampleTrades]);
+  }, [sampleTrades, onTradeExecuted]);
 
   useEffect(() => {
     const timer = setInterval(addNewTrade, NEW_TRADE_INTERVAL);

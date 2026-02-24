@@ -152,9 +152,10 @@ interface OrderBookProps {
   onSelectOrder: (order: OrderBookEntry, side: 'buy' | 'sell') => void;
   selectedOrderId?: string | null;
   tokenSymbol: string;
+  flashedOrderId?: string | null;
 }
 
-export default function OrderBook({ buyOrders, sellOrders, onSelectOrder, selectedOrderId, tokenSymbol }: OrderBookProps) {
+export default function OrderBook({ buyOrders, sellOrders, onSelectOrder, selectedOrderId, tokenSymbol, flashedOrderId }: OrderBookProps) {
   const [activeTab, setActiveTab] = useState<OrderBookTab>('regular');
   const [hoveredOrderId, setHoveredOrderId] = useState<string | null>(null);
 
@@ -249,22 +250,30 @@ export default function OrderBook({ buyOrders, sellOrders, onSelectOrder, select
               {buyOrders.map(order => {
                 const isSelected = selectedOrderId === order.id;
                 const isHovered = hoveredOrderId === order.id;
+                const isFlashed = flashedOrderId === order.id;
+                const isFadingOut = order.fillPercent >= 100 && order.fillType !== 'FULL';
                 return (
                   <div
                     key={order.id}
-                    className={`relative flex items-center h-10 cursor-pointer transition-colors rounded-md px-2 mt-0.5 ${
-                      isSelected
-                        ? 'bg-[rgba(22,194,132,0.08)] border border-[rgba(22,194,132,0.2)]'
-                        : 'bg-[#0e0e0f] hover:bg-[#131314]'
+                    className={`relative flex items-center cursor-pointer transition-all duration-500 rounded-md px-2 ${
+                      isFadingOut
+                        ? 'h-0 mt-0 opacity-0 overflow-hidden'
+                        : 'h-10 mt-0.5'
+                    } ${
+                      isFlashed
+                        ? 'bg-[rgba(22,194,132,0.18)]'
+                        : isSelected
+                          ? 'bg-[rgba(22,194,132,0.08)] border border-[rgba(22,194,132,0.2)]'
+                          : 'bg-[#0e0e0f] hover:bg-[#131314]'
                     }`}
                     onClick={() => onSelectOrder(order, 'buy')}
                     onMouseEnter={() => setHoveredOrderId(order.id)}
                     onMouseLeave={() => setHoveredOrderId(null)}
                   >
                     {/* Fill percentage background bar — hidden for FULL orders */}
-                    {order.fillPercent > 0 && order.fillType !== 'FULL' && (
+                    {order.fillType !== 'FULL' && (
                       <div
-                        className="absolute inset-y-0 left-0 rounded-sm bg-[rgba(22,194,132,0.06)] pointer-events-none"
+                        className="absolute inset-y-0 left-0 rounded-sm bg-[rgba(22,194,132,0.06)] pointer-events-none transition-[width] duration-500 ease-out"
                         style={{ width: `${order.fillPercent}%` }}
                       />
                     )}
@@ -356,22 +365,30 @@ export default function OrderBook({ buyOrders, sellOrders, onSelectOrder, select
               {sellOrders.map(order => {
                 const isSelected = selectedOrderId === order.id;
                 const isHovered = hoveredOrderId === order.id;
+                const isFlashed = flashedOrderId === order.id;
+                const isFadingOut = order.fillPercent >= 100 && order.fillType !== 'FULL';
                 return (
                   <div
                     key={order.id}
-                    className={`relative flex items-center h-10 cursor-pointer transition-colors rounded-md px-2 mt-0.5 ${
-                      isSelected
-                        ? 'bg-[rgba(255,59,70,0.08)] border border-[rgba(255,59,70,0.2)]'
-                        : 'bg-[#0e0e0f] hover:bg-[#131314]'
+                    className={`relative flex items-center cursor-pointer transition-all duration-500 rounded-md px-2 ${
+                      isFadingOut
+                        ? 'h-0 mt-0 opacity-0 overflow-hidden'
+                        : 'h-10 mt-0.5'
+                    } ${
+                      isFlashed
+                        ? 'bg-[rgba(255,59,70,0.18)]'
+                        : isSelected
+                          ? 'bg-[rgba(255,59,70,0.08)] border border-[rgba(255,59,70,0.2)]'
+                          : 'bg-[#0e0e0f] hover:bg-[#131314]'
                     }`}
                     onClick={() => onSelectOrder(order, 'sell')}
                     onMouseEnter={() => setHoveredOrderId(order.id)}
                     onMouseLeave={() => setHoveredOrderId(null)}
                   >
                     {/* Fill percentage background bar — hidden for FULL orders */}
-                    {order.fillPercent > 0 && order.fillType !== 'FULL' && (
+                    {order.fillType !== 'FULL' && (
                       <div
-                        className="absolute inset-y-0 left-0 rounded-sm bg-[rgba(255,59,70,0.06)] pointer-events-none"
+                        className="absolute inset-y-0 left-0 rounded-sm bg-[rgba(255,59,70,0.06)] pointer-events-none transition-[width] duration-500 ease-out"
                         style={{ width: `${order.fillPercent}%` }}
                       />
                     )}
