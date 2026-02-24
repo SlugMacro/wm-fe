@@ -36,13 +36,15 @@ function getNativeToken(chain: string): { symbol: 'SOL' | 'ETH' | 'SUI'; icon: s
   }
 }
 
-export function generateBuyOrders(_basePrice: number, chain = 'solana'): OrderBookEntry[] {
-  const prices = [
-    0.0018, 0.0020, 0.0021, 0.0022, 0.0024, 0.0025, 0.0028, 0.0030,
-    0.0035, 0.0036, 0.0038, 0.0038, 0.0040, 0.0042, 0.0044, 0.0045,
-    0.0019, 0.0023, 0.0026, 0.0027, 0.0029, 0.0032, 0.0033, 0.0034,
-    0.0037, 0.0039, 0.0041, 0.0043, 0.0046, 0.0047,
+export function generateBuyOrders(basePrice: number, chain = 'solana'): OrderBookEntry[] {
+  // Generate buy prices just below market price (96.5%–99.7% of basePrice)
+  const spreadPercents = [
+    0.967, 0.964, 0.962, 0.960, 0.957, 0.954, 0.950, 0.946,
+    0.941, 0.937, 0.933, 0.933, 0.928, 0.924, 0.919, 0.914,
+    0.966, 0.958, 0.952, 0.949, 0.947, 0.943, 0.940, 0.938,
+    0.935, 0.931, 0.926, 0.921, 0.916, 0.912,
   ];
+  const prices = spreadPercents.map(pct => Math.round(basePrice * pct * 10000) / 10000);
   const amounts = [
     38.76, 34.88, 99.67, 6.34, 46.51, 195.36, 99.67, 23.26,
     139.54, 111.11, 125.00, 55.08, 125.00, 476.19, 190.28, 155.04,
@@ -107,13 +109,15 @@ export function generateBuyOrders(_basePrice: number, chain = 'solana'): OrderBo
   });
 }
 
-export function generateSellOrders(_basePrice: number, chain = 'solana'): OrderBookEntry[] {
-  const prices = [
-    0.0015, 0.0015, 0.0015, 0.0015, 0.0015, 0.0014, 0.0013, 0.0012,
-    0.0011, 0.0010, 0.0008, 0.0005, 0.0003, 0.0002, 0.0001,
-    0.0016, 0.0017, 0.0014, 0.0013, 0.0011, 0.0009, 0.0007, 0.0004,
-    0.0006, 0.0002,
+export function generateSellOrders(basePrice: number, chain = 'solana'): OrderBookEntry[] {
+  // Generate sell prices just above market price (100.3%–108.8% of basePrice)
+  const spreadPercents = [
+    1.003, 1.003, 1.005, 1.005, 1.007, 1.010, 1.013, 1.017,
+    1.022, 1.028, 1.035, 1.045, 1.058, 1.070, 1.088,
+    1.004, 1.006, 1.011, 1.015, 1.024, 1.032, 1.040, 1.052,
+    1.062, 1.080,
   ];
+  const prices = spreadPercents.map(pct => Math.round(basePrice * pct * 10000) / 10000);
   const amounts = [
     279.08, 139.54, 186.05, 93.03, 186.05, 199.34, 53.67, 12.50,
     2.73, 100.00, 174.43, 100.00, 500.00, 500.00, 100.00,
