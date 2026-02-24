@@ -244,10 +244,10 @@ export default function PriceChart({ data, currentPrice, priceChange, impliedFdv
         )}
 
         {/* === PRICE CHART SECTION === */}
-        <div className="flex">
+        <div className="flex border-b border-[#252527]">
           {/* Left "Price" label */}
           <div
-            className="shrink-0 flex items-center justify-center border-r border-b border-[#252527]"
+            className="shrink-0 flex items-center justify-center border-r border-[#252527]"
             style={{ width: leftLabelW, height: priceChartH }}
           >
             <span
@@ -466,16 +466,11 @@ export default function PriceChart({ data, currentPrice, priceChange, impliedFdv
           </div>
         </div>
 
-        {/* === SEPARATOR LINE === */}
-        <div style={{ paddingLeft: leftLabelW }}>
-          <div className="border-t border-[#252527]" />
-        </div>
-
         {/* === VOLUME CHART SECTION === */}
         <div className="flex border-b border-[#252527]">
           {/* Left "Volume" label */}
           <div
-            className="shrink-0 flex items-center justify-center border-r border-b border-[#252527]"
+            className="shrink-0 flex items-center justify-center border-r border-[#252527]"
             style={{ width: leftLabelW, height: volumeChartH }}
           >
             <span
