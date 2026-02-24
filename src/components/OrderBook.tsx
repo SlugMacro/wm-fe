@@ -222,15 +222,16 @@ export default function OrderBook({ buyOrders, sellOrders, onSelectOrder, select
         {/* Buy orders */}
         <div className="flex-1">
           {/* Header */}
-          <div className="flex items-center border-b border-[#1b1b1c] h-8">
+          <div className="flex items-center border-b border-[#1b1b1c] h-8 px-2">
             <div className="flex-1">
               <span className="text-xs font-medium text-[#7a7a83]">Price ($)</span>
             </div>
             <div className="w-28 text-right">
               <span className="text-xs font-medium text-[#7a7a83]">Amount</span>
             </div>
-            <div className="w-28 text-right">
+            <div className="w-28 flex items-center justify-end gap-1">
               <span className="text-xs font-medium text-[#7a7a83]">Collateral</span>
+              <span className="size-6" />
             </div>
             <div className="w-24" />
           </div>
@@ -329,15 +330,16 @@ export default function OrderBook({ buyOrders, sellOrders, onSelectOrder, select
         {/* Sell orders */}
         <div className="flex-1">
           {/* Header */}
-          <div className="flex items-center border-b border-[#1b1b1c] h-8">
+          <div className="flex items-center border-b border-[#1b1b1c] h-8 px-2">
             <div className="flex-1">
               <span className="text-xs font-medium text-[#7a7a83]">Price ($)</span>
             </div>
             <div className="w-28 text-right">
               <span className="text-xs font-medium text-[#7a7a83]">Amount</span>
             </div>
-            <div className="w-28 text-right">
+            <div className="w-28 flex items-center justify-end gap-1">
               <span className="text-xs font-medium text-[#7a7a83]">Collateral</span>
+              <span className="size-6" />
             </div>
             <div className="w-24" />
           </div>
