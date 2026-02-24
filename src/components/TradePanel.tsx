@@ -10,12 +10,30 @@ interface TradePanelProps {
   walletBalance?: number;
 }
 
+const infoRowTooltips: Record<string, string> = {
+  'Price': 'The unit price per token for this order.',
+  'Amount Deliver': 'The amount of tokens or collateral you will deposit to fulfill this trade.',
+  'To be Received': 'The amount of tokens or collateral you will receive after the trade is completed.',
+};
+
 function InfoRow({ label, value }: { label: string; value: string }) {
+  const tooltip = infoRowTooltips[label];
   return (
     <div className="flex items-center justify-between">
-      <span className="text-sm leading-5 font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34]">
-        {label}
-      </span>
+      {tooltip ? (
+        <span className="relative group cursor-help inline-flex">
+          <span className="text-sm leading-5 font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34]">
+            {label}
+          </span>
+          <span className="absolute left-0 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-50">
+            {tooltip}
+          </span>
+        </span>
+      ) : (
+        <span className="text-sm leading-5 font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34]">
+          {label}
+        </span>
+      )}
       <span className="text-sm leading-5 font-medium text-[#f9f9fa] tabular-nums">{value}</span>
     </div>
   );

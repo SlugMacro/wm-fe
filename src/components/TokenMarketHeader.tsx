@@ -57,18 +57,20 @@ export default function TokenMarketHeader({ token }: { token: TokenDetail }) {
       label: 'Implied FDV',
       value: token.impliedFdv,
       dashed: true,
+      tooltip: 'Fully Diluted Valuation — the theoretical market cap if all tokens were in circulation, calculated from the current pre-market price.',
     },
     {
       label: 'Settle Time (UTC)',
       value: formatSettleTime(token.settleTime),
       dashed: true,
+      tooltip: 'The date and time (UTC) when the pre-market contracts will settle and tokens will be distributed to buyers.',
     },
   ];
 
   return (
     <div className="flex items-center justify-between border-b-[4px] border-[#1b1b1c] py-4">
       {/* Left: Token info + stats */}
-      <div className="flex flex-1 items-end gap-8 overflow-hidden">
+      <div className="flex flex-1 items-end gap-8 overflow-visible">
         {/* Token icon + name */}
         <div className="flex items-center gap-2 shrink-0">
           <TokenIcon symbol={token.tokenSymbol} chain={token.chain} size="md" />
@@ -92,9 +94,21 @@ export default function TokenMarketHeader({ token }: { token: TokenDetail }) {
         <div className="flex items-center gap-8">
           {stats.map((stat, i) => (
             <div key={i} className="flex flex-col gap-1 shrink-0">
-              <span className={`text-xs leading-4 font-normal text-[#7a7a83] ${stat.dashed ? 'border-b border-dashed border-[#2e2e34]' : ''}`}>
-                {stat.label}
-              </span>
+              {stat.tooltip ? (
+                <span className="relative group cursor-help inline-flex self-start">
+                  <span className={`text-xs leading-4 font-normal text-[#7a7a83] ${stat.dashed ? 'border-b border-dashed border-[#2e2e34]' : ''}`}>
+                    {stat.label}
+                  </span>
+                  {/* Tooltip */}
+                  <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-50">
+                    {stat.tooltip}
+                  </span>
+                </span>
+              ) : (
+                <span className={`text-xs leading-4 font-normal text-[#7a7a83] ${stat.dashed ? 'border-b border-dashed border-[#2e2e34]' : ''}`}>
+                  {stat.label}
+                </span>
+              )}
               <div className="flex items-center gap-1">
                 <span className="text-xs leading-4 font-normal text-[#f9f9fa] tabular-nums">{stat.value}</span>
                 {stat.change && (

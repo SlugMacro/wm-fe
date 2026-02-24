@@ -261,28 +261,43 @@ export default function DashboardOpenOrders({ openOrders, filledOrders }: Dashbo
               <span className="text-xs font-medium text-[#7a7a83]">Side</span>
             </div>
             <div className="w-[10%] min-w-[100px] text-right">
-              <button onClick={() => handleSort('price')} className="inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
+              <button onClick={() => handleSort('price')} className="group relative inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
                 <span className="border-b border-dashed border-[#2e2e34]">Price ($)</span> <SortIcon active={sortField === 'price'} direction={sortField === 'price' ? sortDir : null} />
+                <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-50">
+                  The price per token in USD for this order.
+                </span>
               </button>
             </div>
             <div className="w-[10%] min-w-[100px] text-right">
-              <button onClick={() => handleSort('amount')} className="inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
+              <button onClick={() => handleSort('amount')} className="group relative inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
                 <span className="border-b border-dashed border-[#2e2e34]">Amount</span> <SortIcon active={sortField === 'amount'} direction={sortField === 'amount' ? sortDir : null} />
+                <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-50">
+                  The total number of tokens in this order.
+                </span>
               </button>
             </div>
             <div className="w-[10%] min-w-[100px] text-right">
-              <button onClick={() => handleSort('deposited')} className="inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
+              <button onClick={() => handleSort('deposited')} className="group relative inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
                 <span className="border-b border-dashed border-[#2e2e34]">Deposited</span> <SortIcon active={sortField === 'deposited'} direction={sortField === 'deposited' ? sortDir : null} />
+                <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-50">
+                  The collateral you have deposited for this order.
+                </span>
               </button>
             </div>
             <div className="w-[12%] min-w-[120px] text-right">
-              <button onClick={() => handleSort('toBeReceived')} className="inline-flex items-center text-xs font-medium text-[#16c284] hover:text-[#5bd197]">
+              <button onClick={() => handleSort('toBeReceived')} className="group relative inline-flex items-center text-xs font-medium text-[#16c284] hover:text-[#5bd197]">
                 <span className="border-b border-dashed border-[#16c284]">To be Received</span> <SortIcon active={sortField === 'toBeReceived'} direction={sortField === 'toBeReceived' ? sortDir : null} />
+                <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-52 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-50">
+                  The tokens or collateral you will receive when the order is settled.
+                </span>
               </button>
             </div>
             <div className="w-[10%] min-w-[100px] text-right">
-              <button onClick={() => handleSort('progress')} className="inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
+              <button onClick={() => handleSort('progress')} className="group relative inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
                 <span className="border-b border-dashed border-[#2e2e34]">Progress</span> <SortIcon active={sortField === 'progress'} direction={sortField === 'progress' ? sortDir : null} />
+                <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-50">
+                  The percentage of this order that has been filled.
+                </span>
               </button>
             </div>
             <div className="flex-1 text-right pr-1">

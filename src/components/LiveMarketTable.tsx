@@ -564,20 +564,28 @@ export default function LiveMarketTable() {
                 </button>
               </div>
               <div className="w-[192px] shrink-0">
-                <span className="text-xs font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34]">
-                  Investors & Backers
+                <span className="relative group cursor-help inline-flex">
+                  <span className="text-xs font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34]">
+                    Investors & Backers
+                  </span>
+                  <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-50">
+                    Key investors and venture capital backers supporting this project.
+                  </span>
                 </span>
               </div>
               <div className="w-[192px] shrink-0">
                 <span className="text-xs font-normal text-[#7a7a83]">Narrative</span>
               </div>
-              <div className="w-[192px] shrink-0">
+              <div className="w-[192px] shrink-0 relative">
                 <button
                   onClick={() => handleSort('moniScore')}
-                  className="inline-flex items-center gap-0.5 text-xs font-normal text-[#7a7a83] hover:text-[#f9f9fa] transition-colors border-b border-dashed border-[#2e2e34]"
+                  className="group inline-flex items-center gap-0.5 text-xs font-normal text-[#7a7a83] hover:text-[#f9f9fa] transition-colors border-b border-dashed border-[#2e2e34]"
                 >
                   Moni Score
                   <SortIcon active={sortConfig.field === 'moniScore'} direction={sortConfig.field === 'moniScore' ? sortConfig.direction : null} />
+                  <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-50">
+                    A composite score from Moni that evaluates project quality based on community, development activity, and investor backing.
+                  </span>
                 </button>
               </div>
             </div>
@@ -625,13 +633,23 @@ export default function LiveMarketTable() {
                 </button>
               </div>
               <div className="w-[192px] shrink-0 text-right">
-                <span className="text-xs font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34]">
-                  Settle Starts (UTC)
+                <span className="relative group cursor-help inline-flex">
+                  <span className="text-xs font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34]">
+                    Settle Starts (UTC)
+                  </span>
+                  <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-50">
+                    The date and time (UTC) when the settlement process begins for ended markets.
+                  </span>
                 </span>
               </div>
               <div className="w-[192px] shrink-0 text-right">
-                <span className="text-xs font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34]">
-                  Settle Ends (UTC)
+                <span className="relative group cursor-help inline-flex">
+                  <span className="text-xs font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34]">
+                    Settle Ends (UTC)
+                  </span>
+                  <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-50">
+                    The date and time (UTC) when the settlement process completes and final distribution occurs.
+                  </span>
                 </span>
               </div>
             </div>
@@ -711,8 +729,13 @@ export default function LiveMarketTable() {
                 </div>
               ))}
               <div className="w-[180px] shrink-0 text-right">
-                <span className="text-xs font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34]">
-                  Settle Time (UTC)
+                <span className="relative group cursor-help inline-flex">
+                  <span className="text-xs font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34]">
+                    Settle Time (UTC)
+                  </span>
+                  <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-50">
+                    The date and time (UTC) when the pre-market contracts will settle and tokens will be distributed.
+                  </span>
                 </span>
               </div>
             </div>
