@@ -172,34 +172,30 @@ export const upcomingMarkets: UpcomingMarket[] = [
 ];
 
 export const endedMarkets: EndedMarket[] = [
-  // Page 1
-  { id: 'ended-1', tokenSymbol: 'WEN', tokenName: 'Wen', chain: 'solana', status: 'ended', lastPrice: 0.0001, totalVolume: 125000, settleStartTime: '2025-03-10T13:00:00Z', settleEndTime: '2025-03-10T18:30:00Z' },
-  { id: 'ended-2', tokenSymbol: 'JUP', tokenName: 'Jupiter', chain: 'solana', status: 'ended', lastPrice: 0.85, totalVolume: 890000, settleStartTime: '2025-02-28T09:00:00Z', settleEndTime: '2025-03-01T09:00:00Z' },
-  { id: 'ended-3', tokenSymbol: 'TIA', tokenName: 'Celestia', chain: 'ethereum', status: 'ended', lastPrice: 5.32, totalVolume: 1250000, settleStartTime: '2025-04-15T14:00:00Z', settleEndTime: '2025-04-16T14:00:00Z' },
-  { id: 'ended-4', tokenSymbol: 'BONK', tokenName: 'Bonk', chain: 'solana', status: 'ended', lastPrice: 0.000025, totalVolume: 45000, settleStartTime: null, settleEndTime: null },
-  { id: 'ended-5', tokenSymbol: 'SEI', tokenName: 'Sei', chain: 'ethereum', status: 'ended', lastPrice: 0.42, totalVolume: 560000, settleStartTime: null, settleEndTime: null },
-  { id: 'ended-6', tokenSymbol: 'BLUR', tokenName: 'Blur', chain: 'ethereum', status: 'ended', lastPrice: 0.38, totalVolume: 780000, settleStartTime: '2025-01-20T16:00:00Z', settleEndTime: '2025-01-21T04:00:00Z' },
-  // Page 2
-  { id: 'ended-7', tokenSymbol: 'ARB', tokenName: 'Arbitrum', chain: 'ethereum', status: 'ended', lastPrice: 1.15, totalVolume: 2100000, settleStartTime: '2025-03-05T12:00:00Z', settleEndTime: '2025-03-05T18:00:00Z' },
-  { id: 'ended-8', tokenSymbol: 'OP', tokenName: 'Optimism', chain: 'ethereum', status: 'ended', lastPrice: 1.82, totalVolume: 1800000, settleStartTime: '2025-02-14T10:00:00Z', settleEndTime: '2025-02-14T22:00:00Z' },
-  { id: 'ended-9', tokenSymbol: 'APT', tokenName: 'Aptos', chain: 'ethereum', status: 'ended', lastPrice: 8.45, totalVolume: 950000, settleStartTime: null, settleEndTime: null },
-  { id: 'ended-10', tokenSymbol: 'PYTH', tokenName: 'Pyth Network', chain: 'solana', status: 'ended', lastPrice: 0.34, totalVolume: 432000, settleStartTime: '2025-05-01T08:00:00Z', settleEndTime: '2025-05-01T20:00:00Z' },
-  { id: 'ended-11', tokenSymbol: 'STRK', tokenName: 'Starknet', chain: 'ethereum', status: 'ended', lastPrice: 1.22, totalVolume: 1560000, settleStartTime: '2025-04-20T06:00:00Z', settleEndTime: '2025-04-20T18:00:00Z' },
-  { id: 'ended-12', tokenSymbol: 'W', tokenName: 'Wormhole', chain: 'solana', status: 'ended', lastPrice: 0.58, totalVolume: 287000, settleStartTime: null, settleEndTime: null },
-  // Page 3
-  { id: 'ended-13', tokenSymbol: 'EIGEN', tokenName: 'EigenLayer', chain: 'ethereum', status: 'ended', lastPrice: 3.91, totalVolume: 5230000, settleStartTime: '2025-06-10T15:00:00Z', settleEndTime: '2025-06-11T15:00:00Z' },
-  { id: 'ended-14', tokenSymbol: 'ETHFI', tokenName: 'Ether.fi', chain: 'ethereum', status: 'ended', lastPrice: 2.14, totalVolume: 890000, settleStartTime: '2025-03-25T11:00:00Z', settleEndTime: '2025-03-25T23:00:00Z' },
-  { id: 'ended-15', tokenSymbol: 'AEVO', tokenName: 'Aevo', chain: 'ethereum', status: 'ended', lastPrice: 0.91, totalVolume: 345000, settleStartTime: null, settleEndTime: null },
-  { id: 'ended-16', tokenSymbol: 'ALT', tokenName: 'AltLayer', chain: 'ethereum', status: 'ended', lastPrice: 0.31, totalVolume: 178000, settleStartTime: '2025-02-01T14:00:00Z', settleEndTime: '2025-02-02T02:00:00Z' },
-  { id: 'ended-17', tokenSymbol: 'MANTA', tokenName: 'Manta Network', chain: 'ethereum', status: 'ended', lastPrice: 1.45, totalVolume: 620000, settleStartTime: '2025-01-18T09:00:00Z', settleEndTime: '2025-01-18T21:00:00Z' },
-  { id: 'ended-18', tokenSymbol: 'DYM', tokenName: 'Dymension', chain: 'ethereum', status: 'ended', lastPrice: 2.78, totalVolume: 415000, settleStartTime: '2025-02-07T07:00:00Z', settleEndTime: '2025-02-07T19:00:00Z' },
-  // Page 4
-  { id: 'ended-19', tokenSymbol: 'PIXEL', tokenName: 'Pixels', chain: 'solana', status: 'ended', lastPrice: 0.42, totalVolume: 198000, settleStartTime: null, settleEndTime: null },
-  { id: 'ended-20', tokenSymbol: 'PORTAL', tokenName: 'Portal', chain: 'solana', status: 'ended', lastPrice: 0.68, totalVolume: 312000, settleStartTime: '2025-03-15T16:00:00Z', settleEndTime: '2025-03-16T04:00:00Z' },
-  { id: 'ended-21', tokenSymbol: 'TNSR', tokenName: 'Tensor', chain: 'solana', status: 'ended', lastPrice: 0.95, totalVolume: 527000, settleStartTime: '2025-04-01T12:00:00Z', settleEndTime: '2025-04-01T20:00:00Z' },
-  { id: 'ended-22', tokenSymbol: 'JTO', tokenName: 'Jito', chain: 'solana', status: 'ended', lastPrice: 2.35, totalVolume: 1120000, settleStartTime: '2025-05-20T10:00:00Z', settleEndTime: '2025-05-20T22:00:00Z' },
-  { id: 'ended-23', tokenSymbol: 'KMNO', tokenName: 'Kamino', chain: 'solana', status: 'ended', lastPrice: 0.078, totalVolume: 89000, settleStartTime: null, settleEndTime: null },
-  { id: 'ended-24', tokenSymbol: 'RENDER', tokenName: 'Render', chain: 'solana', status: 'ended', lastPrice: 7.82, totalVolume: 3450000, settleStartTime: '2025-06-01T08:00:00Z', settleEndTime: '2025-06-01T20:00:00Z' },
+  { id: 'ended-1', tokenSymbol: 'EIGEN', tokenName: 'EigenLayer', chain: 'ethereum', status: 'ended', lastPrice: 3.91, totalVolume: 7483875.48, settleStartTime: '2025-06-10T15:00:00Z', settleEndTime: '2025-06-11T15:00:00Z' },
+  { id: 'ended-2', tokenSymbol: 'RENDER', tokenName: 'Render', chain: 'solana', status: 'ended', lastPrice: 7.82, totalVolume: 3451218.63, settleStartTime: '2025-06-01T08:00:00Z', settleEndTime: '2025-06-01T20:00:00Z' },
+  { id: 'ended-3', tokenSymbol: 'ARB', tokenName: 'Arbitrum', chain: 'ethereum', status: 'ended', lastPrice: 1.15, totalVolume: 2104532.91, settleStartTime: '2025-03-05T12:00:00Z', settleEndTime: '2025-03-05T18:00:00Z' },
+  { id: 'ended-4', tokenSymbol: 'OP', tokenName: 'Optimism', chain: 'ethereum', status: 'ended', lastPrice: 1.82, totalVolume: 1803417.55, settleStartTime: '2025-02-14T10:00:00Z', settleEndTime: '2025-02-14T22:00:00Z' },
+  { id: 'ended-5', tokenSymbol: 'STRK', tokenName: 'Starknet', chain: 'ethereum', status: 'ended', lastPrice: 1.22, totalVolume: 1562843.19, settleStartTime: '2025-04-20T06:00:00Z', settleEndTime: '2025-04-20T18:00:00Z' },
+  { id: 'ended-6', tokenSymbol: 'TIA', tokenName: 'Celestia', chain: 'ethereum', status: 'ended', lastPrice: 5.32, totalVolume: 1253647.82, settleStartTime: '2025-04-15T14:00:00Z', settleEndTime: '2025-04-16T14:00:00Z' },
+  { id: 'ended-7', tokenSymbol: 'JTO', tokenName: 'Jito', chain: 'solana', status: 'ended', lastPrice: 2.35, totalVolume: 1124891.37, settleStartTime: '2025-05-20T10:00:00Z', settleEndTime: '2025-05-20T22:00:00Z' },
+  { id: 'ended-8', tokenSymbol: 'APT', tokenName: 'Aptos', chain: 'ethereum', status: 'ended', lastPrice: 8.45, totalVolume: 953218.46, settleStartTime: '2025-05-12T09:00:00Z', settleEndTime: '2025-05-12T21:00:00Z' },
+  { id: 'ended-9', tokenSymbol: 'JUP', tokenName: 'Jupiter', chain: 'solana', status: 'ended', lastPrice: 0.85, totalVolume: 891374.22, settleStartTime: '2025-02-28T09:00:00Z', settleEndTime: '2025-03-01T09:00:00Z' },
+  { id: 'ended-10', tokenSymbol: 'ETHFI', tokenName: 'Ether.fi', chain: 'ethereum', status: 'ended', lastPrice: 2.14, totalVolume: 892105.68, settleStartTime: '2025-03-25T11:00:00Z', settleEndTime: '2025-03-25T23:00:00Z' },
+  { id: 'ended-11', tokenSymbol: 'BLUR', tokenName: 'Blur', chain: 'ethereum', status: 'ended', lastPrice: 0.38, totalVolume: 783429.14, settleStartTime: '2025-01-20T16:00:00Z', settleEndTime: '2025-01-21T04:00:00Z' },
+  { id: 'ended-12', tokenSymbol: 'MANTA', tokenName: 'Manta Network', chain: 'ethereum', status: 'ended', lastPrice: 1.45, totalVolume: 624817.53, settleStartTime: '2025-01-18T09:00:00Z', settleEndTime: '2025-01-18T21:00:00Z' },
+  { id: 'ended-13', tokenSymbol: 'SEI', tokenName: 'Sei', chain: 'ethereum', status: 'ended', lastPrice: 0.42, totalVolume: 563291.87, settleStartTime: '2025-04-08T13:00:00Z', settleEndTime: '2025-04-09T01:00:00Z' },
+  { id: 'ended-14', tokenSymbol: 'TNSR', tokenName: 'Tensor', chain: 'solana', status: 'ended', lastPrice: 0.95, totalVolume: 529483.61, settleStartTime: '2025-04-01T12:00:00Z', settleEndTime: '2025-04-01T20:00:00Z' },
+  { id: 'ended-15', tokenSymbol: 'PYTH', tokenName: 'Pyth Network', chain: 'solana', status: 'ended', lastPrice: 0.34, totalVolume: 434218.79, settleStartTime: '2025-05-01T08:00:00Z', settleEndTime: '2025-05-01T20:00:00Z' },
+  { id: 'ended-16', tokenSymbol: 'DYM', tokenName: 'Dymension', chain: 'ethereum', status: 'ended', lastPrice: 2.78, totalVolume: 417632.44, settleStartTime: '2025-02-07T07:00:00Z', settleEndTime: '2025-02-07T19:00:00Z' },
+  { id: 'ended-17', tokenSymbol: 'AEVO', tokenName: 'Aevo', chain: 'ethereum', status: 'ended', lastPrice: 0.91, totalVolume: 347521.38, settleStartTime: '2025-03-18T15:00:00Z', settleEndTime: '2025-03-19T03:00:00Z' },
+  { id: 'ended-18', tokenSymbol: 'PORTAL', tokenName: 'Portal', chain: 'solana', status: 'ended', lastPrice: 0.68, totalVolume: 314287.92, settleStartTime: '2025-03-15T16:00:00Z', settleEndTime: '2025-03-16T04:00:00Z' },
+  { id: 'ended-19', tokenSymbol: 'W', tokenName: 'Wormhole', chain: 'solana', status: 'ended', lastPrice: 0.58, totalVolume: 289431.56, settleStartTime: '2025-02-20T11:00:00Z', settleEndTime: '2025-02-20T23:00:00Z' },
+  { id: 'ended-20', tokenSymbol: 'PIXEL', tokenName: 'Pixels', chain: 'solana', status: 'ended', lastPrice: 0.42, totalVolume: 201347.83, settleStartTime: '2025-01-25T14:00:00Z', settleEndTime: '2025-01-26T02:00:00Z' },
+  { id: 'ended-21', tokenSymbol: 'ALT', tokenName: 'AltLayer', chain: 'ethereum', status: 'ended', lastPrice: 0.31, totalVolume: 181629.47, settleStartTime: '2025-02-01T14:00:00Z', settleEndTime: '2025-02-02T02:00:00Z' },
+  { id: 'ended-22', tokenSymbol: 'WEN', tokenName: 'Wen', chain: 'solana', status: 'ended', lastPrice: 0.0012, totalVolume: 128753.29, settleStartTime: '2025-03-10T13:00:00Z', settleEndTime: '2025-03-10T18:30:00Z' },
+  { id: 'ended-23', tokenSymbol: 'KMNO', tokenName: 'Kamino', chain: 'solana', status: 'ended', lastPrice: 0.078, totalVolume: 91284.16, settleStartTime: '2025-06-15T10:00:00Z', settleEndTime: '2025-06-15T22:00:00Z' },
+  { id: 'ended-24', tokenSymbol: 'BONK', tokenName: 'Bonk', chain: 'solana', status: 'ended', lastPrice: 0.000025, totalVolume: 47831.54, settleStartTime: '2025-01-05T08:00:00Z', settleEndTime: '2025-01-05T20:00:00Z' },
 ];
 
 export const marketTabCounts = {

@@ -64,8 +64,8 @@ export interface EndedMarket {
   status: 'ended';
   lastPrice: number;
   totalVolume: number;
-  settleStartTime: string | null; // ISO date or null for TBA
-  settleEndTime: string | null;   // ISO date or null for TBA
+  settleStartTime: string; // ISO date (UTC)
+  settleEndTime: string;   // ISO date (UTC)
 }
 
 export type SortField = 'lastPrice' | 'volume24h' | 'totalVolume' | 'impliedFdv';

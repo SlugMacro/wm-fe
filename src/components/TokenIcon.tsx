@@ -14,6 +14,32 @@ import tokenNexo from '../assets/images/token-nexo.png';
 import tokenArc from '../assets/images/token-arc.png';
 import tokenDrift from '../assets/images/token-drift.png';
 
+// Ended token images (from user Desktop)
+import tokenWen from '../assets/images/token-ended-1168.png';
+import tokenJup from '../assets/images/token-ended-5665.png';
+import tokenTia from '../assets/images/token-ended-7226.png';
+import tokenBonk from '../assets/images/token-ended-1659.png';
+import tokenSei from '../assets/images/token-ended-1720.png';
+import tokenBlur from '../assets/images/token-ended-1958.png';
+import tokenArb from '../assets/images/token-ended-2011.png';
+import tokenOp from '../assets/images/token-ended-2280.png';
+import tokenApt from '../assets/images/token-ended-26081.png';
+import tokenPyth from '../assets/images/token-ended-11840.png';
+import tokenStrk from '../assets/images/token-ended-20396.png';
+import tokenW from '../assets/images/token-ended-26997.png';
+import tokenEigen from '../assets/images/token-ended-27075.png';
+import tokenEthfi from '../assets/images/token-ended-27772.png';
+import tokenAevo from '../assets/images/token-ended-28321.png';
+import tokenAlt from '../assets/images/token-ended-29210.png';
+import tokenManta from '../assets/images/token-ended-29420.png';
+import tokenDym from '../assets/images/token-ended-32196.png';
+import tokenPixel from '../assets/images/token-ended-32880.png';
+import tokenPortal from '../assets/images/token-ended-34104.png';
+import tokenTnsr from '../assets/images/token-ended-34387.png';
+import tokenJto from '../assets/images/token-ended-35053.png';
+import tokenKmno from '../assets/images/token-ended-38892.png';
+import tokenRender from '../assets/images/token-ended-3897.png';
+
 // Chain badge images (downloaded from Figma design)
 import chainSolana from '../assets/images/chain-solana.png';
 import chainEthereum from '../assets/images/chain-ethereum.png';
@@ -35,6 +61,31 @@ const TOKEN_IMAGES: Record<string, string> = {
   NEXO: tokenNexo,
   ARC: tokenArc,
   DRIFT: tokenDrift,
+  // Ended tokens
+  WEN: tokenWen,
+  JUP: tokenJup,
+  TIA: tokenTia,
+  BONK: tokenBonk,
+  SEI: tokenSei,
+  BLUR: tokenBlur,
+  ARB: tokenArb,
+  OP: tokenOp,
+  APT: tokenApt,
+  PYTH: tokenPyth,
+  STRK: tokenStrk,
+  W: tokenW,
+  EIGEN: tokenEigen,
+  ETHFI: tokenEthfi,
+  AEVO: tokenAevo,
+  ALT: tokenAlt,
+  MANTA: tokenManta,
+  DYM: tokenDym,
+  PIXEL: tokenPixel,
+  PORTAL: tokenPortal,
+  TNSR: tokenTnsr,
+  JTO: tokenJto,
+  KMNO: tokenKmno,
+  RENDER: tokenRender,
 };
 
 // Fallback brand colors for tokens without local images

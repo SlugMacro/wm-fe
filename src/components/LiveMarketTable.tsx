@@ -228,10 +228,7 @@ function NarrativeBadges({ narratives }: { narratives: string[] }) {
 
 /* ───── Ended-specific cells ───── */
 
-function EndedSettleCell({ time }: { time: string | null }) {
-  if (!time) {
-    return <span className="text-sm font-normal text-[#7a7a83]">TBA</span>;
-  }
+function EndedSettleCell({ time }: { time: string }) {
   const { date, time: t } = formatUTCDate(time);
   return (
     <div className="flex flex-col items-end gap-1">
@@ -318,7 +315,7 @@ function SearchInput({ value, onChange }: { value: string; onChange: (v: string)
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Search"
-        className="w-[256px] h-9 pl-9 pr-3 rounded-lg border border-[#2e2e34] bg-transparent text-sm text-[#f9f9fa] placeholder-[#7a7a83] outline-none focus:border-[#3a3a3d] transition-colors"
+        className="w-[256px] h-9 pl-9 pr-3 rounded-lg border border-[#1f1f23] bg-transparent text-sm text-[#f9f9fa] placeholder-[#7a7a83] outline-none focus:border-[#2e2e34] transition-colors"
       />
     </div>
   );
@@ -342,7 +339,7 @@ function NetworkDropdown({ value, onChange }: { value: NetworkFilter; onChange: 
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 h-9 px-4 rounded-lg border border-[#2e2e34] text-sm text-[#f9f9fa] hover:border-[#3a3a3d] transition-colors"
+        className="flex items-center gap-2 h-9 px-4 rounded-lg bg-[#1b1b1c] text-sm text-[#f9f9fa] hover:bg-[#252527] transition-colors"
       >
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
           <circle cx="8" cy="8" r="6" stroke="#7a7a83" strokeWidth="1.5" />
@@ -415,14 +412,13 @@ export default function LiveMarketTable() {
     setActiveTab(tab);
     if (tab === 'upcoming') {
       setSortConfig({ field: 'watchers', direction: 'desc' });
-    } else {
-      setSortConfig({ field: null, direction: null });
-    }
-    // Reset ended filters
-    if (tab === 'ended') {
+    } else if (tab === 'ended') {
+      setSortConfig({ field: 'totalVolume', direction: 'desc' });
       setEndedPage(1);
       setEndedSearch('');
       setEndedNetwork('all');
+    } else {
+      setSortConfig({ field: null, direction: null });
     }
   };
 
@@ -512,8 +508,8 @@ export default function LiveMarketTable() {
 
   return (
     <div>
-      {/* Tab Filters + Search/Network */}
-      <div className="flex items-center justify-between mb-2">
+      {/* Tab Filters + Search/Network — fixed height to prevent layout jank */}
+      <div className="flex items-center justify-between mb-2 h-10">
         <div className="flex items-center gap-6">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.key;
@@ -640,7 +636,8 @@ export default function LiveMarketTable() {
               </div>
             </div>
 
-            {/* Ended Rows */}
+            {/* Ended Rows — min-height prevents layout jank when filtering */}
+            <div className="min-h-[456px]">
             {pagedEndedMarkets.length === 0 ? (
               <div className="flex items-center justify-center h-[76px] text-sm text-[#7a7a83]">
                 No results found
@@ -689,6 +686,7 @@ export default function LiveMarketTable() {
                 </div>
               ))
             )}
+            </div>
 
             {/* Pagination */}
             <Pagination currentPage={endedPage} totalPages={endedTotalPages} onPageChange={setEndedPage} />
