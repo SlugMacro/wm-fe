@@ -173,7 +173,7 @@ export default function DetailRecentTrades({ tokenSymbol: _tokenSymbol }: Detail
   return (
     <div>
       {/* Header — no Show All button */}
-      <div className="flex items-center border-b border-[#1b1b1c] h-[52px]">
+      <div className="flex items-center h-[52px]">
         <h2 className="text-xl font-medium leading-7 text-[#f9f9fa]">Recent Trades</h2>
       </div>
 
