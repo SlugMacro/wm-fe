@@ -138,11 +138,19 @@ export function generateBuyOrders(_basePrice: number, chain = 'solana'): OrderBo
     72.50, 18.33, 210.00, 45.60, 88.14, 63.25, 150.00, 92.78,
     33.10, 280.50, 57.42, 14.88, 320.00, 105.55,
   ];
-  const collaterals = [
-    0.50, 0.50, 1.50, 0.10, 0.80, 3.50, 2.00, 0.50,
-    3.50, 400.00, 500.00, 1.50, 500.00, 2.00, 6.00, 5.00,
-    1.00, 0.30, 4.20, 0.90, 1.80, 1.50, 3.80, 2.40,
-    0.90, 8.50, 1.70, 0.45, 12.00, 3.60,
+  // native coin collateral (SOL ~$180, ETH ~$2800, SUI ~$3)
+  const nativeCollaterals = [
+    0.50, 0, 1.50, 0.10, 0, 3.50, 0, 0.50,
+    3.50, 0, 4.80, 0, 2.80, 1.20, 0, 5.00,
+    0, 0.30, 4.20, 0, 1.80, 0, 3.80, 2.40,
+    0, 8.50, 0, 0.45, 12.00, 0,
+  ];
+  // stablecoin collateral (USDC)
+  const stableCollaterals = [
+    0, 85.00, 0, 0, 150.00, 0, 350.00, 0,
+    0, 2400.00, 0, 280.00, 0, 0, 1200.00, 0,
+    180.00, 0, 0, 120.00, 0, 250.00, 0, 0,
+    95.00, 0, 320.00, 0, 0, 650.00,
   ];
   const fillPercents = [
     15, 0, 75, 0, 0, 10, 0, 0,
@@ -170,12 +178,13 @@ export function generateBuyOrders(_basePrice: number, chain = 'solana'): OrderBo
     const totalAmount = amounts[i] * 1000;
     const filledAmount = totalAmount * fillPercents[i] / 100;
     const useNative = isNative[i];
+    const collateral = useNative ? nativeCollaterals[i] : stableCollaterals[i];
     return {
       id: `buy-${i}`,
       price,
       amount: totalAmount,
       amountFormatted: `${amounts[i].toFixed(2)}K`,
-      collateral: collaterals[i],
+      collateral,
       collateralIcon: useNative ? native.icon : '/tokens/usdc.svg',
       collateralToken: useNative ? native.symbol : 'USDC' as const,
       isOwner: i === 0,
@@ -200,11 +209,19 @@ export function generateSellOrders(_basePrice: number, chain = 'solana'): OrderB
     85.20, 42.10, 310.00, 67.80, 150.00, 225.50, 38.90, 180.00,
     95.60, 400.00,
   ];
-  const collaterals = [
-    3.00, 1.50, 2.00, 1.00, 2.00, 2.00, 0.50, 15.00,
-    3.00, 100.00, 1.00, 50.00, 150.00, 100.00, 10.00,
-    1.20, 0.55, 3.50, 0.65, 1.20, 1.50, 0.20, 0.55,
-    0.45, 0.60,
+  // native coin collateral
+  const nativeCollaterals = [
+    0, 1.50, 2.00, 0, 2.00, 0, 0.50, 15.00,
+    0, 6.20, 0, 1.80, 5.50, 0, 10.00,
+    1.20, 0, 3.50, 0, 1.20, 0, 0.20, 0,
+    0.45, 0,
+  ];
+  // stablecoin collateral (USDC)
+  const stableCollaterals = [
+    520.00, 0, 0, 180.00, 0, 380.00, 0, 0,
+    85.00, 0, 210.00, 0, 0, 1500.00, 0,
+    0, 90.00, 0, 110.00, 0, 280.00, 0, 95.00,
+    0, 650.00,
   ];
   const fillPercents = [
     0, 0, 30, 0, 50, 0, 0, 100,
@@ -232,12 +249,13 @@ export function generateSellOrders(_basePrice: number, chain = 'solana'): OrderB
     const totalAmount = amounts[i] * 1000;
     const filledAmount = totalAmount * fillPercents[i] / 100;
     const useNative = isNative[i];
+    const collateral = useNative ? nativeCollaterals[i] : stableCollaterals[i];
     return {
       id: `sell-${i}`,
       price,
       amount: totalAmount,
       amountFormatted: `${amounts[i].toFixed(2)}K`,
-      collateral: collaterals[i],
+      collateral,
       collateralIcon: useNative ? native.icon : '/tokens/usdc.svg',
       collateralToken: useNative ? native.symbol : 'USDC' as const,
       isOwner: i === 2,

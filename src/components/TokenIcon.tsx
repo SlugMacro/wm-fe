@@ -8,6 +8,8 @@ import tokenMmt from '../assets/images/token-mmt.png';
 import tokenSol from '../assets/images/token-sol.png';
 import tokenUsdc from '../assets/images/token-usdc.png';
 import tokenUsdt from '../assets/images/token-usdt.png';
+import tokenEth from '../assets/images/token-eth.png';
+import tokenSui from '../assets/images/token-sui.png';
 import tokenPengu from '../assets/images/token-pengu.png';
 import tokenIka from '../assets/images/token-ika.png';
 import tokenNexo from '../assets/images/token-nexo.png';
@@ -54,6 +56,8 @@ const TOKEN_IMAGES: Record<string, string> = {
   LOUD: tokenLoud,
   MMT: tokenMmt,
   SOL: tokenSol,
+  ETH: tokenEth,
+  SUI: tokenSui,
   USDC: tokenUsdc,
   USDT: tokenUsdt,
   PENGU: tokenPengu,
