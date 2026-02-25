@@ -172,7 +172,7 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
           <div className="relative">
             <button
               onClick={() => { setShowSideDropdown(!showSideDropdown); setShowStatusDropdown(false); }}
-              className="flex items-center gap-1 rounded-lg bg-[#1b1b1c] px-3 py-1.5 text-sm font-medium text-[#f9f9fa] transition-colors hover:bg-[#252527]"
+              className="flex h-9 items-center gap-1 rounded-lg bg-[#1b1b1c] px-3 text-sm font-medium text-[#f9f9fa] transition-colors hover:bg-[#252527]"
             >
               Side
               <ChevronDownIcon />
@@ -194,11 +194,13 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
             )}
           </div>
 
+          <div className="h-4 w-px bg-[#252527]" />
+
           {/* Status dropdown */}
           <div className="relative">
             <button
               onClick={() => { setShowStatusDropdown(!showStatusDropdown); setShowSideDropdown(false); }}
-              className="flex items-center gap-1 rounded-lg bg-[#1b1b1c] px-3 py-1.5 text-sm font-medium text-[#f9f9fa] transition-colors hover:bg-[#252527]"
+              className="flex h-9 items-center gap-1 rounded-lg bg-[#1b1b1c] px-3 text-sm font-medium text-[#f9f9fa] transition-colors hover:bg-[#252527]"
             >
               Status
               <ChevronDownIcon />
@@ -219,6 +221,8 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
               </div>
             )}
           </div>
+
+          <div className="h-4 w-px bg-[#252527]" />
 
           {/* Search — match homepage SearchInput style */}
           <div className="relative">
@@ -344,7 +348,7 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
 
                 {/* Received — token or collateral icon, 16x16, gap-2 */}
                 <div className="w-[12%] min-w-[120px] flex items-center justify-end gap-2">
-                  <span className={`text-sm tabular-nums ${isResell ? 'text-[#16c284]' : 'text-[#f9f9fa]'}`}>
+                  <span className="text-sm tabular-nums text-[#f9f9fa]">
                     {order.received}
                   </span>
                   <TokenIconComponent symbol={getReceivedSymbol(order)} size="xs" showChain={false} />

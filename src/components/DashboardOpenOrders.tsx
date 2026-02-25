@@ -217,7 +217,7 @@ export default function DashboardOpenOrders({ openOrders, filledOrders, onCloseO
           <div className="relative">
             <button
               onClick={() => setShowSideDropdown(!showSideDropdown)}
-              className="flex items-center gap-1 rounded-lg bg-[#1b1b1c] px-3 py-1.5 text-sm font-medium text-[#f9f9fa] transition-colors hover:bg-[#252527]"
+              className="flex h-9 items-center gap-1 rounded-lg bg-[#1b1b1c] px-3 text-sm font-medium text-[#f9f9fa] transition-colors hover:bg-[#252527]"
             >
               Side
               <ChevronDownIcon />
@@ -376,7 +376,7 @@ export default function DashboardOpenOrders({ openOrders, filledOrders, onCloseO
 
                 {/* To be Received — token or collateral icon based on side */}
                 <div className="w-[12%] min-w-[120px] flex items-center justify-end gap-2">
-                  <span className={`text-sm tabular-nums ${isResell ? 'text-[#16c284]' : 'text-[#f9f9fa]'}`}>
+                  <span className="text-sm tabular-nums text-[#f9f9fa]">
                     {order.toBeReceived}
                   </span>
                   <TokenIconComponent symbol={getReceivedSymbol(order)} size="xs" showChain={false} />
