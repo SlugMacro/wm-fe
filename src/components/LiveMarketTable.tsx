@@ -324,31 +324,76 @@ function SearchInput({ value, onChange }: { value: string; onChange: (v: string)
 
 /* ───── Network Filter ───── */
 
+import chainSolanaPng from '../assets/images/chain-solana.png';
+import chainEthereumPng from '../assets/images/chain-ethereum.png';
+import chainSuiPng from '../assets/images/chain-sui.png';
+
 type NetworkFilter = 'all' | 'solana' | 'ethereum' | 'sui';
-const NETWORKS: { key: NetworkFilter; label: string }[] = [
-  { key: 'all', label: 'All Networks' },
-  { key: 'solana', label: 'Solana' },
-  { key: 'ethereum', label: 'Ethereum' },
-  { key: 'sui', label: 'Sui' },
+
+interface NetworkOption {
+  key: NetworkFilter;
+  label: string;
+  icon: 'all' | string;
+}
+
+const NETWORKS: NetworkOption[] = [
+  { key: 'all', label: 'All', icon: 'all' },
+  { key: 'solana', label: 'Solana', icon: chainSolanaPng },
+  { key: 'ethereum', label: 'Ethereum', icon: chainEthereumPng },
+  { key: 'sui', label: 'Sui', icon: chainSuiPng },
 ];
+
+function AllNetworksIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="6" r="2" fill="#7a7a83" />
+      <circle cx="6" cy="18" r="2" fill="#7a7a83" />
+      <circle cx="18" cy="18" r="2" fill="#7a7a83" />
+      <path d="M12 8V12M12 12L7 16M12 12L17 16" stroke="#7a7a83" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function CheckIcon16() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <path d="M9.55 18l-5.7-5.7 1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18z" fill="#19fb9b" />
+    </svg>
+  );
+}
 
 function NetworkDropdown({ value, onChange }: { value: NetworkFilter; onChange: (v: NetworkFilter) => void }) {
   const [open, setOpen] = useState(false);
-  const activeLabel = NETWORKS.find((n) => n.key === value)?.label ?? 'Network';
+  const [visible, setVisible] = useState(false);
+  const active = NETWORKS.find((n) => n.key === value);
+
+  useEffect(() => {
+    if (open) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setVisible(true));
+      });
+    } else {
+      setVisible(false);
+    }
+  }, [open]);
+
+  const handleClose = () => {
+    setVisible(false);
+    setTimeout(() => setOpen(false), 150);
+  };
 
   return (
     <div className="relative">
       <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 h-9 px-4 rounded-lg bg-[#1b1b1c] text-sm text-[#f9f9fa] hover:bg-[#252527] transition-colors"
+        onClick={() => (open ? handleClose() : setOpen(true))}
+        className="flex items-center gap-2 h-9 px-4 rounded-lg bg-[#1b1b1c] text-sm font-medium text-[#f9f9fa] hover:bg-[#252527] transition-colors"
       >
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <circle cx="8" cy="8" r="6" stroke="#7a7a83" strokeWidth="1.5" />
-          <path d="M3 8H13" stroke="#7a7a83" strokeWidth="1" />
-          <path d="M8 2C9.5 3.5 10 5.5 10 8C10 10.5 9.5 12.5 8 14" stroke="#7a7a83" strokeWidth="1" />
-          <path d="M8 2C6.5 3.5 6 5.5 6 8C6 10.5 6.5 12.5 8 14" stroke="#7a7a83" strokeWidth="1" />
-        </svg>
-        {activeLabel}
+        {active?.icon === 'all' ? (
+          <AllNetworksIcon />
+        ) : (
+          <img src={active?.icon} alt="" className="size-4 rounded" />
+        )}
+        {active?.label}
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className={`transition-transform ${open ? 'rotate-180' : ''}`}>
           <path d="M3 5L6 8L9 5" stroke="#7a7a83" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
@@ -356,19 +401,53 @@ function NetworkDropdown({ value, onChange }: { value: NetworkFilter; onChange: 
 
       {open && (
         <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full mt-1 z-50 w-[180px] rounded-lg border border-[#2e2e34] bg-[#131315] py-1 shadow-lg">
-            {NETWORKS.map((n) => (
-              <button
-                key={n.key}
-                onClick={() => { onChange(n.key); setOpen(false); }}
-                className={`w-full px-4 py-2 text-left text-sm transition-colors ${
-                  value === n.key ? 'text-[#16c284]' : 'text-[#f9f9fa] hover:bg-[#1b1b1c]'
-                }`}
-              >
-                {n.label}
-              </button>
-            ))}
+          <div className="fixed inset-0 z-40" onClick={handleClose} />
+          <div
+            className={`absolute right-0 top-full mt-2 z-50 w-[192px] rounded-[10px] bg-[#1b1b1c] shadow-[0_0_32px_rgba(0,0,0,0.2)] overflow-hidden transition-all duration-150 origin-top-right ${
+              visible
+                ? 'opacity-100 scale-100 translate-y-0'
+                : 'opacity-0 scale-95 -translate-y-1'
+            }`}
+          >
+            <div className="flex flex-col gap-1 p-2">
+              {/* Title */}
+              <div className="px-2 py-1">
+                <span className="text-xs font-medium leading-4 text-[#7a7a83]">Filter by Network</span>
+              </div>
+
+              {/* Options */}
+              {NETWORKS.map((n) => {
+                const isSelected = value === n.key;
+                return (
+                  <button
+                    key={n.key}
+                    onClick={() => { onChange(n.key); handleClose(); }}
+                    className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 transition-colors ${
+                      isSelected ? 'bg-[#252527]' : 'hover:bg-[#252527]'
+                    }`}
+                  >
+                    {/* Icon */}
+                    <div className="flex items-center p-0.5 shrink-0">
+                      {n.icon === 'all' ? (
+                        <AllNetworksIcon />
+                      ) : (
+                        <img src={n.icon} alt="" className="size-4 rounded" />
+                      )}
+                    </div>
+
+                    {/* Label */}
+                    <span className="flex-1 text-left text-sm font-medium text-[#f9f9fa]">{n.label}</span>
+
+                    {/* Checkmark */}
+                    {isSelected && (
+                      <div className="flex items-center p-0.5 shrink-0">
+                        <CheckIcon16 />
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </>
       )}
@@ -591,10 +670,11 @@ export default function LiveMarketTable() {
               </div>
             </div>
 
+            <div className="min-h-[228px]">
             {getUpcomingMarkets().map((market) => (
               <div
                 key={market.id}
-                onClick={() => navigate(`/markets/${market.id}`)}
+                onClick={() => navigate('/coming-soon')}
                 className="flex items-center border-b border-[#1b1b1c] h-[76px] px-2 cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.02)]"
               >
                 <div className="flex-1 min-w-0 flex items-center"><UpcomingTokenCell market={market} /></div>
@@ -606,6 +686,7 @@ export default function LiveMarketTable() {
                 <div className="w-[192px] shrink-0"><MoniScoreBar score={market.moniScore} /></div>
               </div>
             ))}
+            </div>
           </>
         ) : isEnded ? (
           /* ════════════ ENDED TABLE ════════════ */
@@ -655,17 +736,17 @@ export default function LiveMarketTable() {
               </div>
             </div>
 
-            {/* Ended Rows — min-height prevents layout jank when filtering */}
-            <div className="min-h-[456px]">
+            {/* Ended Rows — min-height = 3 rows to prevent layout jank */}
+            <div className="min-h-[228px]">
             {pagedEndedMarkets.length === 0 ? (
-              <div className="flex items-center justify-center h-[76px] text-sm text-[#7a7a83]">
+              <div className="flex items-center justify-center min-h-[228px] text-sm text-[#7a7a83]">
                 No results found
               </div>
             ) : (
               pagedEndedMarkets.map((market) => (
                 <div
                   key={market.id}
-                  onClick={() => navigate(`/markets/${market.id}`)}
+                  onClick={() => navigate('/coming-soon')}
                   className="flex items-center border-b border-[#1b1b1c] h-[76px] px-2 cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.02)]"
                 >
                   {/* Token */}
@@ -741,6 +822,7 @@ export default function LiveMarketTable() {
               </div>
             </div>
 
+            <div className="min-h-[228px]">
             {getLiveMarkets().map((market) => (
               <div
                 key={market.id}
@@ -756,6 +838,7 @@ export default function LiveMarketTable() {
                 <div className="w-[180px] shrink-0"><SettlementCell market={market} /></div>
               </div>
             ))}
+            </div>
           </>
         )}
       </div>

@@ -141,23 +141,24 @@ function AltcoinSeasonBar({ value }: { value: number }) {
   );
 }
 
-function CountdownTimer() {
-  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 2, minutes: 33, seconds: 12 });
+function CountdownTimer({ targetTime }: { targetTime: string }) {
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        let { days, hours, minutes, seconds } = prev;
-        seconds--;
-        if (seconds < 0) { seconds = 59; minutes--; }
-        if (minutes < 0) { minutes = 59; hours--; }
-        if (hours < 0) { hours = 23; days--; }
-        if (days < 0) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
-        return { days, hours, minutes, seconds };
-      });
-    }, 1000);
+    const calc = () => {
+      const diff = new Date(targetTime).getTime() - Date.now();
+      if (diff <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+      return {
+        days: Math.floor(diff / 86400000),
+        hours: Math.floor((diff % 86400000) / 3600000),
+        minutes: Math.floor((diff % 3600000) / 60000),
+        seconds: Math.floor((diff % 60000) / 1000),
+      };
+    };
+    setTimeLeft(calc());
+    const timer = setInterval(() => setTimeLeft(calc()), 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [targetTime]);
 
   const blocks = [
     { value: timeLeft.days, label: 'd' },
@@ -181,15 +182,42 @@ function CountdownTimer() {
   );
 }
 
+function formatSettleDate(iso: string): string {
+  const d = new Date(iso);
+  const dd = String(d.getUTCDate()).padStart(2, '0');
+  const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const yyyy = d.getUTCFullYear();
+  const hh = String(d.getUTCHours()).padStart(2, '0');
+  const min = String(d.getUTCMinutes()).padStart(2, '0');
+  return `${dd}/${mm}/${yyyy} ${hh}:${min} (UTC)`;
+}
+
 /* ───── Main Component ───── */
 
 export default function TopMetrics() {
   const fearGreed = useFearGreedIndex();
   const altcoinSeason = useAltcoinSeasonIndex();
-  const { vol24h, vol24hChange, volHistory } = useLiveMarkets();
+  const { markets, vol24h, vol24hChange, volHistory } = useLiveMarkets();
 
   const changeColor = vol24hChange >= 0 ? 'text-[#5bd197]' : 'text-[#fd5e67]';
   const changeText = `${vol24hChange >= 0 ? '+' : ''}${vol24hChange.toFixed(2)}%`;
+
+  // Find the token with the nearest future settle time
+  const nextSettle = useMemo(() => {
+    const now = Date.now();
+    let closest: { symbol: string; chain: string; settleTime: string } | null = null;
+    let closestDiff = Infinity;
+
+    for (const m of markets) {
+      if (!m.settleTime) continue;
+      const diff = new Date(m.settleTime).getTime() - now;
+      if (diff > 0 && diff < closestDiff) {
+        closestDiff = diff;
+        closest = { symbol: m.tokenSymbol, chain: m.chain, settleTime: m.settleTime };
+      }
+    }
+    return closest;
+  }, [markets]);
 
   return (
     <div className="grid grid-cols-4 gap-4">
@@ -233,16 +261,22 @@ export default function TopMetrics() {
       {/* Next Settlement */}
       <div className="flex flex-col gap-2 rounded-[10px] bg-[rgba(255,255,255,0.03)] px-5 pt-4 pb-5">
         <span className="text-xs font-medium text-[#7a7a83]">Next settlement</span>
-        <div className="flex flex-col items-center gap-4">
-          <div className="flex w-full items-center gap-2">
-            <TokenIcon symbol="SKATE" chain="solana" size="md" />
-            <div className="flex flex-col gap-0.5">
-              <span className="text-sm font-medium text-[#f9f9fa]">SKATE</span>
-              <span className="text-xs font-normal text-[#7a7a83]">09/06/2025 14:00 (UTC)</span>
+        {nextSettle ? (
+          <div className="flex flex-col items-center gap-4">
+            <div className="flex w-full items-center gap-2">
+              <TokenIcon symbol={nextSettle.symbol} chain={nextSettle.chain} size="md" />
+              <div className="flex flex-col gap-0.5">
+                <span className="text-sm font-medium text-[#f9f9fa]">{nextSettle.symbol}</span>
+                <span className="text-xs font-normal text-[#7a7a83]">{formatSettleDate(nextSettle.settleTime)}</span>
+              </div>
             </div>
+            <CountdownTimer targetTime={nextSettle.settleTime} />
           </div>
-          <CountdownTimer />
-        </div>
+        ) : (
+          <div className="flex flex-1 items-center justify-center">
+            <span className="text-sm text-[#7a7a83]">No upcoming settlements</span>
+          </div>
+        )}
       </div>
     </div>
   );

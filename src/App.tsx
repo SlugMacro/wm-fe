@@ -22,6 +22,7 @@ export default function App() {
         <Route path="/referral" element={<ComingSoonPage />} />
         <Route path="/affiliate" element={<ComingSoonPage />} />
         <Route path="/about" element={<ComingSoonPage />} />
+        <Route path="/coming-soon" element={<ComingSoonPage />} />
       </Route>
     </Routes>
   );
