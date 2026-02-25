@@ -429,10 +429,8 @@ export default function OrderBook({
           isFlashed
             ? isBuy ? 'bg-[rgba(22,194,132,0.18)]' : 'bg-[rgba(255,59,70,0.18)]'
             : isSelected
-              ? isBuy
-                ? 'bg-[rgba(22,194,132,0.08)] border border-[rgba(22,194,132,0.2)]'
-                : 'bg-[rgba(255,59,70,0.08)] border border-[rgba(255,59,70,0.2)]'
-              : 'bg-[#0e0e0f] hover:bg-[#131314]'
+              ? 'bg-[#1e1e1f]'
+              : 'bg-[#121213] hover:bg-[#161617]'
         }`}
         onClick={() => onSelectOrder(order, side)}
         onMouseEnter={() => setHoveredOrderId(order.id)}
@@ -451,9 +449,7 @@ export default function OrderBook({
         <div className="relative flex items-center w-full z-[1]">
           <div className="flex-1 flex items-center gap-1">
             <span className={`text-sm font-normal tabular-nums ${
-              isResell
-                ? 'text-[#eab308]'
-                : isSelected ? (isBuy ? 'text-[#5bd197]' : 'text-[#fd5e67]') : 'text-[#f9f9fa]'
+              isResell ? 'text-[#eab308]' : 'text-[#f9f9fa]'
             }`}>
               {order.price.toFixed(4)}
             </span>
@@ -471,19 +467,34 @@ export default function OrderBook({
           <div className={`${fullWidth ? 'w-28' : 'w-24'} flex items-center justify-end gap-1`}>
             {/* FULL badge — only for non-resell (resell is inherently full) */}
             {!isResell && order.fillType === 'FULL' && (
-              <span className="rounded bg-[#1b1b1c] px-1.5 py-0.5 text-[10px] font-medium text-[#7a7a83] uppercase">Full</span>
+              <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium uppercase ${
+                isSelected ? 'bg-[#2a2a2c] text-[#9a9a9f]' : 'bg-[#1b1b1c] text-[#7a7a83]'
+              }`}>Full</span>
             )}
             {showResellBadge && isResell && (
               <span className="rounded-full bg-[#eab308] px-1.5 py-0.5 text-[10px] font-semibold text-[#0a0a0b] uppercase">RS</span>
             )}
-            <button className={`rounded px-3 py-1 text-xs font-medium transition-colors ${
-              isResell
-                ? 'text-[#eab308] bg-[rgba(234,179,8,0.1)] hover:bg-[rgba(234,179,8,0.2)]'
-                : isBuy
-                  ? 'text-[#5bd197] bg-[rgba(22,194,132,0.1)] hover:bg-[rgba(22,194,132,0.2)]'
-                  : 'text-[#fd5e67] bg-[rgba(255,59,70,0.1)] hover:bg-[rgba(255,59,70,0.2)]'
+            <button className={`relative rounded px-3 py-1 text-xs font-medium transition-colors ${
+              isSelected
+                ? isResell
+                  ? 'bg-[#eab308] hover:bg-[#d4a207]'
+                  : isBuy
+                    ? 'bg-[#16c284] hover:bg-[#14b077]'
+                    : 'bg-[#fd5e67] hover:bg-[#e5545c]'
+                : isResell
+                  ? 'text-[#eab308] bg-[rgba(234,179,8,0.1)] hover:bg-[rgba(234,179,8,0.2)]'
+                  : isBuy
+                    ? 'text-[#5bd197] bg-[rgba(22,194,132,0.1)] hover:bg-[rgba(22,194,132,0.2)]'
+                    : 'text-[#fd5e67] bg-[rgba(255,59,70,0.1)] hover:bg-[rgba(255,59,70,0.2)]'
             }`}>
-              {isResell ? 'Buy' : isBuy ? 'Buy' : 'Sell'}
+              <span className={isSelected ? 'invisible' : ''}>
+                {isResell ? 'Buy' : isBuy ? 'Buy' : 'Sell'}
+              </span>
+              {isSelected && (
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="absolute inset-0 m-auto">
+                  <path d="M4.5 2.5L8.5 6L4.5 9.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
             </button>
           </div>
         </div>
@@ -573,17 +584,17 @@ export default function OrderBook({
       {/* ─── Filter Bar ─────────────────────────────────────────────── */}
       <div className="flex items-center justify-between py-2">
         {/* Left: Type tabs */}
-        <div className="flex items-center rounded-lg border border-[#252527] overflow-hidden">
+        <div className="flex items-center rounded-lg border border-[#252527] overflow-hidden h-9">
           {tabs.map((tab, idx) => {
             const isActive = activeTab === tab.key;
             return (
-              <div key={tab.key} className="flex items-center">
+              <div key={tab.key} className="flex items-center h-full">
                 {idx > 0 && <div className="self-stretch w-px bg-[#252527]" />}
                 <button
                   onClick={() => setActiveTab(tab.key)}
-                  className={`flex items-center text-sm font-medium leading-5 transition-colors ${
+                  className={`flex items-center h-full text-sm font-medium leading-5 transition-colors ${
                     tab.hasInfo ? 'gap-1.5 pl-4 pr-2' : 'px-4'
-                  } py-2 ${
+                  } ${
                     isActive
                       ? 'text-[#16c284] bg-[rgba(22,194,132,0.08)]'
                       : 'text-[#f9f9fa] hover:text-[#b4b4ba]'
@@ -616,7 +627,7 @@ export default function OrderBook({
             <div className="relative" ref={sizeRef}>
               <button
                 onClick={() => handleToggleDropdown('size')}
-                className={`relative flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+                className={`relative flex items-center gap-1 rounded-lg px-3 h-9 text-sm font-medium transition-colors ${
                   openDropdown === 'size' ? 'bg-[#252527] text-[#f9f9fa]' : 'bg-[#1b1b1c] text-[#f9f9fa] hover:bg-[#252527]'
                 }`}
               >
@@ -669,7 +680,7 @@ export default function OrderBook({
             <div className="relative" ref={minFillRef}>
               <button
                 onClick={() => handleToggleDropdown('minFill')}
-                className={`relative flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+                className={`relative flex items-center gap-1 rounded-lg px-3 h-9 text-sm font-medium transition-colors ${
                   openDropdown === 'minFill' ? 'bg-[#252527] text-[#f9f9fa]' : 'bg-[#1b1b1c] text-[#f9f9fa] hover:bg-[#252527]'
                 }`}
               >
@@ -721,7 +732,7 @@ export default function OrderBook({
           <div className="relative" ref={collateralRef}>
             <button
               onClick={() => handleToggleDropdown('collateral')}
-              className={`relative flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+              className={`relative flex items-center gap-1 rounded-lg px-3 h-9 text-sm font-medium transition-colors ${
                 openDropdown === 'collateral' ? 'bg-[#252527] text-[#f9f9fa]' : 'bg-[#1b1b1c] text-[#f9f9fa] hover:bg-[#252527]'
               }`}
             >
@@ -779,7 +790,7 @@ export default function OrderBook({
           {/* Chart toggle */}
           <button
             onClick={onToggleChart}
-            className={`flex items-center justify-center rounded-lg bg-[#1b1b1c] p-2 transition-colors hover:bg-[#252527] ${
+            className={`flex items-center justify-center rounded-lg bg-[#1b1b1c] h-9 w-9 transition-colors hover:bg-[#252527] ${
               showChart ? 'text-[#16c284]' : 'text-[#f9f9fa]'
             }`}
           >

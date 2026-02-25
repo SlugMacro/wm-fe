@@ -1,8 +1,15 @@
 @import "tailwindcss";
 
 @font-face {
-  font-family: 'Inter';
-  src: local('Inter');
+  font-family: 'Geist';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('./assets/fonts/GeistVariable.woff2') format('woff2-variations');
+}
+
+@theme {
+  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 html, body, #root {
@@ -11,8 +18,8 @@ html, body, #root {
   min-height: 100vh;
   background-color: #0a0a0b;
   color: #f9f9fa;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-feature-settings: 'lnum', 'tnum';
+  font-family: var(--font-sans);
+  font-feature-settings: 'dlig' on, 'ss01' on, 'ss03' on, 'ss04' on, 'ss05' on, 'ss06' on;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

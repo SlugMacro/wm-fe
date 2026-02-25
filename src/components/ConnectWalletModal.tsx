@@ -35,6 +35,8 @@ interface ConnectWalletModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConnect: () => void;
+  /** Pre-select a network tab when modal opens (e.g. 'evm', 'solana', 'sui') */
+  defaultNetwork?: string;
 }
 
 /* ───── Data ───── */
@@ -86,8 +88,15 @@ function CloseIcon() {
 
 /* ───── Component ───── */
 
-export default function ConnectWalletModal({ isOpen, onClose, onConnect }: ConnectWalletModalProps) {
-  const [activeNetwork, setActiveNetwork] = useState('evm');
+export default function ConnectWalletModal({ isOpen, onClose, onConnect, defaultNetwork }: ConnectWalletModalProps) {
+  const [activeNetwork, setActiveNetwork] = useState(defaultNetwork || 'evm');
+
+  // Sync activeNetwork when defaultNetwork changes while modal opens
+  useEffect(() => {
+    if (isOpen && defaultNetwork) {
+      setActiveNetwork(defaultNetwork);
+    }
+  }, [isOpen, defaultNetwork]);
   const [visible, setVisible] = useState(false);
   const [animating, setAnimating] = useState(false);
 

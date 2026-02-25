@@ -9,6 +9,7 @@ import tokenSolPng from '../assets/images/token-sol.png';
 import avatarPng from '../assets/images/avatar.png';
 import duneDashboardPng from '../assets/images/dune-dashboard.png';
 import ConnectWalletModal from './ConnectWalletModal';
+import { useWallet } from '../hooks/useWalletContext';
 
 interface NavItemProps {
   to: string;
@@ -610,8 +611,8 @@ function AvatarDropdown({ onDisconnect }: { onDisconnect: () => void }) {
 /* ───── Main Header ───── */
 
 export default function Header() {
-  const [isConnected, setIsConnected] = useState(true);
-  const [showConnectModal, setShowConnectModal] = useState(false);
+  const wallet = useWallet();
+  const { isConnected } = wallet;
 
   return (
     <>
@@ -689,12 +690,12 @@ export default function Header() {
                 </button>
 
                 {/* Avatar with Dropdown */}
-                <AvatarDropdown onDisconnect={() => setIsConnected(false)} />
+                <AvatarDropdown onDisconnect={() => wallet.disconnect()} />
               </>
             ) : (
               /* Disconnected state - Connect button */
               <button
-                onClick={() => setShowConnectModal(true)}
+                onClick={() => wallet.openConnectModal()}
                 className="flex items-center h-9 px-4 rounded-lg bg-[#f9f9fa] text-sm font-medium text-[#0a0a0b] hover:bg-[#e0e0e2] transition-colors"
               >
                 Connect
@@ -722,12 +723,10 @@ export default function Header() {
 
       {/* Connect Wallet Modal */}
       <ConnectWalletModal
-        isOpen={showConnectModal}
-        onClose={() => setShowConnectModal(false)}
-        onConnect={() => {
-          setShowConnectModal(false);
-          setIsConnected(true);
-        }}
+        isOpen={wallet.showConnectModal}
+        onClose={() => wallet.closeConnectModal()}
+        onConnect={() => wallet.connect()}
+        defaultNetwork={wallet.defaultModalNetwork}
       />
     </>
   );

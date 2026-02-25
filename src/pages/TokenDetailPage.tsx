@@ -200,8 +200,10 @@ export default function TokenDetailPage() {
           <div className="pt-4">
             <TradePanel
               tokenSymbol={token.tokenSymbol}
+              tokenName={token.tokenName}
               selectedOrder={selectedOrder}
               collateralToken={collateralToken}
+              chain={token.chain}
             />
           </div>
 
