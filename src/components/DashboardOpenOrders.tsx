@@ -210,7 +210,7 @@ export default function DashboardOpenOrders({ openOrders, filledOrders, onCloseO
     <div>
       {/* Header: Tabs + Filters */}
       <div className="flex items-center justify-between py-3">
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-3">
           {/* Collapse toggle — circular bg, leftmost */}
           <button
             onClick={() => setCollapsed(!collapsed)}
@@ -219,38 +219,40 @@ export default function DashboardOpenOrders({ openOrders, filledOrders, onCloseO
             <CollapseIcon collapsed={collapsed} />
           </button>
 
-          {/* Tabs — match homepage LiveMarketTable style */}
-          <button
-            onClick={() => handleTabChange('open')}
-            className={`inline-flex items-center gap-2 text-xl font-medium leading-7 transition-colors ${
-              activeTab === 'open' ? 'text-[#f9f9fa]' : 'text-[#7a7a83] hover:text-[#f9f9fa]'
-            }`}
-          >
-            Open Orders
-            <span className={`inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-medium leading-4 ${
-              activeTab === 'open'
-                ? 'bg-[rgba(22,194,132,0.15)] text-[#5bd197]'
-                : 'bg-[#252527] text-[#7a7a83]'
-            }`}>
-              {openOrders.length}
-            </span>
-          </button>
+          {/* Tabs — gap-6 between tabs only, matching homepage */}
+          <div className="flex items-center gap-6">
+            <button
+              onClick={() => handleTabChange('open')}
+              className={`inline-flex items-center gap-2 text-xl font-medium leading-7 transition-colors ${
+                activeTab === 'open' ? 'text-[#f9f9fa]' : 'text-[#7a7a83] hover:text-[#f9f9fa]'
+              }`}
+            >
+              Open Orders
+              <span className={`inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-medium leading-4 ${
+                activeTab === 'open'
+                  ? 'bg-[rgba(22,194,132,0.15)] text-[#5bd197]'
+                  : 'bg-[#252527] text-[#7a7a83]'
+              }`}>
+                {openOrders.length}
+              </span>
+            </button>
 
-          <button
-            onClick={() => handleTabChange('filled')}
-            className={`inline-flex items-center gap-2 text-xl font-medium leading-7 transition-colors ${
-              activeTab === 'filled' ? 'text-[#f9f9fa]' : 'text-[#7a7a83] hover:text-[#f9f9fa]'
-            }`}
-          >
-            Filled Orders
-            <span className={`inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-medium leading-4 ${
-              activeTab === 'filled'
-                ? 'bg-[rgba(22,194,132,0.15)] text-[#5bd197]'
-                : 'bg-[#252527] text-[#7a7a83]'
-            }`}>
-              {filledOrders.length}
-            </span>
-          </button>
+            <button
+              onClick={() => handleTabChange('filled')}
+              className={`inline-flex items-center gap-2 text-xl font-medium leading-7 transition-colors ${
+                activeTab === 'filled' ? 'text-[#f9f9fa]' : 'text-[#7a7a83] hover:text-[#f9f9fa]'
+              }`}
+            >
+              Filled Orders
+              <span className={`inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-medium leading-4 ${
+                activeTab === 'filled'
+                  ? 'bg-[rgba(22,194,132,0.15)] text-[#5bd197]'
+                  : 'bg-[#252527] text-[#7a7a83]'
+              }`}>
+                {filledOrders.length}
+              </span>
+            </button>
+          </div>
         </div>
 
         {/* Right: Filters + Collapse */}
