@@ -114,7 +114,7 @@ interface DashboardOpenOrdersProps {
   onCloseOrder?: (orderId: string) => void;
 }
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 8;
 
 export default function DashboardOpenOrders({ openOrders, filledOrders, onCloseOrder }: DashboardOpenOrdersProps) {
   const [activeTab, setActiveTab] = useState<DashboardOrdersTab>('open');
@@ -210,7 +210,7 @@ export default function DashboardOpenOrders({ openOrders, filledOrders, onCloseO
     <div>
       {/* Header: Tabs + Filters */}
       <div className="flex items-center justify-between py-3">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-6">
           {/* Collapse toggle — circular bg, leftmost */}
           <button
             onClick={() => setCollapsed(!collapsed)}
@@ -259,10 +259,15 @@ export default function DashboardOpenOrders({ openOrders, filledOrders, onCloseO
           <div className="relative">
             <button
               onClick={() => setShowSideDropdown(!showSideDropdown)}
-              className="flex h-9 items-center gap-1 rounded-lg bg-[#1b1b1c] px-3 text-sm font-medium text-[#f9f9fa] transition-colors hover:bg-[#252527]"
+              className={`relative flex items-center gap-1 rounded-lg px-3 h-9 text-sm font-medium transition-colors ${
+                showSideDropdown ? 'bg-[#252527] text-[#f9f9fa]' : 'bg-[#1b1b1c] text-[#f9f9fa] hover:bg-[#252527]'
+              }`}
             >
               Side
               <ChevronDownIcon />
+              {sideFilter !== 'all' && (
+                <span className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-[#16c284]" />
+              )}
             </button>
             {showSideDropdown && (
               <div className="absolute right-0 top-full z-20 mt-1 w-32 rounded-lg border border-[#252527] bg-[#0a0a0b] py-1 shadow-lg">

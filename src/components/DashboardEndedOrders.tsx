@@ -105,7 +105,7 @@ interface DashboardEndedOrdersProps {
   orders: DashboardEndedOrder[];
 }
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 8;
 
 export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersProps) {
   const [collapsed, setCollapsed] = useState(false);
@@ -209,10 +209,15 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
           <div className="relative">
             <button
               onClick={() => { setShowSideDropdown(!showSideDropdown); setShowStatusDropdown(false); }}
-              className="flex h-9 items-center gap-1 rounded-lg bg-[#1b1b1c] px-3 text-sm font-medium text-[#f9f9fa] transition-colors hover:bg-[#252527]"
+              className={`relative flex items-center gap-1 rounded-lg px-3 h-9 text-sm font-medium transition-colors ${
+                showSideDropdown ? 'bg-[#252527] text-[#f9f9fa]' : 'bg-[#1b1b1c] text-[#f9f9fa] hover:bg-[#252527]'
+              }`}
             >
               Side
               <ChevronDownIcon />
+              {sideFilter !== 'all' && (
+                <span className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-[#16c284]" />
+              )}
             </button>
             {showSideDropdown && (
               <div className="absolute right-0 top-full z-20 mt-1 w-32 rounded-lg border border-[#252527] bg-[#0a0a0b] py-1 shadow-lg">
@@ -231,16 +236,19 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
             )}
           </div>
 
-          <div className="h-4 w-px bg-[#252527]" />
-
           {/* Status dropdown */}
           <div className="relative">
             <button
               onClick={() => { setShowStatusDropdown(!showStatusDropdown); setShowSideDropdown(false); }}
-              className="flex h-9 items-center gap-1 rounded-lg bg-[#1b1b1c] px-3 text-sm font-medium text-[#f9f9fa] transition-colors hover:bg-[#252527]"
+              className={`relative flex items-center gap-1 rounded-lg px-3 h-9 text-sm font-medium transition-colors ${
+                showStatusDropdown ? 'bg-[#252527] text-[#f9f9fa]' : 'bg-[#1b1b1c] text-[#f9f9fa] hover:bg-[#252527]'
+              }`}
             >
               Status
               <ChevronDownIcon />
+              {statusFilter !== 'all' && (
+                <span className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-[#16c284]" />
+              )}
             </button>
             {showStatusDropdown && (
               <div className="absolute right-0 top-full z-20 mt-1 w-36 rounded-lg border border-[#252527] bg-[#0a0a0b] py-1 shadow-lg">
