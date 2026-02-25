@@ -20,6 +20,8 @@ export default function App() {
         <Route path="/staking" element={<ComingSoonPage />} />
         <Route path="/incentives" element={<ComingSoonPage />} />
         <Route path="/referral" element={<ComingSoonPage />} />
+        <Route path="/affiliate" element={<ComingSoonPage />} />
+        <Route path="/about" element={<ComingSoonPage />} />
       </Route>
     </Routes>
   );

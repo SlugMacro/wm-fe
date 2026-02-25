@@ -1,27 +1,40 @@
 import { useNavigate } from 'react-router-dom';
+import comingSoonSvg from '../assets/images/coming-soon.svg';
 
 export default function ComingSoonPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
-      <div className="flex flex-col items-center gap-3">
-        <div className="size-16 rounded-full bg-[#1b1b1c] flex items-center justify-center">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-            <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm1-8.414 2.293-2.293a1 1 0 0 1 1.414 1.414l-3 3a1 1 0 0 1-1.414 0l-3-3a1 1 0 0 1 1.414-1.414L11 11.586V7a1 1 0 1 1 2 0v4.586z" fill="#7a7a83" />
-          </svg>
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-60px)] px-8 py-4">
+      <div className="flex flex-col items-center gap-4 max-w-[448px] pt-8 pb-10 px-6">
+        {/* Illustration */}
+        <img src={comingSoonSvg} alt="" className="size-48" />
+
+        {/* Content */}
+        <div className="flex flex-col gap-2 items-center text-center pb-4 px-8 w-full">
+          <h1
+            className="text-xl font-medium leading-7 text-[#f9f9fa]"
+            style={{ fontFeatureSettings: "'lnum' 1, 'tnum' 1" }}
+          >
+            Coming Soon
+          </h1>
+          <p
+            className="text-sm font-normal leading-5 text-[#b4b4ba] max-w-[280px]"
+            style={{ fontFeatureSettings: "'lnum' 1, 'tnum' 1" }}
+          >
+            This feature is currently under development and will be available soon.
+          </p>
         </div>
-        <h1 className="text-2xl font-semibold text-[#f9f9fa]">Coming Soon</h1>
-        <p className="text-sm text-[#7a7a83] text-center max-w-[320px]">
-          This feature is currently under development and will be available soon.
-        </p>
+
+        {/* Button */}
+        <button
+          onClick={() => navigate('/markets')}
+          className="flex items-center justify-center rounded-[10px] bg-[#f9f9fa] px-5 py-2.5 text-base font-medium leading-6 text-[#0a0a0b] hover:bg-[#e0e0e2] transition-colors"
+          style={{ fontFeatureSettings: "'lnum' 1, 'tnum' 1" }}
+        >
+          Back to Markets
+        </button>
       </div>
-      <button
-        onClick={() => navigate('/markets')}
-        className="flex items-center gap-2 h-10 px-6 rounded-lg bg-[#16c284] text-sm font-medium text-[#0a0a0b] hover:bg-[#13a872] transition-colors"
-      >
-        Back to Markets
-      </button>
     </div>
   );
 }

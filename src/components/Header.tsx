@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import mascotSvg from '../assets/images/mascot.svg';
 import logoTopSvg from '../assets/images/logo-top.svg';
 import logoBottomSvg from '../assets/images/logo-bottom.svg';
@@ -7,12 +7,12 @@ import chainSolanaPng from '../assets/images/chain-solana.png';
 import tokenFeePng from '../assets/images/token-fee.png';
 import tokenSolPng from '../assets/images/token-sol.png';
 import avatarPng from '../assets/images/avatar.png';
+import duneDashboardPng from '../assets/images/dune-dashboard.png';
 import ConnectWalletModal from './ConnectWalletModal';
 
 interface NavItemProps {
   to: string;
   label: string;
-  hasDropdown?: boolean;
 }
 
 /* ───── Icons ───── */
@@ -234,27 +234,222 @@ function ExitIcon() {
 
 /* ───── Nav Item ───── */
 
-function NavItem({ to, label, hasDropdown }: NavItemProps) {
+function NavItem({ to, label }: NavItemProps) {
   return (
     <NavLink
       to={to}
       className={({ isActive }) =>
-        `flex items-center gap-1.5 rounded-lg ${
-          hasDropdown ? 'pl-4 pr-2' : 'px-4'
-        } py-2 text-sm font-medium transition-colors hover:text-[#19fb9b] ${
+        `flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-colors hover:text-[#19fb9b] ${
           isActive ? 'text-[#19fb9b]' : 'text-[#f9f9fa]'
         }`
       }
     >
       {label}
-      {hasDropdown && (
-        <div className="flex items-center p-0.5">
-          <ChevronDownIcon className="text-[#7a7a83]" />
-        </div>
-      )}
     </NavLink>
   );
 }
+
+/* ───── Dropdown Menu Icons (16x16 — synced with user dropdown) ───── */
+
+function ArrowRightLineIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2h12.172z" />
+    </svg>
+  );
+}
+
+function BookLineIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M20 22H6.5A3.5 3.5 0 0 1 3 18.5V5a3 3 0 0 1 3-3h14v15.5a1 1 0 0 1-2 0 1.5 1.5 0 0 0-3 0V22zm-2-5.5a3.49 3.49 0 0 0-2 .63V4H6a1 1 0 0 0-1 1v13.5A1.5 1.5 0 0 0 6.5 20H18v-3.5zM10 10h4v2h-4v-2z" />
+    </svg>
+  );
+}
+
+function PigMoneyIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19 7h-1V2H6v5H5c-1.654 0-3 1.346-3 3v7c0 1.654 1.346 3 3 3h14c1.654 0 3-1.346 3-3v-7c0-1.654-1.346-3-3-3zM8 4h8v3H8V4zm12 13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v7zm-5-4a2 2 0 1 1-4 0 2 2 0 0 1 4 0z" />
+    </svg>
+  );
+}
+
+function UserAddIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M14 14.252v2.09A6 6 0 0 0 6 22H4a8 8 0 0 1 10-7.748zM12 13c-3.315 0-6-2.685-6-6s2.685-6 6-6 6 2.685 6 6-2.685 6-6 6zm0-2c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm6 6v-3h2v3h3v2h-3v3h-2v-3h-3v-2h3z" />
+    </svg>
+  );
+}
+
+/* ───── Nav Dropdown Menu ───── */
+
+interface NavDropdownMenuItemData {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  to?: string;
+  href?: string;
+}
+
+function NavDropdown({
+  label,
+  items,
+  activeRoutes,
+}: {
+  label: string;
+  items: NavDropdownMenuItemData[];
+  activeRoutes: string[];
+}) {
+  const [open, setOpen] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const isRouteActive = activeRoutes.some((r) => location.pathname.startsWith(r));
+
+  useEffect(() => {
+    if (open) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setVisible(true));
+      });
+    } else {
+      setVisible(false);
+    }
+  }, [open]);
+
+  const handleClose = () => {
+    setVisible(false);
+    setTimeout(() => setOpen(false), 150);
+  };
+
+  const handleItemClick = (item: NavDropdownMenuItemData) => {
+    if (item.to) {
+      navigate(item.to);
+    } else if (item.href) {
+      window.open(item.href, '_blank');
+    }
+    handleClose();
+  };
+
+  const isActive = open || isRouteActive;
+  const showGreen = isActive || hovered;
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => (open ? handleClose() : setOpen(true))}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        className={`flex items-center gap-1.5 pl-4 pr-2 py-2 text-sm font-medium transition-colors ${
+          showGreen ? 'text-[#19fb9b]' : 'text-[#f9f9fa]'
+        } hover:text-[#19fb9b]`}
+      >
+        {label}
+        <div
+          className={`flex items-center p-0.5 transition-transform duration-200 ${
+            open ? 'rotate-180' : ''
+          }`}
+        >
+          <ChevronDownIcon
+            className={`transition-colors ${showGreen ? 'text-[#19fb9b]' : 'text-[#7a7a83]'}`}
+          />
+        </div>
+      </button>
+
+      {open && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={handleClose} />
+          <div
+            className={`absolute left-0 top-full mt-2 z-50 w-[280px] rounded-xl bg-[#1b1b1c] shadow-[0_0_32px_rgba(0,0,0,0.2)] overflow-hidden transition-all duration-150 origin-top-left p-4 flex flex-col gap-4 ${
+              visible
+                ? 'opacity-100 scale-100 translate-y-0'
+                : 'opacity-0 scale-95 -translate-y-1'
+            }`}
+          >
+            {items.map((item, i) => {
+              const isLast = i === items.length - 1;
+              return (
+                <button
+                  key={item.title}
+                  onClick={() => handleItemClick(item)}
+                  className="flex gap-2 items-start w-full text-left group"
+                >
+                  <div className="flex items-center p-0.5 shrink-0 text-[#f9f9fa] group-hover:text-[#5bd197] transition-colors duration-200">
+                    {item.icon}
+                  </div>
+                  <div
+                    className={`flex flex-1 flex-col gap-1 ${
+                      !isLast ? 'pb-4 border-b border-[#252527]' : ''
+                    }`}
+                  >
+                    <div className="flex items-center gap-0">
+                      <span className="text-sm font-medium text-[#f9f9fa] group-hover:text-[#5bd197] transition-colors duration-200">
+                        {item.title}
+                      </span>
+                      <div className="flex items-center text-[#5bd197] max-w-0 opacity-0 -translate-x-1 group-hover:max-w-[20px] group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 overflow-hidden ml-0 group-hover:ml-1">
+                        <ArrowRightLineIcon />
+                      </div>
+                    </div>
+                    <span className="text-xs font-normal text-[#7a7a83] leading-4">
+                      {item.description}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+/* ───── Dropdown Menu Data ───── */
+
+const RESOURCE_MENU: NavDropdownMenuItemData[] = [
+  {
+    icon: <img src={mascotSvg} alt="" className="size-4" />,
+    title: 'About',
+    description: 'Learn about Whales Market',
+    to: '/about',
+  },
+  {
+    icon: <BookLineIcon />,
+    title: 'Docs',
+    description: 'Technical documentation',
+    href: 'https://github.com/SlugMacro/wm-fe',
+  },
+  {
+    icon: <img src={duneDashboardPng} alt="" className="size-4 rounded-full object-cover" />,
+    title: 'Dune Dashboard',
+    description: 'On-chain analytics',
+    href: 'https://github.com/SlugMacro/wm-fe',
+  },
+];
+
+const EARN_MENU: NavDropdownMenuItemData[] = [
+  {
+    icon: <PigMoneyIcon />,
+    title: 'Stake',
+    description: 'Secure. Stake. Earn.',
+    to: '/staking',
+  },
+  {
+    icon: <UserAddIcon />,
+    title: 'Referral',
+    description: 'Bring users. Share gains.',
+    to: '/referral',
+  },
+  {
+    icon: <UserAddIcon />,
+    title: 'Affiliate',
+    description: 'Join teams. Earn extra rewards.',
+    to: '/affiliate',
+  },
+];
 
 /* ───── Avatar Dropdown ───── */
 
@@ -447,8 +642,16 @@ export default function Header() {
             <nav className="flex flex-1 items-center">
               <NavItem to="/markets" label="Markets" />
               <NavItem to="/dashboard" label="Dashboard" />
-              <NavItem to="/earn" label="Earn" hasDropdown />
-              <NavItem to="/resources" label="Resources" hasDropdown />
+              <NavDropdown
+                label="Earn"
+                items={EARN_MENU}
+                activeRoutes={['/earn', '/staking', '/referral', '/affiliate']}
+              />
+              <NavDropdown
+                label="Resources"
+                items={RESOURCE_MENU}
+                activeRoutes={['/resources', '/about']}
+              />
             </nav>
           </div>
 

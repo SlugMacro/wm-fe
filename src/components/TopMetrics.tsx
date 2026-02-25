@@ -49,9 +49,7 @@ function LiveSparklineChart({ data }: { data: number[] }) {
           <stop offset="100%" stopColor={gradientColor} stopOpacity="0" />
         </linearGradient>
       </defs>
-      <path d={areaPath} fill={`url(#${gradientId})`}>
-        <animate attributeName="d" dur="0.5s" fill="freeze" />
-      </path>
+      <path d={areaPath} fill={`url(#${gradientId})`} />
       <path
         d={linePath}
         stroke={strokeColor}
