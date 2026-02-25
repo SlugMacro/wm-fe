@@ -6,6 +6,8 @@ import logoBottomSvg from '../assets/images/logo-bottom.svg';
 import chainSolanaPng from '../assets/images/chain-solana.png';
 import tokenFeePng from '../assets/images/token-fee.png';
 import tokenSolPng from '../assets/images/token-sol.png';
+import tokenEthPng from '../assets/images/token-eth.png';
+import tokenSuiPng from '../assets/images/token-sui.png';
 import avatarPng from '../assets/images/avatar.png';
 import duneDashboardPng from '../assets/images/dune-dashboard.png';
 import ConnectWalletModal from './ConnectWalletModal';
@@ -684,9 +686,13 @@ export default function Header() {
                 {/* Balance */}
                 <button className="flex items-center gap-1.5 h-9 rounded-lg border border-[#252527] pl-2 pr-3 py-2 transition-colors hover:border-[#3a3a3d]">
                   <div className="flex items-center p-0.5">
-                    <img src={tokenSolPng} alt="SOL" className="w-4 h-4 rounded-full" />
+                    <img
+                      src={wallet.connectedChain === 'ethereum' ? tokenEthPng : wallet.connectedChain === 'sui' ? tokenSuiPng : tokenSolPng}
+                      alt={wallet.connectedChain === 'ethereum' ? 'ETH' : wallet.connectedChain === 'sui' ? 'SUI' : 'SOL'}
+                      className="w-4 h-4 rounded-full"
+                    />
                   </div>
-                  <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">18.32</span>
+                  <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">{wallet.walletBalance.toFixed(2)}</span>
                 </button>
 
                 {/* Avatar with Dropdown */}
