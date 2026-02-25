@@ -411,11 +411,13 @@ export default function OrderBook({
   ];
 
   // ─── Render a single order row ───────────────────────────────────
-  const renderRow = (order: OrderBookEntry, side: 'buy' | 'sell', showResellBadge: boolean) => {
+  const renderRow = (order: OrderBookEntry, side: 'buy' | 'sell', showResellBadge: boolean, fullWidth?: boolean) => {
     const isSelected = selectedOrderId === order.id;
     const isHovered = hoveredOrderId === order.id;
     const isFlashed = flashedOrderId === order.id;
-    const isFadingOut = order.fillPercent >= 100 && order.fillType !== 'FULL';
+    const isResell = !!order.isResell;
+    // Resell orders fill entirely in one go — no partial fill, no fadeout
+    const isFadingOut = !isResell && order.fillPercent >= 100 && order.fillType !== 'FULL';
     const isBuy = side === 'buy';
 
     return (
@@ -436,8 +438,8 @@ export default function OrderBook({
         onMouseEnter={() => setHoveredOrderId(order.id)}
         onMouseLeave={() => setHoveredOrderId(null)}
       >
-        {/* Fill bar */}
-        {order.fillType !== 'FULL' && (
+        {/* Fill bar — resell orders have no partial fill */}
+        {!isResell && order.fillType !== 'FULL' && (
           <div
             className={`absolute inset-y-0 left-0 rounded-sm pointer-events-none transition-[width] duration-500 ease-out ${
               isBuy ? 'bg-[rgba(22,194,132,0.06)]' : 'bg-[rgba(255,59,70,0.06)]'
@@ -449,39 +451,44 @@ export default function OrderBook({
         <div className="relative flex items-center w-full z-[1]">
           <div className="flex-1 flex items-center gap-1">
             <span className={`text-sm font-normal tabular-nums ${
-              isSelected ? (isBuy ? 'text-[#5bd197]' : 'text-[#fd5e67]') : 'text-[#f9f9fa]'
+              isResell
+                ? 'text-[#eab308]'
+                : isSelected ? (isBuy ? 'text-[#5bd197]' : 'text-[#fd5e67]') : 'text-[#f9f9fa]'
             }`}>
               {order.price.toFixed(4)}
             </span>
             {order.isOwner && <span className="text-[#7a7a83]"><UserIcon /></span>}
           </div>
-          <div className="w-28 text-right">
+          <div className={`${fullWidth ? 'w-40' : 'w-28'} text-right`}>
             <span className="text-sm font-normal text-[#f9f9fa] tabular-nums">{order.amountFormatted}</span>
           </div>
-          <div className="w-28 text-right flex items-center justify-end gap-2">
+          <div className={`${fullWidth ? 'w-40' : 'w-28'} text-right flex items-center justify-end gap-2`}>
             <span className="text-sm font-normal text-[#f9f9fa] tabular-nums">
               {order.collateral < 1 ? order.collateral.toFixed(2) : order.collateral.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
             <TokenIcon symbol={order.collateralToken} size="xs" showChain={false} />
           </div>
-          <div className="w-24 flex items-center justify-end gap-1">
-            {order.fillType === 'FULL' && (
+          <div className={`${fullWidth ? 'w-28' : 'w-24'} flex items-center justify-end gap-1`}>
+            {/* FULL badge — only for non-resell (resell is inherently full) */}
+            {!isResell && order.fillType === 'FULL' && (
               <span className="rounded bg-[#1b1b1c] px-1.5 py-0.5 text-[10px] font-medium text-[#7a7a83] uppercase">Full</span>
             )}
-            {showResellBadge && order.isResell && (
+            {showResellBadge && isResell && (
               <span className="rounded-full bg-[#eab308] px-1.5 py-0.5 text-[10px] font-semibold text-[#0a0a0b] uppercase">RS</span>
             )}
             <button className={`rounded px-3 py-1 text-xs font-medium transition-colors ${
-              isBuy
-                ? 'text-[#5bd197] bg-[rgba(22,194,132,0.1)] hover:bg-[rgba(22,194,132,0.2)]'
-                : 'text-[#fd5e67] bg-[rgba(255,59,70,0.1)] hover:bg-[rgba(255,59,70,0.2)]'
+              isResell
+                ? 'text-[#eab308] bg-[rgba(234,179,8,0.1)] hover:bg-[rgba(234,179,8,0.2)]'
+                : isBuy
+                  ? 'text-[#5bd197] bg-[rgba(22,194,132,0.1)] hover:bg-[rgba(22,194,132,0.2)]'
+                  : 'text-[#fd5e67] bg-[rgba(255,59,70,0.1)] hover:bg-[rgba(255,59,70,0.2)]'
             }`}>
-              {isBuy ? 'Buy' : 'Sell'}
+              {isResell ? 'Buy' : isBuy ? 'Buy' : 'Sell'}
             </button>
           </div>
         </div>
-        {/* Tooltip */}
-        {isHovered && order.fillPercent > 0 && order.fillType !== 'FULL' && (
+        {/* Tooltip — resell orders have no partial fill to show */}
+        {!isResell && isHovered && order.fillPercent > 0 && order.fillType !== 'FULL' && (
           <OrderTooltip order={order} tokenSymbol={tokenSymbol} />
         )}
       </div>
@@ -494,6 +501,7 @@ export default function OrderBook({
     side: 'buy' | 'sell',
     scroll: ReturnType<typeof useColumnScroll>,
     showResellBadge: boolean,
+    fullWidth?: boolean,
   ) => (
     <div>
       {/* Header */}
@@ -501,13 +509,13 @@ export default function OrderBook({
         <div className="flex-1">
           <span className="text-xs font-medium text-[#7a7a83]">Price ($)</span>
         </div>
-        <div className="w-28 text-right">
+        <div className={`${fullWidth ? 'w-40' : 'w-28'} text-right`}>
           <span className="text-xs font-medium text-[#7a7a83]">Amount</span>
         </div>
-        <div className="w-28 text-right">
+        <div className={`${fullWidth ? 'w-40' : 'w-28'} text-right`}>
           <span className="text-xs font-medium text-[#7a7a83]">Collateral</span>
         </div>
-        <div className="w-24" />
+        <div className={fullWidth ? 'w-28' : 'w-24'} />
       </div>
 
       {/* Scrollable rows */}
@@ -531,7 +539,7 @@ export default function OrderBook({
               className="ob-scroll"
               style={{ maxHeight: `${scroll.maxHeight}px`, overflowY: 'auto' }}
             >
-              {orders.map(order => renderRow(order, side, showResellBadge))}
+              {orders.map(order => renderRow(order, side, showResellBadge, fullWidth))}
             </div>
 
             {/* Custom scrollbar */}
@@ -859,7 +867,7 @@ export default function OrderBook({
       {/* ─── Order Columns ──────────────────────────────────────────── */}
       {activeTab === 'resell' ? (
         /* Resell: single full-width column for resell buy orders */
-        renderColumn(filteredBuyOrders, 'buy', buyScroll, true)
+        renderColumn(filteredBuyOrders, 'buy', buyScroll, true, true)
       ) : (
         /* Regular / All: two columns */
         <div className="flex gap-4">
