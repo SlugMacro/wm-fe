@@ -113,6 +113,8 @@ export interface OrderBookEntry {
   totalAmount: number; // total amount in token units
   fillType?: 'FULL' | 'PARTIAL'; // optional fill type label
   isResell?: boolean; // resell order from buy side
+  originalPrice?: number; // for resell: the original position price
+  originalCollateral?: number; // for resell: the original collateral amount
 }
 
 export interface MyOrder {

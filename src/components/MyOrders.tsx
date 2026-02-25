@@ -62,18 +62,21 @@ const CHAIN_NAMES: Record<string, string> = {
   sui: 'Sui',
 };
 
-function OrderItem({ order }: { order: MyOrder }) {
+function OrderItem({ order, isFilled }: { order: MyOrder; isFilled?: boolean }) {
+  const isBuy = order.side === 'Buy';
+  const showResell = isFilled && isBuy;
+
   return (
     <div className="flex flex-col gap-3 border-b border-[#1b1b1c] pb-4">
       {/* Row 1: Side + Pair + Badge | Date */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1">
-          <span className={`text-sm font-medium leading-5 ${order.side === 'Buy' ? 'text-[#5bd197]' : 'text-[#fd5e67]'}`}>
+          <span className={`text-sm font-medium leading-5 ${isBuy ? 'text-[#5bd197]' : 'text-[#fd5e67]'}`}>
             {order.side}
           </span>
           <span className="text-sm font-medium leading-5 text-[#f9f9fa]">{order.pair}</span>
           {order.hasBadge && (
-            <span className="inline-flex items-center justify-center rounded-full bg-[#eab308] px-1.5 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b]">
+            <span className="inline-flex items-center justify-center rounded-full bg-[#eab308] px-2 py-1 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b]">
               {order.hasBadge}
             </span>
           )}
@@ -86,7 +89,7 @@ function OrderItem({ order }: { order: MyOrder }) {
         <div className="flex flex-1 flex-col gap-1">
           {/* Price row */}
           <div className="flex items-center gap-1 text-xs leading-4">
-            {order.entryPrice && order.originalPrice ? (
+            {order.entryPrice != null && order.originalPrice != null ? (
               <>
                 <span className="text-[#7a7a83]">Your Entry / Original Price</span>
                 <span className="text-[#facc15] tabular-nums">${order.entryPrice.toFixed(4)}</span>
@@ -111,8 +114,8 @@ function OrderItem({ order }: { order: MyOrder }) {
           </div>
         </div>
 
-        {order.canResell && (
-          <button className="shrink-0 rounded-full bg-[rgba(255,255,255,0.08)] px-3 py-1.5 text-xs font-medium leading-4 text-[rgba(255,255,255,0.9)] transition-colors hover:bg-[rgba(255,255,255,0.12)]">
+        {showResell && (
+          <button className="shrink-0 overflow-clip rounded-[4px] bg-[rgba(234,179,8,0.1)] px-3 py-1.5 text-xs font-medium leading-4 text-[#eab308] transition-colors hover:bg-[rgba(234,179,8,0.18)]">
             Resell
           </button>
         )}
@@ -233,7 +236,7 @@ export default function MyOrders({ filledOrders, openOrders, chain }: MyOrdersPr
       ) : (
         <div className="flex flex-col gap-4">
           {orders.slice(0, 5).map(order => (
-            <OrderItem key={order.id} order={order} />
+            <OrderItem key={order.id} order={order} isFilled={activeTab === 'filled'} />
           ))}
         </div>
       )}

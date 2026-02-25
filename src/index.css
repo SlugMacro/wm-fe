@@ -19,7 +19,7 @@ html, body, #root {
   background-color: #0a0a0b;
   color: #f9f9fa;
   font-family: var(--font-sans);
-  font-feature-settings: 'dlig' on, 'ss01' on, 'ss03' on, 'ss04' on, 'ss05' on, 'ss06' on;
+  font-feature-settings: 'dlig' on, 'ss01' on, 'ss03' on, 'ss04' on, 'ss05' on, 'ss06' on, 'lnum' on, 'tnum' on;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

@@ -88,6 +88,13 @@ export function generateBuyOrders(basePrice: number, chain = 'solana'): OrderBoo
   ];
   // Mark some buy orders as resell
   const resellIndices = new Set([2, 5, 9, 13, 18, 22, 26]);
+  // For resell orders: original price is lower (prev buyer got in cheaper)
+  const resellOrigPriceFactor: Record<number, number> = {
+    2: 0.55, 5: 0.60, 9: 0.50, 13: 0.65, 18: 0.58, 22: 0.62, 26: 0.48,
+  };
+  const resellOrigCollateralFactor: Record<number, number> = {
+    2: 1.3, 5: 1.5, 9: 1.2, 13: 1.4, 18: 1.3, 22: 1.5, 26: 1.2,
+  };
 
   const native = getNativeToken(chain);
 
@@ -96,6 +103,7 @@ export function generateBuyOrders(basePrice: number, chain = 'solana'): OrderBoo
     const filledAmount = totalAmount * fillPercents[i] / 100;
     const useNative = isNative[i];
     const collateral = useNative ? nativeCollaterals[i] : stableCollaterals[i];
+    const isResell = resellIndices.has(i);
     return {
       id: `buy-${i}`,
       price,
@@ -109,7 +117,11 @@ export function generateBuyOrders(basePrice: number, chain = 'solana'): OrderBoo
       filledAmount,
       totalAmount,
       fillType: fillTypes[i],
-      isResell: resellIndices.has(i),
+      isResell,
+      ...(isResell ? {
+        originalPrice: Math.round(price * resellOrigPriceFactor[i] * 10000) / 10000,
+        originalCollateral: Math.round(collateral * resellOrigCollateralFactor[i] * 100) / 100,
+      } : {}),
     };
   });
 }

@@ -4,6 +4,7 @@ import TokenIcon from './TokenIcon';
 import OrderInfoModal from './OrderInfoModal';
 import CloseOrderModal from './CloseOrderModal';
 import FillOrderModal from './FillOrderModal';
+import ResellRiskModal from './ResellRiskModal';
 import Toast from './Toast';
 import { useWallet } from '../hooks/useWalletContext';
 import noOrderSvg from '../assets/images/no-order.svg';
@@ -20,6 +21,7 @@ interface TradePanelProps {
 
 const infoRowTooltips: Record<string, string> = {
   'Price': 'The unit price per token for this order.',
+  'Price / Original Price': 'The resell price you pay vs. the original position price.',
   'Amount Deliver': 'The amount of tokens or collateral you will deposit to fulfill this trade.',
   'To be Received': 'The amount of tokens or collateral you will receive after the trade is completed.',
 };
@@ -189,9 +191,11 @@ export default function TradePanel({
   const hasOrder = selectedOrder !== null;
   const isBuy = selectedOrder?.side === 'buy';
   const isOwner = hasOrder && selectedOrder.order.isOwner === true;
+  const isResell = hasOrder && !isOwner && selectedOrder.order.isResell === true;
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showCloseModal, setShowCloseModal] = useState(false);
   const [showFillModal, setShowFillModal] = useState(false);
+  const [showResellRiskModal, setShowResellRiskModal] = useState(false);
   const [pendingClose, setPendingClose] = useState(false);
   const [pendingFill, setPendingFill] = useState(false);
   const [toast, setToast] = useState<{ type: 'waiting' | 'success'; title: string; subtitle: string; visible: boolean } | null>(null);
@@ -268,6 +272,13 @@ export default function TradePanel({
       }, 5000);
     }, 2500);
   }, [selectedOrder, sliderValue, onOrderFilled]);
+
+  // Handle resell risk modal → opens fill/confirm modal
+  const handleResellRiskConfirm = useCallback(() => {
+    setShowResellRiskModal(false);
+    // Small delay so the risk modal closes before fill modal opens
+    setTimeout(() => setShowFillModal(true), 250);
+  }, []);
 
   // Compute values based on selected order
   const price = hasOrder ? selectedOrder.order.price : 0;
@@ -411,7 +422,8 @@ export default function TradePanel({
       return { text: 'Close Order', className: 'bg-[rgba(253,94,103,0.12)] text-[#fd5e67] hover:bg-[rgba(253,94,103,0.2)] cursor-pointer', disabled: false, onClick: () => setShowCloseModal(true) };
     }
     if (pendingFill) {
-      return { text: 'Pending Approval', className: `${accentBg} text-[#f9f9fa] opacity-40 cursor-not-allowed`, disabled: true, onClick: undefined as (() => void) | undefined };
+      const pendingBg = isResell ? 'bg-[#16c284]' : accentBg;
+      return { text: 'Pending Approval', className: `${pendingBg} text-[#f9f9fa] opacity-40 cursor-not-allowed`, disabled: true, onClick: undefined as (() => void) | undefined };
     }
     if (!wallet.isConnected) {
       return { text: 'Connect Wallet', className: 'bg-[#f9f9fa] text-[#0a0a0b] hover:opacity-90 cursor-pointer', disabled: false, onClick: () => wallet.openConnectModal(chain) };
@@ -422,8 +434,14 @@ export default function TradePanel({
     if (isInsufficientBalance) {
       return { text: 'Insufficient Balance', className: 'bg-[rgba(255,255,255,0.08)] text-[#fd5e67] cursor-not-allowed', disabled: true, onClick: undefined as (() => void) | undefined };
     }
+    if (canTrade && isResell) {
+      return { text: 'Buy Resell', className: 'bg-[#16c284] text-[#f9f9fa] hover:opacity-90 cursor-pointer', disabled: false, onClick: () => setShowResellRiskModal(true) };
+    }
     if (canTrade) {
       return { text: isBuy ? 'Buy' : 'Sell', className: `${accentBg} text-[#f9f9fa] hover:opacity-90 cursor-pointer`, disabled: false, onClick: () => setShowFillModal(true) };
+    }
+    if (isResell) {
+      return { text: 'Buy Resell', className: 'bg-[rgba(255,255,255,0.08)] text-[#7a7a83] cursor-not-allowed', disabled: true, onClick: undefined as (() => void) | undefined };
     }
     return { text: isBuy ? 'Buy' : 'Sell', className: 'bg-[rgba(255,255,255,0.08)] text-[#7a7a83] cursor-not-allowed', disabled: true, onClick: undefined as (() => void) | undefined };
   };
@@ -451,26 +469,49 @@ export default function TradePanel({
       <div className="flex items-start justify-between">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <h3 className={`text-lg font-medium leading-7 ${hasOrder ? (isOwner ? 'text-[#f9f9fa]' : accentText) : 'text-[#f9f9fa]'}`}>
+            <h3 className={`text-lg font-medium leading-7 ${hasOrder ? (isOwner ? 'text-[#f9f9fa]' : isResell ? 'text-[#5bd197]' : accentText) : 'text-[#f9f9fa]'}`}>
               {!hasOrder
                 ? `Trade ${tokenSymbol}`
                 : isOwner
                   ? <>My <span className={accentText}>{isBuy ? 'Buy' : 'Sell'}</span> Order</>
-                  : `${isBuy ? 'Buy' : 'Sell'} ${tokenSymbol}`
+                  : isResell
+                    ? `Buy ${tokenSymbol}`
+                    : `${isBuy ? 'Buy' : 'Sell'} ${tokenSymbol}`
               }
             </h3>
-            {hasOrder && !isOwner && selectedOrder.order.fillType && (
+            {/* Badge: RS for resell, FULL/PARTIAL for regular */}
+            {hasOrder && !isOwner && isResell && (
+              <span className="inline-flex items-center justify-center rounded-full bg-[#eab308] px-1.5 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b]">
+                RS
+              </span>
+            )}
+            {hasOrder && !isOwner && !isResell && selectedOrder.order.fillType && (
               <span className="rounded-sm bg-[rgba(255,255,255,0.08)] px-1.5 py-0.5 text-[10px] font-medium uppercase text-[#7a7a83]">
                 {selectedOrder.order.fillType}
               </span>
             )}
           </div>
-          <div className="flex items-center gap-1">
-            <span className="text-xs leading-4 font-normal text-[#7a7a83]">Price</span>
-            <span className="text-xs leading-4 font-normal text-[#f9f9fa]">
-              {hasOrder ? `$${price.toFixed(4)}` : '$-'}
-            </span>
-          </div>
+          {/* Price subtitle — different for resell */}
+          {isResell ? (
+            <div className="flex items-center gap-1 flex-wrap">
+              <span className="text-xs leading-4 font-normal text-[#7a7a83]">Price</span>
+              <span className="text-xs leading-4 font-normal text-[#facc15] tabular-nums">
+                ${price.toFixed(4)}
+              </span>
+              <span className="text-xs leading-4 text-[#44444b]">·</span>
+              <span className="text-xs leading-4 font-normal text-[#7a7a83]">Org. Price / Collateral</span>
+              <span className="text-xs leading-4 font-normal text-[#f9f9fa] tabular-nums">
+                ${(selectedOrder.order.originalPrice ?? price).toFixed(4)} / {(selectedOrder.order.originalCollateral ?? maxCollateral).toFixed(1)} {orderCollateralToken}
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1">
+              <span className="text-xs leading-4 font-normal text-[#7a7a83]">Price</span>
+              <span className="text-xs leading-4 font-normal text-[#f9f9fa]">
+                {hasOrder ? `$${price.toFixed(4)}` : '$-'}
+              </span>
+            </div>
+          )}
         </div>
         {hasOrder && (
           <button
@@ -596,6 +637,19 @@ export default function TradePanel({
             </span>
           </InfoRow>
         </div>
+      ) : isResell ? (
+        /* ── Resell info rows ── */
+        <div className="flex flex-col gap-2">
+          <InfoRow label="Price / Original Price">
+            <span className="text-sm leading-5 font-medium tabular-nums">
+              <span className="text-[#facc15]">${price.toFixed(4)}</span>
+              <span className="text-[#7a7a83]"> / </span>
+              <span className="text-[#f9f9fa]">${(selectedOrder.order.originalPrice ?? price).toFixed(4)}</span>
+            </span>
+          </InfoRow>
+          <InfoRow label="Amount Deliver" value={amountDeliver} />
+          <InfoRow label="To be Received" value={toBeReceived} />
+        </div>
       ) : (
         /* ── Regular info rows ── */
         <div className="flex flex-col gap-2">
@@ -643,6 +697,17 @@ export default function TradePanel({
           fillFraction={sliderValue / 100}
           onClose={() => setShowFillModal(false)}
           onConfirm={handleConfirmFill}
+        />
+      )}
+
+      {/* Resell Risk Warning Modal */}
+      {hasOrder && isResell && (
+        <ResellRiskModal
+          isOpen={showResellRiskModal}
+          order={selectedOrder.order}
+          tokenSymbol={tokenSymbol}
+          onClose={() => setShowResellRiskModal(false)}
+          onConfirm={handleResellRiskConfirm}
         />
       )}
 

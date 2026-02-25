@@ -240,6 +240,12 @@ export default function TokenDetailPage() {
                     : `${tokenAmt.toLocaleString()} ${token.tokenSymbol}`,
                   collateral: `${collateralAmt.toFixed(2)} ${filledOrder.collateralToken}`,
                   canResell: side === 'buy',
+                  // Resell-specific fields
+                  ...(filledOrder.isResell ? {
+                    hasBadge: 'RS',
+                    entryPrice: filledOrder.price,
+                    originalPrice: filledOrder.originalPrice,
+                  } : {}),
                 };
 
                 // Add to filled orders (prepend so it appears first)

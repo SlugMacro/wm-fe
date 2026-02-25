@@ -14,13 +14,11 @@ export default function ComingSoonPage() {
         <div className="flex flex-col gap-2 items-center text-center pb-4 px-8 w-full">
           <h1
             className="text-xl font-medium leading-7 text-[#f9f9fa]"
-            style={{ fontFeatureSettings: "'lnum' 1, 'tnum' 1" }}
           >
             Coming Soon
           </h1>
           <p
             className="text-sm font-normal leading-5 text-[#b4b4ba] max-w-[280px]"
-            style={{ fontFeatureSettings: "'lnum' 1, 'tnum' 1" }}
           >
             This feature is currently under development and will be available soon.
           </p>
@@ -30,7 +28,6 @@ export default function ComingSoonPage() {
         <button
           onClick={() => navigate('/markets')}
           className="flex items-center justify-center rounded-[10px] bg-[#f9f9fa] px-5 py-2.5 text-base font-medium leading-6 text-[#0a0a0b] hover:bg-[#e0e0e2] transition-colors"
-          style={{ fontFeatureSettings: "'lnum' 1, 'tnum' 1" }}
         >
           Back to Markets
         </button>

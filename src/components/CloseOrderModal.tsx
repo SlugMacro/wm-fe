@@ -22,7 +22,7 @@ function CloseIcon() {
 
 function WarningIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+    <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
       <circle cx="10" cy="10" r="9" fill="#eab308" />
       <path d="M10 6V11M10 13V13.5" stroke="#0a0a0b" strokeWidth="1.5" strokeLinecap="round" />
     </svg>

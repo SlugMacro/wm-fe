@@ -465,7 +465,7 @@ export default function OrderBook({
             </span>
             <TokenIcon symbol={order.collateralToken} size="xs" showChain={false} />
           </div>
-          <div className="w-24 flex items-center justify-end gap-1">
+          <div className="w-[112px] flex items-center justify-end gap-2">
             {/* FULL badge — only for non-resell (resell is inherently full) */}
             {!isResell && order.fillType === 'FULL' && (
               <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium uppercase ${
@@ -527,7 +527,7 @@ export default function OrderBook({
         <div className={`${fullWidth ? 'w-40' : 'w-28'} text-right`}>
           <span className="text-xs font-medium text-[#7a7a83]">Collateral</span>
         </div>
-        <div className="w-24" />
+        <div className="w-[112px]" />
       </div>
 
       {/* Scrollable rows */}
@@ -643,7 +643,7 @@ export default function OrderBook({
                 <div className="absolute top-full right-0 mt-1 z-50 min-w-[200px] rounded-[10px] bg-[#1b1b1c] shadow-[0_0_32px_rgba(0,0,0,0.2)] overflow-hidden">
                   <div className="flex flex-col gap-1 p-2">
                     <div className="px-2 pb-0.5">
-                      <span className="text-xs text-[#7a7a83]" style={{ fontFeatureSettings: "'lnum' 1, 'tnum' 1" }}>
+                      <span className="text-xs text-[#7a7a83]">
                         Select Order Size
                       </span>
                     </div>
@@ -664,7 +664,7 @@ export default function OrderBook({
                               <div className="size-4 rounded border-2 border-[#44444b] bg-[#252527]" />
                             )}
                           </div>
-                          <span className="text-sm font-medium text-[#f9f9fa]" style={{ fontFeatureSettings: "'lnum' 1, 'tnum' 1" }}>
+                          <span className="text-sm font-medium text-[#f9f9fa]">
                             {opt.label}
                           </span>
                         </button>
@@ -696,7 +696,7 @@ export default function OrderBook({
                 <div className="absolute top-full right-0 mt-1 z-50 min-w-[200px] rounded-[10px] bg-[#1b1b1c] shadow-[0_0_32px_rgba(0,0,0,0.2)] overflow-hidden">
                   <div className="flex flex-col gap-1 p-2">
                     <div className="px-2 pb-0.5">
-                      <span className="text-xs text-[#7a7a83]" style={{ fontFeatureSettings: "'lnum' 1, 'tnum' 1" }}>
+                      <span className="text-xs text-[#7a7a83]">
                         Select Minimum Fill
                       </span>
                     </div>
@@ -717,7 +717,7 @@ export default function OrderBook({
                               <div className="size-4 rounded-full border-2 border-[#2e2e34] bg-[#1b1b1c]" />
                             )}
                           </div>
-                          <span className="text-sm font-medium text-[#f9f9fa]" style={{ fontFeatureSettings: "'lnum' 1, 'tnum' 1" }}>
+                          <span className="text-sm font-medium text-[#f9f9fa]">
                             {opt.label}
                           </span>
                         </button>
@@ -748,7 +748,7 @@ export default function OrderBook({
               <div className="absolute top-full right-0 mt-1 z-50 min-w-[180px] rounded-[10px] bg-[#1b1b1c] shadow-[0_0_32px_rgba(0,0,0,0.2)] overflow-hidden">
                 <div className="flex flex-col gap-1 p-2">
                   <div className="px-2 pb-0.5">
-                    <span className="text-xs text-[#7a7a83]" style={{ fontFeatureSettings: "'lnum' 1, 'tnum' 1" }}>
+                    <span className="text-xs text-[#7a7a83]">
                       Select Token
                     </span>
                   </div>
@@ -762,7 +762,7 @@ export default function OrderBook({
                     <div className="flex items-center p-0.5 shrink-0">
                       <AllTokenIcon />
                     </div>
-                    <span className="flex-1 text-sm font-medium text-[#f9f9fa]" style={{ fontFeatureSettings: "'lnum' 1, 'tnum' 1" }}>All</span>
+                    <span className="flex-1 text-sm font-medium text-[#f9f9fa]">All</span>
                     {collateralFilter === null && <GreenCheckIcon />}
                   </button>
                   {/* Token options */}
@@ -777,7 +777,7 @@ export default function OrderBook({
                       <div className="flex items-center p-0.5 shrink-0">
                         <TokenIcon symbol={token} size="xs" showChain={false} />
                       </div>
-                      <span className="flex-1 text-sm font-medium text-[#f9f9fa]" style={{ fontFeatureSettings: "'lnum' 1, 'tnum' 1" }}>{token}</span>
+                      <span className="flex-1 text-sm font-medium text-[#f9f9fa]">{token}</span>
                       {collateralFilter === token && <GreenCheckIcon />}
                     </button>
                   ))}
@@ -807,7 +807,7 @@ export default function OrderBook({
             {/* Size chips */}
             {activeTab !== 'resell' && !sizeFilters.has('all') && sizeFilters.size > 0 && (
               <div className="flex items-center gap-2">
-                <span className="text-xs text-[#7a7a83]" style={{ fontFeatureSettings: "'lnum' 1, 'tnum' 1" }}>
+                <span className="text-xs text-[#7a7a83]">
                   Order Size
                 </span>
                 {Array.from(sizeFilters).map(s => {
@@ -819,7 +819,7 @@ export default function OrderBook({
                       onClick={() => handleSizeToggle(s)}
                       className="flex items-center gap-1 rounded-full bg-[#1b1b1c] px-2 py-1 transition-colors hover:bg-[#252527]"
                     >
-                      <span className="text-[10px] font-medium text-[#b4b4ba] uppercase" style={{ fontFeatureSettings: "'lnum' 1, 'tnum' 1" }}>
+                      <span className="text-[10px] font-medium text-[#b4b4ba] uppercase">
                         {opt.label}
                       </span>
                       <CloseCircleIcon />
@@ -832,14 +832,14 @@ export default function OrderBook({
             {/* Min fill chip */}
             {activeTab !== 'resell' && minFillFilter !== null && (
               <div className="flex items-center gap-2">
-                <span className="text-xs text-[#7a7a83]" style={{ fontFeatureSettings: "'lnum' 1, 'tnum' 1" }}>
+                <span className="text-xs text-[#7a7a83]">
                   Minimum Fill Value
                 </span>
                 <button
                   onClick={() => setMinFillFilter(null)}
                   className="flex items-center gap-1 rounded-full bg-[#1b1b1c] px-2 py-1 transition-colors hover:bg-[#252527]"
                 >
-                  <span className="text-[10px] font-medium text-[#b4b4ba] uppercase" style={{ fontFeatureSettings: "'lnum' 1, 'tnum' 1" }}>
+                  <span className="text-[10px] font-medium text-[#b4b4ba] uppercase">
                     {MIN_FILL_OPTIONS.find(o => o.value === minFillFilter)?.label ?? `≥ $${minFillFilter}`}
                   </span>
                   <CloseCircleIcon />
@@ -850,14 +850,14 @@ export default function OrderBook({
             {/* Collateral chip */}
             {collateralFilter && (
               <div className="flex items-center gap-2">
-                <span className="text-xs text-[#7a7a83]" style={{ fontFeatureSettings: "'lnum' 1, 'tnum' 1" }}>
+                <span className="text-xs text-[#7a7a83]">
                   Collateral
                 </span>
                 <button
                   onClick={() => setCollateralFilter(null)}
                   className="flex items-center gap-1 rounded-full bg-[#1b1b1c] px-2 py-1 transition-colors hover:bg-[#252527]"
                 >
-                  <span className="text-[10px] font-medium text-[#b4b4ba] uppercase" style={{ fontFeatureSettings: "'lnum' 1, 'tnum' 1" }}>
+                  <span className="text-[10px] font-medium text-[#b4b4ba] uppercase">
                     {collateralFilter}
                   </span>
                   <CloseCircleIcon />
@@ -869,7 +869,7 @@ export default function OrderBook({
           <button
             onClick={handleClearAll}
             className="shrink-0 text-xs text-[#f9f9fa] hover:text-[#b4b4ba] transition-colors"
-            style={{ fontFeatureSettings: "'lnum' 1, 'tnum' 1" }}
+           
           >
             Clear all
           </button>

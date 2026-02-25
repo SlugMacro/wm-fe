@@ -25,9 +25,25 @@ function CloseIcon() {
 
 function WarningIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+    <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
       <circle cx="10" cy="10" r="9" fill="#eab308" />
       <path d="M10 6V11M10 13V13.5" stroke="#0a0a0b" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function QuestionIconSmall() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 13.333 13.333" fill="none">
+      <path d="M6.667 0a6.667 6.667 0 1 1 0 13.333A6.667 6.667 0 0 1 6.667 0Zm0 1.333a5.333 5.333 0 1 0 0 10.667 5.333 5.333 0 0 0 0-10.667Zm0 8a.667.667 0 1 1 0 1.334.667.667 0 0 1 0-1.334Zm0-6.333a2.417 2.417 0 0 1 2.373 2.917 2.42 2.42 0 0 1-1.474 1.743c-.077.03-.147.075-.204.134a.143.143 0 0 0-.033.12l.005.086a.667.667 0 0 1-1.334.078V8c0-.768.62-1.23 1.07-1.41a1.09 1.09 0 0 0 .575-.67 1.09 1.09 0 0 0-.23-1.103 1.083 1.083 0 0 0-1.824.6.667.667 0 1 1-1.333 0A2.417 2.417 0 0 1 6.667 3Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+function ExternalLinkIconSmall() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+      <path d="M3.5 8.5L8.5 3.5M8.5 3.5H4.5M8.5 3.5V7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -38,6 +54,8 @@ const infoRowTooltips: Record<string, string> = {
   'Selling': 'The amount of tokens you are selling in this trade.',
   'For': 'The collateral amount you will deposit for this trade.',
   'Price': 'The unit price per token for this order.',
+  'Original Price': 'The price the previous buyer originally paid for this position.',
+  'Original Collateral': 'The collateral locked in the original position.',
   'Collateral': 'The collateral locked for this trade. Returned on settlement or compensation if counterparty defaults.',
   'Fee': 'The fee charged for this trade. Currently waived during the promotional period.',
 };
@@ -92,7 +110,6 @@ export default function FillOrderModal({
   onClose,
   onConfirm,
 }: FillOrderModalProps) {
-  void _chain;
   const [visible, setVisible] = useState(false);
   const [animating, setAnimating] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
@@ -132,6 +149,7 @@ export default function FillOrderModal({
   if (!isOpen && !animating) return null;
 
   const isBuy = side === 'buy';
+  const isResell = order.isResell === true;
   const collateralToken = order.collateralToken;
 
   // Compute amounts based on fill fraction
@@ -143,29 +161,38 @@ export default function FillOrderModal({
   // Native symbol for chain
   const nativeSymbol = _chain === 'ethereum' ? 'ETH' : _chain === 'sui' ? 'SUI' : 'SOL';
 
-  // Notice text varies by side
-  const noticeText = isBuy
+  // Notice text varies by side and resell
+  const noticeText = isResell
     ? {
-        line1: "You'll receive your tokens after Settle Starts when seller settles.",
-        line2p1: "If they don't settle by Settle Ends, you can cancel the order to get back your deposited ",
+        line1: "You are buying a resell position. Settlement depends on the original seller.",
+        line2p1: "If the original seller doesn't settle by Settle Ends, you'll receive back your deposited ",
         highlight1: `${fmtCollateral(collateralAmount)} ${collateralToken}`,
         mid: ' plus ',
-        highlight2: `${fmtCollateral(collateralAmount * 0.8)} ${nativeSymbol}`,
-        line2p2: ' compensation from their collateral.',
+        highlight2: `${fmtCollateral(order.originalCollateral ?? collateralAmount * 0.8)} ${nativeSymbol}`,
+        line2p2: ' compensation from the original collateral.',
       }
-    : {
-        line1: "You'll need to settle your tokens after Settle Starts.",
-        line2p1: "If you don't settle by Settle Ends, the buyer can claim ",
-        highlight1: `${fmtCollateral(collateralAmount)} ${collateralToken}`,
-        mid: ' from your collateral as compensation, plus their ',
-        highlight2: `${fmtCollateral(collateralAmount)} ${collateralToken}`,
-        line2p2: ' back.',
-      };
+    : isBuy
+      ? {
+          line1: "You'll receive your tokens after Settle Starts when seller settles.",
+          line2p1: "If they don't settle by Settle Ends, you can cancel the order to get back your deposited ",
+          highlight1: `${fmtCollateral(collateralAmount)} ${collateralToken}`,
+          mid: ' plus ',
+          highlight2: `${fmtCollateral(collateralAmount * 0.8)} ${nativeSymbol}`,
+          line2p2: ' compensation from their collateral.',
+        }
+      : {
+          line1: "You'll need to settle your tokens after Settle Starts.",
+          line2p1: "If you don't settle by Settle Ends, the buyer can claim ",
+          highlight1: `${fmtCollateral(collateralAmount)} ${collateralToken}`,
+          mid: ' from your collateral as compensation, plus their ',
+          highlight2: `${fmtCollateral(collateralAmount)} ${collateralToken}`,
+          line2p2: ' back.',
+        };
 
-  // Button colors
-  const activeColor = isBuy ? 'bg-[#16c284]' : 'bg-[#fd5e67]';
-  const actionVerb = isBuy ? 'buying' : 'selling';
-  const actionColor = isBuy ? 'text-[#5bd197]' : 'text-[#fd5e67]';
+  // Button colors — resell always uses buy (green) colors
+  const activeColor = (isBuy || isResell) ? 'bg-[#16c284]' : 'bg-[#fd5e67]';
+  const actionVerb = isResell ? 'buying' : isBuy ? 'buying' : 'selling';
+  const actionColor = (isBuy || isResell) ? 'text-[#5bd197]' : 'text-[#fd5e67]';
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center">
@@ -185,7 +212,7 @@ export default function FillOrderModal({
         <div className="flex items-center justify-between">
           <div className="flex-1" />
           <p className="text-lg font-medium leading-7 text-[#f9f9fa]">
-            Confirm {isBuy ? 'Buy' : 'Sell'} Order
+            Confirm {isResell ? 'Buy Resell' : isBuy ? 'Buy' : 'Sell'} Order
           </p>
           <div className="flex flex-1 justify-end">
             <button
@@ -199,6 +226,11 @@ export default function FillOrderModal({
 
         {/* Subtitle */}
         <p className="text-center text-sm font-normal leading-5 text-[#b4b4ba]">
+          {isResell && (
+            <span className="mr-1.5 inline-flex -translate-y-[1px] items-center justify-center rounded-full bg-[#eab308] px-1.5 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b] align-middle">
+              RS
+            </span>
+          )}
           You are <span className={actionColor}>{actionVerb}</span>{' '}
           <span className="font-medium text-[#f9f9fa]">{fmtTokenAmount(tokenAmount)} {tokenSymbol}</span>{' '}
           for <span className="font-medium text-[#f9f9fa]">{fmtCollateral(collateralAmount)} {collateralToken}</span>.
@@ -220,16 +252,35 @@ export default function FillOrderModal({
             <TokenIcon symbol={collateralToken} size="xs" showChain={false} />
           </InfoRow>
 
-          {/* Price */}
+          {/* Price — yellow for resell */}
           <InfoRow label="Price">
-            <span>${order.price.toFixed(4)}</span>
+            <span className={isResell ? 'text-[#facc15]' : ''}>
+              ${order.price.toFixed(4)}
+            </span>
           </InfoRow>
 
-          {/* Collateral */}
-          <InfoRow label="Collateral">
-            <span>{fmtCollateral(collateralAmount)}</span>
-            <TokenIcon symbol={collateralToken} size="xs" showChain={false} />
-          </InfoRow>
+          {/* Resell-only: Original Price */}
+          {isResell && order.originalPrice != null && (
+            <InfoRow label="Original Price">
+              <span>${order.originalPrice.toFixed(4)}</span>
+            </InfoRow>
+          )}
+
+          {/* Resell-only: Original Collateral */}
+          {isResell && order.originalCollateral != null && (
+            <InfoRow label="Original Collateral">
+              <span>{fmtCollateral(order.originalCollateral)}</span>
+              <TokenIcon symbol={collateralToken} size="xs" showChain={false} />
+            </InfoRow>
+          )}
+
+          {/* Collateral — hide for resell (already shown as Original Collateral) */}
+          {!isResell && (
+            <InfoRow label="Collateral">
+              <span>{fmtCollateral(collateralAmount)}</span>
+              <TokenIcon symbol={collateralToken} size="xs" showChain={false} />
+            </InfoRow>
+          )}
 
           {/* Fee */}
           <InfoRow
@@ -294,6 +345,20 @@ export default function FillOrderModal({
         >
           Deposit {fmtCollateral(collateralAmount)} {collateralToken}
         </button>
+
+        {/* Learn more link — resell only */}
+        {isResell && (
+          <a
+            href="https://docs.whales.market/resell"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="-mt-3 flex items-center justify-center gap-1.5 text-xs font-normal leading-4 text-[#5bd197] underline decoration-[#5bd197]/30 underline-offset-2 transition-colors hover:text-[#6ee0a8] hover:decoration-[#6ee0a8]/50"
+          >
+            <span><QuestionIconSmall /></span>
+            <span>Learn how Resell works</span>
+            <span><ExternalLinkIconSmall /></span>
+          </a>
+        )}
       </div>
     </div>
   );

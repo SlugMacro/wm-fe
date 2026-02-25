@@ -104,7 +104,7 @@ function FearGreedGauge({ value, label }: { value: number; label: string }) {
         />
       </svg>
       <div className="absolute bottom-0 flex flex-col items-center">
-        <span className="text-[28px] font-medium leading-9 text-[#f9f9fa]" style={{ fontFeatureSettings: "'lnum', 'tnum'" }}>
+        <span className="text-[28px] font-medium leading-9 text-[#f9f9fa]">
           {value}
         </span>
         <span className="text-xs font-normal text-[#7a7a83]">{label}</span>
@@ -229,7 +229,7 @@ export default function TopMetrics() {
             <div className="size-1.5 rounded-full bg-[#16c284] animate-pulse" />
           </div>
           <div className="flex items-baseline gap-1">
-            <span className="text-2xl font-medium text-[#f9f9fa]" style={{ fontFeatureSettings: "'lnum', 'tnum'" }}>
+            <span className="text-2xl font-medium text-[#f9f9fa]">
               {formatVol(vol24h)}
             </span>
             <span className={`text-xs font-normal ${changeColor}`}>{changeText}</span>
@@ -250,7 +250,7 @@ export default function TopMetrics() {
       <div className="flex flex-col gap-2 rounded-[10px] bg-[rgba(255,255,255,0.03)] px-5 pt-4 pb-5">
         <span className="text-xs font-medium text-[#7a7a83]">Altcoin season</span>
         <div className="flex flex-col gap-4">
-          <div className="flex items-center text-2xl font-medium leading-8" style={{ fontFeatureSettings: "'lnum', 'tnum'" }}>
+          <div className="flex items-center text-2xl font-medium leading-8">
             <span className="text-[#f9f9fa]">{altcoinSeason.value}</span>
             <span className="text-[#7a7a83]">/100</span>
           </div>
