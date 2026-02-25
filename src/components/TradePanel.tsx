@@ -581,6 +581,7 @@ export default function TradePanel({
           tokenSymbol={tokenSymbol}
           tokenName={tokenName}
           chain={chain}
+          isOwner={isOwner}
           onClose={() => setShowInfoModal(false)}
         />
       )}

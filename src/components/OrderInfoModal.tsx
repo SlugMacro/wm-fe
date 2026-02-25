@@ -9,6 +9,7 @@ interface OrderInfoModalProps {
   tokenSymbol: string;
   tokenName: string;
   chain: string;
+  isOwner?: boolean;
   onClose: () => void;
 }
 
@@ -75,6 +76,9 @@ function InfoCell({ label, children }: { label: string; children: React.ReactNod
   );
 }
 
+/** Mock wallet address — same as in Header AvatarDropdown & dashboard profile */
+const MY_WALLET_SHORT = 'GQ98...iA5Y';
+
 export default function OrderInfoModal({
   isOpen,
   order,
@@ -82,6 +86,7 @@ export default function OrderInfoModal({
   tokenSymbol,
   tokenName,
   chain,
+  isOwner = false,
   onClose,
 }: OrderInfoModalProps) {
   const [visible, setVisible] = useState(false);
@@ -157,7 +162,7 @@ export default function OrderInfoModal({
         <div className="flex flex-col gap-6">
           {/* Message */}
           <p className="text-sm font-normal leading-5 text-[#b4b4ba]">
-            <span>GH3k...Ui81 is </span>
+            <span>{isOwner ? MY_WALLET_SHORT : 'GH3k...Ui81'} is </span>
             <span className={isBuy ? 'text-[#5bd197]' : 'text-[#fd5e67]'}>
               {isBuy ? 'buying' : 'selling'}
             </span>
