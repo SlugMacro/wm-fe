@@ -8,7 +8,7 @@ import TradePanel from '../components/TradePanel';
 import MyOrders from '../components/MyOrders';
 import DetailRecentTrades from '../components/DetailRecentTrades';
 import BottomStats from '../components/BottomStats';
-import type { OrderBookEntry, PriceDataPoint } from '../types';
+import type { OrderBookEntry, PriceDataPoint, MyOrder } from '../types';
 import {
   tokenDetails,
   defaultTokenId,
@@ -37,7 +37,9 @@ export default function TokenDetailPage() {
   const [priceData, setPriceData] = useState<PriceDataPoint[]>(() => generatePriceData(token.price, token.chartData));
 
   // My orders — generated per token (LOUD has no orders for testing empty state)
-  const myFilledOrders = useMemo(() => token.tokenSymbol === 'LOUD' ? [] : generateMyFilledOrders(token.tokenSymbol, token.chain, token.price), [token.id]);
+  const [myFilledOrders, setMyFilledOrders] = useState<MyOrder[]>(() =>
+    token.tokenSymbol === 'LOUD' ? [] : generateMyFilledOrders(token.tokenSymbol, token.chain, token.price)
+  );
   const myOpenOrders = useMemo(() => token.tokenSymbol === 'LOUD' ? [] : generateMyOpenOrders(token.tokenSymbol, token.chain, token.price), [token.id]);
 
   // When a trade executes in Recent Trades, update a matching order's fill AND chart
@@ -213,6 +215,55 @@ export default function TokenDetailPage() {
                 setSelectedOrder(null);
                 setBuyOrders(prev => prev.filter(o => o.id !== orderId));
                 setSellOrders(prev => prev.filter(o => o.id !== orderId));
+              }}
+              onOrderFilled={(orderId, side, fillFraction) => {
+                // Find the order from the book
+                const allOrders = side === 'buy' ? buyOrders : sellOrders;
+                const filledOrder = allOrders.find(o => o.id === orderId);
+                if (!filledOrder) return;
+
+                const nativeSymbol = token.chain === 'ethereum' ? 'ETH' : token.chain === 'sui' ? 'SUI' : 'SOL';
+                const tokenAmt = Math.round(filledOrder.amount * fillFraction);
+                const collateralAmt = filledOrder.collateral * fillFraction;
+
+                // Create a new MyOrder entry for the filled orders list
+                const newFilledOrder: MyOrder = {
+                  id: `filled-${Date.now()}`,
+                  side: side === 'buy' ? 'Buy' : 'Sell',
+                  pair: `${token.tokenSymbol}/${nativeSymbol}`,
+                  date: new Date().toISOString().split('T')[0].replace(/-/g, '.'),
+                  price: filledOrder.price,
+                  amount: tokenAmt >= 1000
+                    ? `${(tokenAmt / 1000).toFixed(2)}K ${token.tokenSymbol}`
+                    : `${tokenAmt.toLocaleString()} ${token.tokenSymbol}`,
+                  collateral: `${collateralAmt.toFixed(2)} ${filledOrder.collateralToken}`,
+                  canResell: side === 'buy',
+                };
+
+                // Add to filled orders (prepend so it appears first)
+                setMyFilledOrders(prev => [newFilledOrder, ...prev]);
+
+                // Update the order book — increase fill percent or remove
+                const setOrders = side === 'buy' ? setBuyOrders : setSellOrders;
+                setOrders(prev => {
+                  const idx = prev.findIndex(o => o.id === orderId);
+                  if (idx === -1) return prev;
+                  const order = prev[idx];
+                  const newFillPercent = Math.min(100, order.fillPercent + fillFraction * 100);
+                  const newFilledAmount = (newFillPercent / 100) * order.totalAmount;
+
+                  if (newFillPercent >= 100) {
+                    // Fully filled — remove from book
+                    return prev.filter(o => o.id !== orderId);
+                  }
+                  // Partially filled — update
+                  const updated = [...prev];
+                  updated[idx] = { ...order, fillPercent: newFillPercent, filledAmount: newFilledAmount };
+                  return updated;
+                });
+
+                // Deselect
+                setSelectedOrder(null);
               }}
             />
           </div>

@@ -3,6 +3,7 @@ import type { OrderBookEntry } from '../types';
 import TokenIcon from './TokenIcon';
 import OrderInfoModal from './OrderInfoModal';
 import CloseOrderModal from './CloseOrderModal';
+import FillOrderModal from './FillOrderModal';
 import Toast from './Toast';
 import { useWallet } from '../hooks/useWalletContext';
 import mascotSvg from '../assets/images/mascot.svg';
@@ -14,6 +15,7 @@ interface TradePanelProps {
   collateralToken?: string;
   chain?: string;
   onOrderClosed?: (orderId: string) => void;
+  onOrderFilled?: (orderId: string, side: 'buy' | 'sell', fillFraction: number) => void;
 }
 
 const infoRowTooltips: Record<string, string> = {
@@ -155,6 +157,7 @@ export default function TradePanel({
   collateralToken = 'SOL',
   chain = 'solana',
   onOrderClosed,
+  onOrderFilled,
 }: TradePanelProps) {
   const wallet = useWallet();
   const hasOrder = selectedOrder !== null;
@@ -162,15 +165,19 @@ export default function TradePanel({
   const isOwner = hasOrder && selectedOrder.order.isOwner === true;
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showCloseModal, setShowCloseModal] = useState(false);
+  const [showFillModal, setShowFillModal] = useState(false);
   const [pendingClose, setPendingClose] = useState(false);
-  const [toast, setToast] = useState<{ type: 'waiting' | 'success'; visible: boolean } | null>(null);
+  const [pendingFill, setPendingFill] = useState(false);
+  const [toast, setToast] = useState<{ type: 'waiting' | 'success'; title: string; subtitle: string; visible: boolean } | null>(null);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const fillTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Cleanup timers on unmount
   useEffect(() => {
     return () => {
       if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+      if (fillTimerRef.current) clearTimeout(fillTimerRef.current);
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     };
   }, []);
@@ -179,13 +186,13 @@ export default function TradePanel({
   const handleConfirmClose = useCallback(() => {
     setShowCloseModal(false);
     setPendingClose(true);
-    setToast({ type: 'waiting', visible: true });
+    setToast({ type: 'waiting', title: 'Waiting for Approval', subtitle: 'Please confirm the transaction in your wallet.', visible: true });
 
     // Simulate blockchain transaction — after ~2.5s, mark as success
     closeTimerRef.current = setTimeout(() => {
       setPendingClose(false);
       // Show success toast
-      setToast({ type: 'success', visible: true });
+      setToast({ type: 'success', title: 'Order Closed', subtitle: 'Your order has been successfully closed.', visible: true });
 
       // Notify parent to remove order from book
       if (hasOrder && onOrderClosed) {
@@ -207,6 +214,34 @@ export default function TradePanel({
   const [topAmount, setTopAmount] = useState('');
   const [bottomAmount, setBottomAmount] = useState('');
   const [sliderValue, setSliderValue] = useState(0);
+
+  // Handle fill order (buy/sell) confirmation flow
+  const handleConfirmFill = useCallback(() => {
+    setShowFillModal(false);
+    setPendingFill(true);
+    setToast({ type: 'waiting', title: 'Waiting for Approval', subtitle: 'Please confirm the transaction in your wallet.', visible: true });
+
+    const currentSide = selectedOrder?.side;
+    const currentOrderId = selectedOrder?.order.id;
+    const currentFraction = sliderValue / 100;
+
+    fillTimerRef.current = setTimeout(() => {
+      setPendingFill(false);
+      const sideLabel = currentSide === 'buy' ? 'Buy' : 'Sell';
+      setToast({ type: 'success', title: `${sideLabel} Order Filled`, subtitle: `Your ${sideLabel.toLowerCase()} order has been successfully filled.`, visible: true });
+
+      // Notify parent to move order to filled
+      if (currentOrderId && currentSide && onOrderFilled) {
+        onOrderFilled(currentOrderId, currentSide, currentFraction);
+      }
+
+      // Auto-dismiss success toast after 5s
+      toastTimerRef.current = setTimeout(() => {
+        setToast(prev => prev ? { ...prev, visible: false } : null);
+        setTimeout(() => setToast(null), 300);
+      }, 5000);
+    }, 2500);
+  }, [selectedOrder, sliderValue, onOrderFilled]);
 
   // Compute values based on selected order
   const price = hasOrder ? selectedOrder.order.price : 0;
@@ -349,6 +384,9 @@ export default function TradePanel({
     if (isOwner) {
       return { text: 'Close Order', className: 'bg-[rgba(253,94,103,0.12)] text-[#fd5e67] hover:bg-[rgba(253,94,103,0.2)] cursor-pointer', disabled: false, onClick: () => setShowCloseModal(true) };
     }
+    if (pendingFill) {
+      return { text: 'Pending Approval', className: `${accentBg} text-[#f9f9fa] opacity-40 cursor-not-allowed`, disabled: true, onClick: undefined as (() => void) | undefined };
+    }
     if (!wallet.isConnected) {
       return { text: 'Connect Wallet', className: 'bg-[#f9f9fa] text-[#0a0a0b] hover:opacity-90 cursor-pointer', disabled: false, onClick: () => wallet.openConnectModal(chain) };
     }
@@ -359,7 +397,7 @@ export default function TradePanel({
       return { text: 'Insufficient Balance', className: 'bg-[rgba(255,255,255,0.08)] text-[#fd5e67] cursor-not-allowed', disabled: true, onClick: undefined as (() => void) | undefined };
     }
     if (canTrade) {
-      return { text: isBuy ? 'Buy' : 'Sell', className: `${accentBg} text-[#f9f9fa] hover:opacity-90`, disabled: false, onClick: undefined as (() => void) | undefined };
+      return { text: isBuy ? 'Buy' : 'Sell', className: `${accentBg} text-[#f9f9fa] hover:opacity-90 cursor-pointer`, disabled: false, onClick: () => setShowFillModal(true) };
     }
     return { text: isBuy ? 'Buy' : 'Sell', className: 'bg-[rgba(255,255,255,0.08)] text-[#7a7a83] cursor-not-allowed', disabled: true, onClick: undefined as (() => void) | undefined };
   };
@@ -560,12 +598,26 @@ export default function TradePanel({
         />
       )}
 
+      {/* Fill Order (Buy/Sell) Confirm Modal */}
+      {hasOrder && !isOwner && (
+        <FillOrderModal
+          isOpen={showFillModal}
+          order={selectedOrder.order}
+          side={selectedOrder.side}
+          tokenSymbol={tokenSymbol}
+          chain={chain}
+          fillFraction={sliderValue / 100}
+          onClose={() => setShowFillModal(false)}
+          onConfirm={handleConfirmFill}
+        />
+      )}
+
       {/* Toast notification */}
       {toast && (
         <Toast
           type={toast.type}
-          title={toast.type === 'waiting' ? 'Waiting for Approval' : 'Order Closed'}
-          subtitle={toast.type === 'waiting' ? 'Please confirm the transaction in your wallet.' : 'Your order has been successfully closed.'}
+          title={toast.title}
+          subtitle={toast.subtitle}
           visible={toast.visible}
           action={toast.type === 'success' ? { label: 'View Transaction', href: 'https://github.com/SlugMacro/wm-fe' } : undefined}
         />
