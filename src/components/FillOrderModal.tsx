@@ -96,13 +96,11 @@ export default function FillOrderModal({
   const [visible, setVisible] = useState(false);
   const [animating, setAnimating] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
-  const [pending, setPending] = useState(false);
 
   // Reset state when modal opens
   useEffect(() => {
     if (isOpen) {
       setConfirmed(false);
-      setPending(false);
     }
   }, [isOpen]);
 
@@ -121,21 +119,15 @@ export default function FillOrderModal({
   }, [isOpen]);
 
   const handleClose = useCallback(() => {
-    if (pending) return; // don't close while pending
     setVisible(false);
     setTimeout(onClose, 200);
-  }, [onClose, pending]);
+  }, [onClose]);
 
   const handleConfirm = useCallback(() => {
-    if (!confirmed || pending) return;
-    setPending(true);
-
-    // Simulate wallet approval — after 2.5s, call onConfirm
-    setTimeout(() => {
-      setVisible(false);
-      setTimeout(onConfirm, 200);
-    }, 2500);
-  }, [confirmed, pending, onConfirm]);
+    if (!confirmed) return;
+    setVisible(false);
+    setTimeout(onConfirm, 200);
+  }, [confirmed, onConfirm]);
 
   if (!isOpen && !animating) return null;
 
@@ -198,8 +190,7 @@ export default function FillOrderModal({
           <div className="flex flex-1 justify-end">
             <button
               onClick={handleClose}
-              disabled={pending}
-              className="flex items-center justify-center rounded-full bg-[#252527] p-2 text-[#f9f9fa] transition-colors hover:bg-[#2e2e34] disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex items-center justify-center rounded-full bg-[#252527] p-2 text-[#f9f9fa] transition-colors hover:bg-[#2e2e34]"
             >
               <CloseIcon />
             </button>
@@ -280,7 +271,7 @@ export default function FillOrderModal({
             className={`flex size-4 shrink-0 items-center justify-center rounded border-2 transition-colors ${
               confirmed ? 'border-[#f9f9fa] bg-[#f9f9fa]' : 'border-[#44444b] bg-[#252527]'
             }`}
-            onClick={() => !pending && setConfirmed(!confirmed)}
+            onClick={() => setConfirmed(!confirmed)}
           >
             {confirmed && (
               <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
@@ -294,16 +285,14 @@ export default function FillOrderModal({
         {/* Confirm button */}
         <button
           onClick={handleConfirm}
-          disabled={!confirmed || pending}
+          disabled={!confirmed}
           className={`flex w-full items-center justify-center rounded-[10px] px-5 py-2.5 text-base font-medium leading-6 transition-colors ${
-            pending
-              ? `${activeColor} cursor-not-allowed opacity-40 text-[#f9f9fa]`
-              : confirmed
-                ? `${activeColor} text-[#f9f9fa] hover:opacity-90`
-                : `${activeColor} cursor-not-allowed opacity-40 text-[#f9f9fa]`
+            confirmed
+              ? `${activeColor} text-[#f9f9fa] hover:opacity-90 cursor-pointer`
+              : `${activeColor} cursor-not-allowed opacity-40 text-[#f9f9fa]`
           }`}
         >
-          {pending ? 'Pending Approval...' : `Deposit ${fmtCollateral(collateralAmount)} ${collateralToken}`}
+          Deposit {fmtCollateral(collateralAmount)} {collateralToken}
         </button>
       </div>
     </div>
