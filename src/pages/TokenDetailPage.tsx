@@ -204,6 +204,12 @@ export default function TokenDetailPage() {
               selectedOrder={selectedOrder}
               collateralToken={collateralToken}
               chain={token.chain}
+              onOrderClosed={(orderId) => {
+                // Remove the order from the book and deselect
+                setSelectedOrder(null);
+                setBuyOrders(prev => prev.filter(o => o.id !== orderId));
+                setSellOrders(prev => prev.filter(o => o.id !== orderId));
+              }}
             />
           </div>
 

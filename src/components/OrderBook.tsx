@@ -80,11 +80,12 @@ function ChartLineIcon() {
   );
 }
 
-function UserIcon() {
+function MyOrderIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-      <circle cx="6" cy="4" r="2.5" stroke="currentColor" strokeWidth="1" />
-      <path d="M2 10.5C2 8.5 3.8 7 6 7C8.2 7 10 8.5 10 10.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <rect x="1" y="1" width="12" height="12" rx="3" stroke="#eab308" strokeWidth="1.2" />
+      <circle cx="7" cy="5.5" r="2" stroke="#eab308" strokeWidth="1" />
+      <path d="M3.5 11.5C3.5 9.8 5 8.5 7 8.5C9 8.5 10.5 9.8 10.5 11.5" stroke="#eab308" strokeWidth="1" strokeLinecap="round" />
     </svg>
   );
 }
@@ -453,7 +454,7 @@ export default function OrderBook({
             }`}>
               {order.price.toFixed(4)}
             </span>
-            {order.isOwner && <span className="text-[#7a7a83]"><UserIcon /></span>}
+            {order.isOwner && <MyOrderIcon />}
           </div>
           <div className={`${fullWidth ? 'w-40' : 'w-28'} text-right`}>
             <span className="text-sm font-normal text-[#f9f9fa] tabular-nums">{order.amountFormatted}</span>

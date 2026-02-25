@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import type { OrderBookEntry } from '../types';
 import TokenIcon from './TokenIcon';
 import OrderInfoModal from './OrderInfoModal';
+import CloseOrderModal from './CloseOrderModal';
+import Toast from './Toast';
 import { useWallet } from '../hooks/useWalletContext';
 import mascotSvg from '../assets/images/mascot.svg';
 
@@ -11,6 +13,7 @@ interface TradePanelProps {
   selectedOrder: { order: OrderBookEntry; side: 'buy' | 'sell' } | null;
   collateralToken?: string;
   chain?: string;
+  onOrderClosed?: (orderId: string) => void;
 }
 
 const infoRowTooltips: Record<string, string> = {
@@ -19,7 +22,7 @@ const infoRowTooltips: Record<string, string> = {
   'To be Received': 'The amount of tokens or collateral you will receive after the trade is completed.',
 };
 
-function InfoRow({ label, value }: { label: string; value: string }) {
+function InfoRow({ label, value, children }: { label: string; value?: string; children?: React.ReactNode }) {
   const tooltip = infoRowTooltips[label];
   return (
     <div className="flex items-center justify-between">
@@ -37,7 +40,9 @@ function InfoRow({ label, value }: { label: string; value: string }) {
           {label}
         </span>
       )}
-      <span className="text-sm leading-5 font-medium text-[#f9f9fa] tabular-nums">{value}</span>
+      {children ?? (
+        <span className="text-sm leading-5 font-medium text-[#f9f9fa] tabular-nums">{value}</span>
+      )}
     </div>
   );
 }
@@ -68,7 +73,7 @@ function ProgressSlider({ value, onChange, disabled = false }: { value: number; 
     const track = trackRef.current;
     if (!track) return value;
     const rect = track.getBoundingClientRect();
-    const pad = 12; // px padding for dot centers
+    const pad = 12;
     const x = Math.max(0, Math.min(e.clientX - rect.left - pad, rect.width - pad * 2));
     return Math.round((x / (rect.width - pad * 2)) * 100);
   }, [value]);
@@ -98,15 +103,12 @@ function ProgressSlider({ value, onChange, disabled = false }: { value: number; 
       className={`relative flex h-6 items-center px-3 select-none ${disabled ? 'cursor-default opacity-50' : 'cursor-pointer'}`}
       onMouseDown={handleMouseDown}
     >
-      {/* Track background */}
       <div className="relative h-0.5 w-full bg-[#1b1b1c] rounded-full">
-        {/* Filled track */}
         <div
           className={`absolute inset-y-0 left-0 bg-[#f9f9fa] rounded-full ${dragging ? '' : 'transition-all duration-150'}`}
           style={{ width: `${value}%` }}
         />
       </div>
-      {/* Dot snap points */}
       {steps.map((step) => {
         const isFilled = value >= step;
         return (
@@ -126,7 +128,6 @@ function ProgressSlider({ value, onChange, disabled = false }: { value: number; 
           </button>
         );
       })}
-      {/* Draggable thumb */}
       <div
         className={`absolute -translate-y-1/2 top-1/2 -translate-x-1/2 size-4 rounded-full bg-[#f9f9fa] shadow-md pointer-events-none ${dragging ? '' : 'transition-all duration-150'}`}
         style={{ left: `calc(12px + (100% - 24px) * ${value / 100})` }}
@@ -135,20 +136,72 @@ function ProgressSlider({ value, onChange, disabled = false }: { value: number; 
   );
 }
 
+/* ═══════════════════════════════════════════════════════════
+   Helper: format token amount
+   ═══════════════════════════════════════════════════════════ */
+function fmtAmount(val: number): string {
+  if (val === 0) return '0';
+  const k = val / 1000;
+  return k >= 1 ? `${k.toFixed(2)}K` : val.toLocaleString('en-US', { maximumFractionDigits: 0 });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TradePanel
+   ═══════════════════════════════════════════════════════════ */
 export default function TradePanel({
   tokenSymbol,
   tokenName = 'Pre-market Token',
   selectedOrder,
   collateralToken = 'SOL',
   chain = 'solana',
+  onOrderClosed,
 }: TradePanelProps) {
   const wallet = useWallet();
   const hasOrder = selectedOrder !== null;
   const isBuy = selectedOrder?.side === 'buy';
+  const isOwner = hasOrder && selectedOrder.order.isOwner === true;
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const [showCloseModal, setShowCloseModal] = useState(false);
+  const [pendingClose, setPendingClose] = useState(false);
+  const [toast, setToast] = useState<{ type: 'waiting' | 'success'; visible: boolean } | null>(null);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    };
+  }, []);
+
+  // Handle close order confirmation flow
+  const handleConfirmClose = useCallback(() => {
+    setShowCloseModal(false);
+    setPendingClose(true);
+    setToast({ type: 'waiting', visible: true });
+
+    // Simulate blockchain transaction — after ~2.5s, mark as success
+    closeTimerRef.current = setTimeout(() => {
+      setPendingClose(false);
+      // Show success toast
+      setToast({ type: 'success', visible: true });
+
+      // Notify parent to remove order from book
+      if (hasOrder && onOrderClosed) {
+        onOrderClosed(selectedOrder.order.id);
+      }
+
+      // Auto-dismiss success toast after 5s
+      toastTimerRef.current = setTimeout(() => {
+        setToast(prev => prev ? { ...prev, visible: false } : null);
+        setTimeout(() => setToast(null), 300);
+      }, 5000);
+    }, 2500);
+  }, [hasOrder, selectedOrder, onOrderClosed]);
 
   // FULL or resell orders → must fill 100%, no editing allowed
-  const isFixedFill = hasOrder && (selectedOrder.order.fillType === 'FULL' || selectedOrder.order.isResell === true);
+  const isFixedFill = hasOrder && !isOwner && (selectedOrder.order.fillType === 'FULL' || selectedOrder.order.isResell === true);
 
   // Form state
   const [topAmount, setTopAmount] = useState('');
@@ -160,14 +213,14 @@ export default function TradePanel({
   const maxAmount = hasOrder ? selectedOrder.order.amount : 0;
   const maxCollateral = hasOrder ? selectedOrder.order.collateral : 0;
 
-  // Wallet state checks — based on wallet chain vs TOKEN chain (not order chain)
+  // Wallet state checks
   const isWrongNetwork = wallet.isConnected && wallet.connectedChain !== chain;
   const needsAction = !wallet.isConnected || isWrongNetwork;
 
   // Collateral token from order (for display)
   const orderCollateralToken = hasOrder ? selectedOrder.order.collateralToken : collateralToken;
 
-  // When order changes, auto-fill capped to affordable amount
+  // Balance
   const collateralBal = wallet.getBalance(hasOrder ? selectedOrder.order.collateralToken : collateralToken);
 
   useEffect(() => {
@@ -175,8 +228,14 @@ export default function TradePanel({
       const orderCollateral = selectedOrder.order.collateral;
       const orderAmount = selectedOrder.order.amount;
 
-      // Fixed-fill (FULL/resell) → always 100%
-      // Otherwise, cap to affordable amount if wallet connected + correct network
+      if (isOwner) {
+        // Owner view: always show full order amounts
+        setTopAmount(orderAmount.toLocaleString('en-US', { maximumFractionDigits: 0 }));
+        setBottomAmount(orderCollateral > 0 ? orderCollateral.toFixed(2) : '');
+        setSliderValue(0);
+        return;
+      }
+
       let fraction = 1;
       if (!isFixedFill) {
         const canAfford = wallet.isConnected && wallet.connectedChain === chain;
@@ -202,7 +261,7 @@ export default function TradePanel({
       setBottomAmount('');
       setSliderValue(0);
     }
-  }, [hasOrder, selectedOrder, isBuy, isFixedFill, wallet.isConnected, wallet.connectedChain, chain, collateralBal]);
+  }, [hasOrder, selectedOrder, isBuy, isOwner, isFixedFill, wallet.isConnected, wallet.connectedChain, chain, collateralBal]);
 
   // Compute collateral from token amount
   const computeCollateral = useCallback((tokenAmt: number): string => {
@@ -212,13 +271,12 @@ export default function TradePanel({
     return cost > 0 ? cost.toFixed(2) : '';
   }, [hasOrder, maxAmount, maxCollateral]);
 
-  // Handle top input change — recalculate bottom + slider, clamp to max
+  // Handle top input change
   const handleTopAmountChange = useCallback((raw: string) => {
     if (!hasOrder || maxAmount === 0) {
       setTopAmount(raw);
       return;
     }
-
     const parsed = parseFloat(raw.replace(/,/g, ''));
     if (isNaN(parsed) || parsed <= 0) {
       setTopAmount(raw);
@@ -226,11 +284,7 @@ export default function TradePanel({
       setSliderValue(0);
       return;
     }
-
-    // For buy: top is raw token amount. For sell: top is in K (×1000)
     const tokenAmt = isBuy ? parsed : parsed * 1000;
-
-    // Clamp to max — snap to 100% if exceeds
     if (tokenAmt >= maxAmount) {
       if (isBuy) {
         setTopAmount(maxAmount.toLocaleString('en-US', { maximumFractionDigits: 0 }));
@@ -242,7 +296,6 @@ export default function TradePanel({
       setSliderValue(100);
       return;
     }
-
     setTopAmount(raw);
     setBottomAmount(computeCollateral(tokenAmt));
     const pct = Math.round((tokenAmt / maxAmount) * 100);
@@ -266,86 +319,68 @@ export default function TradePanel({
     }
   }, [hasOrder, isBuy, maxAmount, maxCollateral]);
 
-  // Determine button state — no "Insufficient Balance" when wallet not connected or wrong network
+  // Button state (non-owner)
   const bottomNum = parseFloat(bottomAmount.replace(/,/g, ''));
   const topNum = parseFloat(topAmount.replace(/,/g, ''));
   const collateralBalance = wallet.getBalance(orderCollateralToken);
   const isInsufficientBalance = !needsAction && bottomNum > collateralBalance;
   const canTrade = hasOrder && !needsAction && topNum > 0 && bottomNum > 0 && !isInsufficientBalance;
 
-  // Computed info values
+  // Computed info values (non-owner)
   const amountDeliver = hasOrder
-    ? isBuy
-      ? `${bottomAmount} ${orderCollateralToken}`
-      : `${topAmount}K ${tokenSymbol}`
+    ? isBuy ? `${bottomAmount} ${orderCollateralToken}` : `${topAmount}K ${tokenSymbol}`
     : '-';
   const toBeReceived = hasOrder
-    ? isBuy
-      ? `${topAmount} ${tokenSymbol}`
-      : `${bottomAmount} ${orderCollateralToken}`
+    ? isBuy ? `${topAmount} ${tokenSymbol}` : `${bottomAmount} ${orderCollateralToken}`
     : '-';
 
-  // Colors based on buy/sell
+  // Colors
   const accentBg = isBuy ? 'bg-[#16c284]' : 'bg-[#fd5e67]';
   const accentText = isBuy ? 'text-[#5bd197]' : 'text-[#fd5e67]';
 
   // CTA button config
   const getButtonConfig = () => {
     if (!hasOrder) {
-      return {
-        text: `Trade ${tokenSymbol}`,
-        className: 'bg-[#f9f9fa] text-[#0a0a0b] opacity-40 cursor-not-allowed',
-        disabled: true,
-        onClick: undefined as (() => void) | undefined,
-      };
+      return { text: `Trade ${tokenSymbol}`, className: 'bg-[#f9f9fa] text-[#0a0a0b] opacity-40 cursor-not-allowed', disabled: true, onClick: undefined as (() => void) | undefined };
+    }
+    if (isOwner && pendingClose) {
+      return { text: 'Pending Approval', className: 'bg-[rgba(253,94,103,0.06)] text-[#fd5e67]/40 cursor-not-allowed', disabled: true, onClick: undefined as (() => void) | undefined };
+    }
+    if (isOwner) {
+      return { text: 'Close Order', className: 'bg-[rgba(253,94,103,0.12)] text-[#fd5e67] hover:bg-[rgba(253,94,103,0.2)] cursor-pointer', disabled: false, onClick: () => setShowCloseModal(true) };
     }
     if (!wallet.isConnected) {
-      return {
-        text: 'Connect Wallet',
-        className: 'bg-[#f9f9fa] text-[#0a0a0b] hover:opacity-90 cursor-pointer',
-        disabled: false,
-        onClick: () => wallet.openConnectModal(chain),
-      };
+      return { text: 'Connect Wallet', className: 'bg-[#f9f9fa] text-[#0a0a0b] hover:opacity-90 cursor-pointer', disabled: false, onClick: () => wallet.openConnectModal(chain) };
     }
     if (isWrongNetwork) {
-      return {
-        text: 'Switch Network',
-        className: 'bg-[#f9f9fa] text-[#0a0a0b] hover:opacity-90 cursor-pointer',
-        disabled: false,
-        onClick: () => wallet.openConnectModal(chain),
-      };
+      return { text: 'Switch Network', className: 'bg-[#f9f9fa] text-[#0a0a0b] hover:opacity-90 cursor-pointer', disabled: false, onClick: () => wallet.openConnectModal(chain) };
     }
     if (isInsufficientBalance) {
-      return {
-        text: 'Insufficient Balance',
-        className: 'bg-[rgba(255,255,255,0.08)] text-[#fd5e67] cursor-not-allowed',
-        disabled: true,
-        onClick: undefined as (() => void) | undefined,
-      };
+      return { text: 'Insufficient Balance', className: 'bg-[rgba(255,255,255,0.08)] text-[#fd5e67] cursor-not-allowed', disabled: true, onClick: undefined as (() => void) | undefined };
     }
     if (canTrade) {
-      return {
-        text: isBuy ? 'Buy' : 'Sell',
-        className: `${accentBg} text-[#f9f9fa] hover:opacity-90`,
-        disabled: false,
-        onClick: undefined as (() => void) | undefined,
-      };
+      return { text: isBuy ? 'Buy' : 'Sell', className: `${accentBg} text-[#f9f9fa] hover:opacity-90`, disabled: false, onClick: undefined as (() => void) | undefined };
     }
-    return {
-      text: isBuy ? 'Buy' : 'Sell',
-      className: 'bg-[rgba(255,255,255,0.08)] text-[#7a7a83] cursor-not-allowed',
-      disabled: true,
-      onClick: undefined as (() => void) | undefined,
-    };
+    return { text: isBuy ? 'Buy' : 'Sell', className: 'bg-[rgba(255,255,255,0.08)] text-[#7a7a83] cursor-not-allowed', disabled: true, onClick: undefined as (() => void) | undefined };
   };
 
   const buttonConfig = getButtonConfig();
 
-  // Balance display — only show when wallet connected AND correct network
-  const showBalance = wallet.isConnected && !isWrongNetwork;
+  // Balance display
+  const showBalance = wallet.isConnected && !isWrongNetwork && !isOwner;
   const balanceDisplay = showBalance
     ? `Balance: ${collateralBalance.toFixed(2)} ${orderCollateralToken}`
     : '';
+
+  // Both fields display-only when owner or fixedFill
+  const isDisplayOnly = isOwner || isFixedFill;
+
+  // ═══ Owner info row data ═══
+  const ownerFilledAmount = hasOrder ? selectedOrder.order.filledAmount : 0;
+  const ownerTotalAmount = hasOrder ? selectedOrder.order.totalAmount : 0;
+  const ownerFilledCollateral = hasOrder && ownerTotalAmount > 0
+    ? (ownerFilledAmount / ownerTotalAmount) * maxCollateral
+    : 0;
 
   return (
     <div className="flex flex-col gap-4 border-b-[4px] border-[#1b1b1c] pb-6">
@@ -353,10 +388,15 @@ export default function TradePanel({
       <div className="flex items-start justify-between">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <h3 className={`text-lg font-medium leading-7 ${hasOrder ? accentText : 'text-[#f9f9fa]'}`}>
-              {hasOrder ? `${isBuy ? 'Buy' : 'Sell'} ${tokenSymbol}` : `Trade ${tokenSymbol}`}
+            <h3 className={`text-lg font-medium leading-7 ${hasOrder ? (isOwner ? 'text-[#f9f9fa]' : accentText) : 'text-[#f9f9fa]'}`}>
+              {!hasOrder
+                ? `Trade ${tokenSymbol}`
+                : isOwner
+                  ? <>My <span className={accentText}>{isBuy ? 'Buy' : 'Sell'}</span> Order</>
+                  : `${isBuy ? 'Buy' : 'Sell'} ${tokenSymbol}`
+              }
             </h3>
-            {hasOrder && selectedOrder.order.fillType && (
+            {hasOrder && !isOwner && selectedOrder.order.fillType && (
               <span className="rounded-sm bg-[rgba(255,255,255,0.08)] px-1.5 py-0.5 text-[10px] font-medium uppercase text-[#7a7a83]">
                 {selectedOrder.order.fillType}
               </span>
@@ -391,15 +431,15 @@ export default function TradePanel({
         </div>
       ) : (
         <div className="relative overflow-hidden rounded-[10px] border border-[#1b1b1c]">
-          {/* Top field: Buying/Selling token */}
-          <div className={`flex flex-col gap-2 p-4 ${isFixedFill ? 'border-b border-[#1b1b1c]' : 'bg-[#1b1b1c]'}`}>
+          {/* Top field */}
+          <div className={`flex flex-col gap-2 p-4 ${isDisplayOnly ? 'border-b border-[#1b1b1c]' : 'bg-[#1b1b1c]'}`}>
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium leading-4 text-[#7a7a83]">
                 {isBuy ? 'Buying' : 'Selling'}
               </span>
             </div>
             <div className="flex items-center justify-between gap-4">
-              {isFixedFill ? (
+              {isDisplayOnly ? (
                 <span className="flex-1 text-2xl font-medium leading-8 tabular-nums text-[#f9f9fa]">
                   {topAmount || '0'}
                 </span>
@@ -428,7 +468,7 @@ export default function TradePanel({
             </div>
           </div>
 
-          {/* Bottom field: collateral info — display only, not editable */}
+          {/* Bottom field */}
           <div className="flex flex-col gap-2 p-4">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium leading-4 text-[#7a7a83]">
@@ -453,12 +493,12 @@ export default function TradePanel({
         </div>
       )}
 
-      {/* Progress slider - only when order is selected */}
-      {hasOrder && (
+      {/* Progress slider — hidden for own orders */}
+      {hasOrder && !isOwner && (
         <ProgressSlider value={sliderValue} onChange={handleSliderChange} disabled={isFixedFill} />
       )}
 
-      {/* Trade button */}
+      {/* CTA button */}
       <button
         className={`w-full rounded-[10px] px-5 py-2.5 text-base font-medium leading-6 transition-colors ${buttonConfig.className}`}
         disabled={buttonConfig.disabled}
@@ -468,11 +508,31 @@ export default function TradePanel({
       </button>
 
       {/* Info rows */}
-      <div className="flex flex-col gap-2">
-        <InfoRow label="Price" value={hasOrder ? `$${price.toFixed(4)}` : '-'} />
-        <InfoRow label="Amount Deliver" value={amountDeliver} />
-        <InfoRow label="To be Received" value={toBeReceived} />
-      </div>
+      {hasOrder && isOwner ? (
+        /* ── Owner info rows ── */
+        <div className="flex flex-col gap-2">
+          <InfoRow label="Price" value={`$${price.toFixed(4)}`} />
+          <InfoRow label="Filled / Total Amount">
+            <span className="text-sm leading-5 font-medium tabular-nums">
+              <span className="text-[#5bd197]">{fmtAmount(ownerFilledAmount)}</span>
+              <span className="text-[#7a7a83]"> / {fmtAmount(ownerTotalAmount)} {tokenSymbol}</span>
+            </span>
+          </InfoRow>
+          <InfoRow label="To be Received / Total">
+            <span className="text-sm leading-5 font-medium tabular-nums">
+              <span className="text-[#5bd197]">{ownerFilledCollateral.toFixed(2)}</span>
+              <span className="text-[#7a7a83]"> / {maxCollateral.toFixed(2)} {orderCollateralToken}</span>
+            </span>
+          </InfoRow>
+        </div>
+      ) : (
+        /* ── Regular info rows ── */
+        <div className="flex flex-col gap-2">
+          <InfoRow label="Price" value={hasOrder ? `$${price.toFixed(4)}` : '-'} />
+          <InfoRow label="Amount Deliver" value={amountDeliver} />
+          <InfoRow label="To be Received" value={toBeReceived} />
+        </div>
+      )}
 
       {/* Order Info Modal */}
       {hasOrder && (
@@ -484,6 +544,30 @@ export default function TradePanel({
           tokenName={tokenName}
           chain={chain}
           onClose={() => setShowInfoModal(false)}
+        />
+      )}
+
+      {/* Close Order Confirm Modal */}
+      {hasOrder && isOwner && (
+        <CloseOrderModal
+          isOpen={showCloseModal}
+          order={selectedOrder.order}
+          side={selectedOrder.side}
+          tokenSymbol={tokenSymbol}
+          chain={chain}
+          onClose={() => setShowCloseModal(false)}
+          onConfirm={handleConfirmClose}
+        />
+      )}
+
+      {/* Toast notification */}
+      {toast && (
+        <Toast
+          type={toast.type}
+          title={toast.type === 'waiting' ? 'Waiting for Approval' : 'Order Closed'}
+          subtitle={toast.type === 'waiting' ? 'Please confirm the transaction in your wallet.' : 'Your order has been successfully closed.'}
+          visible={toast.visible}
+          action={toast.type === 'success' ? { label: 'View Transaction', href: 'https://github.com/SlugMacro/wm-fe' } : undefined}
         />
       )}
     </div>
