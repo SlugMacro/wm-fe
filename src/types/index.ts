@@ -144,6 +144,8 @@ export type MyOrdersTab = 'filled' | 'open';
 export interface DashboardOpenOrder {
   id: string;
   pair: string;
+  tokenSymbol: string;
+  chain: string;
   tokenColor: string;
   hasBadge?: 'FULL' | 'RS';
   createdTime: string;
@@ -155,6 +157,13 @@ export interface DashboardOpenOrder {
   toBeReceived: string;
   toBeReceivedType: 'sol' | 'usdc' | 'token';
   progress: number;
+  // For close modal — original order data
+  collateralToken: string;
+  totalAmount: number;
+  filledAmount: number;
+  collateralAmount: number;
+  isResell?: boolean;
+  originalPrice?: number;
 }
 
 export interface DashboardEndedOrder {

@@ -1,11 +1,12 @@
-import { useState, useMemo } from 'react';
-import type { DashboardOpenOrder, DashboardOrdersTab } from '../types';
+import { useState, useMemo, useCallback } from 'react';
+import type { DashboardOpenOrder, DashboardOrdersTab, OrderBookEntry } from '../types';
 import Pagination from './Pagination';
 import TokenIconComponent from './TokenIcon';
+import CloseOrderModal from './CloseOrderModal';
 
 function SortIcon({ active, direction }: { active: boolean; direction: 'asc' | 'desc' | null }) {
   return (
-    <span className="ml-0.5 inline-flex flex-col gap-[1px]">
+    <span className="ml-1 inline-flex flex-col gap-[1px]">
       <svg width="6" height="4" viewBox="0 0 6 4" fill="none">
         <path d="M3 0L6 4H0L3 0Z" fill={active && direction === 'asc' ? '#f9f9fa' : '#3a3a3d'} />
       </svg>
@@ -47,28 +48,6 @@ function CollapseIcon({ collapsed }: { collapsed: boolean }) {
   );
 }
 
-function AssetIcon({ type }: { type: 'sol' | 'usdc' | 'token' }) {
-  if (type === 'sol') {
-    return (
-      <div className="flex size-3.5 items-center justify-center rounded-full bg-[#9945ff]">
-        <span className="text-[6px] font-bold text-white">◎</span>
-      </div>
-    );
-  }
-  if (type === 'usdc') {
-    return (
-      <div className="flex size-3.5 items-center justify-center rounded-full bg-[#2775ca]">
-        <span className="text-[6px] font-bold text-white">U</span>
-      </div>
-    );
-  }
-  return (
-    <div className="flex size-3.5 items-center justify-center rounded-full bg-[#16c284]">
-      <span className="text-[6px] font-bold text-white">T</span>
-    </div>
-  );
-}
-
 function ProgressBar({ value }: { value: number }) {
   const hasProgress = value > 0;
   return (
@@ -92,14 +71,33 @@ function formatPrice(price: number): string {
   return price.toFixed(2);
 }
 
+/** Build an OrderBookEntry from a DashboardOpenOrder for the CloseOrderModal */
+function toOrderBookEntry(o: DashboardOpenOrder): OrderBookEntry {
+  return {
+    id: o.id,
+    price: o.price,
+    amount: o.totalAmount,
+    amountFormatted: o.amount,
+    collateral: o.collateralAmount,
+    collateralIcon: '',
+    collateralToken: o.collateralToken as OrderBookEntry['collateralToken'],
+    fillPercent: o.progress,
+    filledAmount: o.filledAmount,
+    totalAmount: o.totalAmount,
+    isResell: o.isResell,
+    originalPrice: o.originalPrice,
+  };
+}
+
 interface DashboardOpenOrdersProps {
   openOrders: DashboardOpenOrder[];
   filledOrders: DashboardOpenOrder[];
+  onCloseOrder?: (orderId: string) => void;
 }
 
 const ITEMS_PER_PAGE = 6;
 
-export default function DashboardOpenOrders({ openOrders, filledOrders }: DashboardOpenOrdersProps) {
+export default function DashboardOpenOrders({ openOrders, filledOrders, onCloseOrder }: DashboardOpenOrdersProps) {
   const [activeTab, setActiveTab] = useState<DashboardOrdersTab>('open');
   const [collapsed, setCollapsed] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -108,6 +106,9 @@ export default function DashboardOpenOrders({ openOrders, filledOrders }: Dashbo
   const [sortDir, setSortDir] = useState<'asc' | 'desc' | null>(null);
   const [sideFilter, setSideFilter] = useState<string>('all');
   const [showSideDropdown, setShowSideDropdown] = useState(false);
+
+  // Close modal state
+  const [closeModalOrder, setCloseModalOrder] = useState<DashboardOpenOrder | null>(null);
 
   const activeOrders = activeTab === 'open' ? openOrders : filledOrders;
 
@@ -154,6 +155,22 @@ export default function DashboardOpenOrders({ openOrders, filledOrders }: Dashbo
     if (side === 'Buy') return 'text-[#5bd197]';
     if (side === 'Sell') return 'text-[#fd5e67]';
     return 'text-[#facc15]';
+  };
+
+  const handleCloseConfirm = useCallback(() => {
+    if (closeModalOrder) {
+      onCloseOrder?.(closeModalOrder.id);
+    }
+    setCloseModalOrder(null);
+  }, [closeModalOrder, onCloseOrder]);
+
+  /** Determine icon symbol for deposited column */
+  const getDepositedSymbol = (order: DashboardOpenOrder) => order.collateralToken;
+
+  /** Determine icon symbol for "to be received" column */
+  const getReceivedSymbol = (order: DashboardOpenOrder) => {
+    if (order.side === 'Sell') return order.collateralToken; // sell → receive collateral back
+    return order.tokenSymbol; // buy/resell → receive tokens
   };
 
   return (
@@ -286,7 +303,7 @@ export default function DashboardOpenOrders({ openOrders, filledOrders }: Dashbo
             </div>
             <div className="w-[12%] min-w-[120px] text-right">
               <button onClick={() => handleSort('toBeReceived')} className="group relative inline-flex items-center text-xs font-medium text-[#16c284] hover:text-[#5bd197]">
-                <span className="border-b border-dashed border-[#16c284]">To be Received</span> <SortIcon active={sortField === 'toBeReceived'} direction={sortField === 'toBeReceived' ? sortDir : null} />
+                <span className="border-b border-dashed border-[#2e2e34]">To be Received</span> <SortIcon active={sortField === 'toBeReceived'} direction={sortField === 'toBeReceived' ? sortDir : null} />
                 <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-52 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-left text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-[150]">
                   The tokens or collateral you will receive when the order is settled.
                 </span>
@@ -315,7 +332,7 @@ export default function DashboardOpenOrders({ openOrders, filledOrders }: Dashbo
               >
                 {/* Pair */}
                 <div className="w-[14%] min-w-[160px] flex items-center gap-2">
-                  <TokenIconComponent symbol={order.pair.split('/')[0]} chain="solana" size="sm" />
+                  <TokenIconComponent symbol={order.tokenSymbol} size="xs" showChain={false} />
                   <span className="text-sm text-[#f9f9fa]">{order.pair}</span>
                   {order.hasBadge === 'FULL' && (
                     <span className="rounded px-1.5 py-0.5 text-[10px] font-medium bg-[#1b1b1c] text-[#7a7a83]">
@@ -353,18 +370,18 @@ export default function DashboardOpenOrders({ openOrders, filledOrders }: Dashbo
                   <span className="text-sm text-[#f9f9fa] tabular-nums">{order.amount}</span>
                 </div>
 
-                {/* Deposited */}
-                <div className="w-[10%] min-w-[100px] flex items-center justify-end gap-1">
+                {/* Deposited — collateral token icon */}
+                <div className="w-[10%] min-w-[100px] flex items-center justify-end gap-2">
                   <span className="text-sm text-[#f9f9fa] tabular-nums">{order.deposited}</span>
-                  <AssetIcon type={order.depositedType} />
+                  <TokenIconComponent symbol={getDepositedSymbol(order)} size="xs" showChain={false} />
                 </div>
 
-                {/* To be Received */}
-                <div className="w-[12%] min-w-[120px] flex items-center justify-end gap-1">
+                {/* To be Received — token or collateral icon based on side */}
+                <div className="w-[12%] min-w-[120px] flex items-center justify-end gap-2">
                   <span className={`text-sm tabular-nums ${isResell ? 'text-[#16c284]' : 'text-[#f9f9fa]'}`}>
                     {order.toBeReceived}
                   </span>
-                  <AssetIcon type={order.toBeReceivedType} />
+                  <TokenIconComponent symbol={getReceivedSymbol(order)} size="xs" showChain={false} />
                 </div>
 
                 {/* Progress */}
@@ -372,9 +389,12 @@ export default function DashboardOpenOrders({ openOrders, filledOrders }: Dashbo
                   <ProgressBar value={order.progress} />
                 </div>
 
-                {/* Action */}
+                {/* Action — Close button opens modal */}
                 <div className="flex-1 flex justify-end pr-1">
-                  <button className="rounded-md bg-[#1b1b1c] px-3 py-1.5 text-xs font-medium text-[#f9f9fa] transition-colors hover:bg-[#252527]">
+                  <button
+                    onClick={() => setCloseModalOrder(order)}
+                    className="rounded-md bg-[#1b1b1c] px-3 py-1.5 text-xs font-medium text-[#f9f9fa] transition-colors hover:bg-[#252527]"
+                  >
                     Close
                   </button>
                 </div>
@@ -391,6 +411,19 @@ export default function DashboardOpenOrders({ openOrders, filledOrders }: Dashbo
             onPageChange={setCurrentPage}
           />
         </>
+      )}
+
+      {/* Close Order Modal */}
+      {closeModalOrder && (
+        <CloseOrderModal
+          isOpen={!!closeModalOrder}
+          order={toOrderBookEntry(closeModalOrder)}
+          side={closeModalOrder.side === 'Sell' ? 'sell' : 'buy'}
+          tokenSymbol={closeModalOrder.tokenSymbol}
+          chain={closeModalOrder.chain}
+          onClose={() => setCloseModalOrder(null)}
+          onConfirm={handleCloseConfirm}
+        />
       )}
     </div>
   );

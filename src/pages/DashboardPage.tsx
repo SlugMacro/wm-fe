@@ -1,3 +1,4 @@
+import { useState, useCallback } from 'react';
 import Breadcrumb from '../components/Breadcrumb';
 import DashboardProfile from '../components/DashboardProfile';
 import SettlementBanners from '../components/SettlementBanners';
@@ -6,8 +7,8 @@ import DashboardEndedOrders from '../components/DashboardEndedOrders';
 import BottomStats from '../components/BottomStats';
 import {
   profileData,
-  openOrders,
-  filledOrders,
+  openOrders as initialOpenOrders,
+  filledOrders as initialFilledOrders,
   endedOrders,
 } from '../mock-data/dashboard';
 
@@ -17,6 +18,14 @@ const breadcrumbItems = [
 ];
 
 export default function DashboardPage() {
+  const [openOrders, setOpenOrders] = useState(initialOpenOrders);
+  const [filledOrders, setFilledOrders] = useState(initialFilledOrders);
+
+  const handleCloseOrder = useCallback((orderId: string) => {
+    setOpenOrders(prev => prev.filter(o => o.id !== orderId));
+    setFilledOrders(prev => prev.filter(o => o.id !== orderId));
+  }, []);
+
   return (
     <div className="mx-auto max-w-[1440px] px-12">
       {/* Breadcrumb */}
@@ -41,6 +50,7 @@ export default function DashboardPage() {
         <DashboardOpenOrders
           openOrders={openOrders}
           filledOrders={filledOrders}
+          onCloseOrder={handleCloseOrder}
         />
       </div>
 
