@@ -6,7 +6,7 @@ import CloseOrderModal from './CloseOrderModal';
 import FillOrderModal from './FillOrderModal';
 import Toast from './Toast';
 import { useWallet } from '../hooks/useWalletContext';
-import mascotSvg from '../assets/images/mascot.svg';
+import noOrderSvg from '../assets/images/no-order.svg';
 
 interface TradePanelProps {
   tokenSymbol: string;
@@ -66,7 +66,7 @@ function ArrowDownIcon() {
 }
 
 /** Slider with 5 dot snap points + free drag anywhere on track */
-function ProgressSlider({ value, onChange, disabled = false }: { value: number; onChange: (v: number) => void; disabled?: boolean }) {
+function ProgressSlider({ value, onChange, disabled = false, hideThumb = false }: { value: number; onChange: (v: number) => void; disabled?: boolean; hideThumb?: boolean }) {
   const steps = [0, 25, 50, 75, 100];
   const trackRef = useRef<HTMLDivElement>(null);
   const [dragging, setDragging] = useState(false);
@@ -111,7 +111,7 @@ function ProgressSlider({ value, onChange, disabled = false }: { value: number; 
           style={{ width: `${value}%` }}
         />
       </div>
-      {steps.map((step) => {
+      {!hideThumb && steps.map((step) => {
         const isFilled = value >= step;
         return (
           <button
@@ -130,10 +130,36 @@ function ProgressSlider({ value, onChange, disabled = false }: { value: number; 
           </button>
         );
       })}
-      <div
-        className={`absolute -translate-y-1/2 top-1/2 -translate-x-1/2 size-4 rounded-full bg-[#f9f9fa] shadow-md pointer-events-none ${dragging ? '' : 'transition-all duration-150'}`}
-        style={{ left: `calc(12px + (100% - 24px) * ${value / 100})` }}
-      />
+      {!hideThumb && (
+        <div
+          className={`absolute -translate-y-1/2 top-1/2 -translate-x-1/2 size-4 rounded-full bg-[#f9f9fa] shadow-md pointer-events-none ${dragging ? '' : 'transition-all duration-150'}`}
+          style={{ left: `calc(12px + (100% - 24px) * ${value / 100})` }}
+        />
+      )}
+    </div>
+  );
+}
+
+/** Fill progress bar for owner orders — same height as ProgressSlider */
+function FillProgressBar({ filledAmount, totalAmount, tokenSymbol }: { filledAmount: number; totalAmount: number; tokenSymbol: string }) {
+  const pct = totalAmount > 0 ? Math.min(100, (filledAmount / totalAmount) * 100) : 0;
+  const filledLabel = fmtAmount(filledAmount);
+  const totalLabel = fmtAmount(totalAmount);
+
+  return (
+    <div className="relative group flex h-6 items-center cursor-default">
+      <div className="relative h-1 w-full bg-[#1b1b1c] rounded-full overflow-hidden">
+        <div
+          className="absolute inset-y-0 left-0 bg-[#5bd197] rounded-full transition-all duration-300"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      {/* Tooltip */}
+      <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 whitespace-nowrap z-[150]">
+        <span className="text-[#5bd197] font-medium">{filledLabel}</span>
+        <span className="text-[#7a7a83]"> / {totalLabel} {tokenSymbol}</span>
+        <span className="text-[#7a7a83]"> ({pct.toFixed(0)}% filled)</span>
+      </div>
     </div>
   );
 }
@@ -419,7 +445,6 @@ export default function TradePanel({
   const ownerFilledCollateral = hasOrder && ownerTotalAmount > 0
     ? (ownerFilledAmount / ownerTotalAmount) * maxCollateral
     : 0;
-
   return (
     <div className="flex flex-col gap-4 border-b-[4px] border-[#1b1b1c] pb-6">
       {/* Title */}
@@ -457,84 +482,92 @@ export default function TradePanel({
         )}
       </div>
 
-      {/* Empty state or Trade Form */}
-      {!hasOrder ? (
-        <div className="flex h-[216px] flex-col items-center justify-center rounded-[10px] border border-[#1b1b1c] p-8">
-          <img src={mascotSvg} alt="" className="size-24 mb-4" />
-          <p className="text-xs leading-4 text-[#7a7a83] text-center">
-            No order selected yet.
-            <br />
-            Pick one from the list to start trading.
-          </p>
-        </div>
-      ) : (
-        <div className="relative overflow-hidden rounded-[10px] border border-[#1b1b1c]">
-          {/* Top field */}
-          <div className={`flex flex-col gap-2 p-4 ${isDisplayOnly ? 'border-b border-[#1b1b1c]' : 'bg-[#1b1b1c]'}`}>
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium leading-4 text-[#7a7a83]">
-                {isBuy ? 'Buying' : 'Selling'}
-              </span>
-            </div>
-            <div className="flex items-center justify-between gap-4">
-              {isDisplayOnly ? (
-                <span className="flex-1 text-2xl font-medium leading-8 tabular-nums text-[#f9f9fa]">
-                  {topAmount || '0'}
+      {/* Trade form + slider area — grid overlay keeps height consistent */}
+      <div className="grid">
+        {/* Form + slider — always rendered for height; invisible when no order */}
+        <div className={`col-start-1 row-start-1 flex flex-col gap-4 ${hasOrder ? '' : 'invisible'}`}>
+          <div className="relative overflow-hidden rounded-[10px] border border-[#1b1b1c]">
+            {/* Top field */}
+            <div className={`flex flex-col gap-2 p-4 border-b ${isDisplayOnly ? 'border-[#1b1b1c]' : 'bg-[#1b1b1c] border-transparent'}`}>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-medium leading-4 text-[#7a7a83]">
+                  {isBuy ? 'Buying' : 'Selling'}
                 </span>
-              ) : (
-                <div className="flex flex-1 items-center gap-0.5">
-                  <input
-                    type="text"
-                    value={topAmount}
-                    onChange={(e) => handleTopAmountChange(e.target.value)}
-                    placeholder="0"
-                    className="w-full bg-transparent text-2xl font-medium leading-8 text-[#f9f9fa] placeholder-[#3a3a3d] outline-none tabular-nums"
-                  />
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                {isDisplayOnly ? (
+                  <span className="flex-1 text-2xl font-medium leading-8 tabular-nums text-[#f9f9fa]">
+                    {topAmount || '0'}
+                  </span>
+                ) : (
+                  <div className="flex flex-1 items-center gap-0.5">
+                    <input
+                      type="text"
+                      value={topAmount}
+                      onChange={(e) => handleTopAmountChange(e.target.value)}
+                      placeholder="0"
+                      className="w-full bg-transparent text-2xl font-medium leading-8 text-[#f9f9fa] placeholder-[#3a3a3d] outline-none tabular-nums"
+                    />
+                  </div>
+                )}
+                <div className="flex shrink-0 items-center gap-1 rounded-full border border-[#252527] py-1 pl-1 pr-4">
+                  <TokenIcon symbol={tokenSymbol} size="sm" showChain={false} />
+                  <span className="text-sm font-medium text-[#f9f9fa]">{tokenSymbol}</span>
                 </div>
-              )}
-              <div className="flex shrink-0 items-center gap-1 rounded-full border border-[#252527] py-1 pl-1 pr-4">
-                <TokenIcon symbol={tokenSymbol} size="sm" showChain={false} />
-                <span className="text-sm font-medium text-[#f9f9fa]">{tokenSymbol}</span>
               </div>
             </div>
-          </div>
 
-          {/* Swap button */}
-          <div className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2">
-            <div className="flex items-center justify-center rounded-full border-2 border-[#0a0a0b] bg-[#1b1b1c] p-1.5">
-              <ArrowDownIcon />
+            {/* Swap button */}
+            <div className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2">
+              <div className="flex items-center justify-center rounded-full border-2 border-[#0a0a0b] bg-[#1b1b1c] p-1.5">
+                <ArrowDownIcon />
+              </div>
             </div>
-          </div>
 
-          {/* Bottom field */}
-          <div className="flex flex-col gap-2 p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium leading-4 text-[#7a7a83]">
-                {isBuy ? 'Selling' : 'Buying'}
-              </span>
-              {balanceDisplay && (
-                <span className="text-xs font-normal leading-4 text-[#7a7a83]">
-                  {balanceDisplay}
+            {/* Bottom field */}
+            <div className="flex flex-col gap-2 p-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-medium leading-4 text-[#7a7a83]">
+                  {isBuy ? 'Selling' : 'Buying'}
                 </span>
-              )}
-            </div>
-            <div className="flex items-center justify-between gap-4">
-              <span className="flex-1 text-2xl font-medium leading-8 tabular-nums text-[#f9f9fa]">
-                {bottomAmount || '0'}
-              </span>
-              <div className="flex shrink-0 items-center gap-1 rounded-full border border-[#252527] py-1 pl-1 pr-4">
-                <TokenIcon symbol={orderCollateralToken} size="sm" showChain={false} />
-                <span className="text-sm font-medium text-[#f9f9fa]">{orderCollateralToken}</span>
+                {balanceDisplay && (
+                  <span className="text-xs font-normal leading-4 text-[#7a7a83]">
+                    {balanceDisplay}
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <span className="flex-1 text-2xl font-medium leading-8 tabular-nums text-[#f9f9fa]">
+                  {bottomAmount || '0'}
+                </span>
+                <div className="flex shrink-0 items-center gap-1 rounded-full border border-[#252527] py-1 pl-1 pr-4">
+                  <TokenIcon symbol={orderCollateralToken} size="sm" showChain={false} />
+                  <span className="text-sm font-medium text-[#f9f9fa]">{orderCollateralToken}</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
 
-      {/* Progress slider — hidden for own orders */}
-      {hasOrder && !isOwner && (
-        <ProgressSlider value={sliderValue} onChange={handleSliderChange} disabled={isFixedFill} />
-      )}
+          {/* Slider / progress inside the grid cell */}
+          {!isOwner ? (
+            <ProgressSlider value={sliderValue} onChange={handleSliderChange} disabled={isFixedFill} />
+          ) : (
+            <FillProgressBar filledAmount={ownerFilledAmount} totalAmount={ownerTotalAmount} tokenSymbol={tokenSymbol} />
+          )}
+        </div>
+
+        {/* Empty state — fills same grid cell, vertically centers content */}
+        {!hasOrder && (
+          <div className="col-start-1 row-start-1 flex flex-col items-center justify-center rounded-[10px] border border-[#1b1b1c]">
+            <img src={noOrderSvg} alt="" className="size-24 mb-4" />
+            <p className="text-xs leading-4 text-[#7a7a83] text-center">
+              No order selected yet.
+              <br />
+              Pick one from the list to start trading.
+            </p>
+          </div>
+        )}
+      </div>
 
       {/* CTA button */}
       <button
