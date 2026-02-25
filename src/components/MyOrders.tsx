@@ -138,8 +138,8 @@ export default function MyOrders({ filledOrders, openOrders, chain }: MyOrdersPr
   const showOrders = isConnected && !isWrongNetwork;
 
   const tabs: { key: MyOrdersTab; label: string; count: number }[] = [
-    { key: 'filled', label: 'My Filled Orders', count: showOrders ? Math.min(filledOrders.length, 5) : 0 },
-    { key: 'open', label: 'My Open Orders', count: showOrders ? Math.min(openOrders.length, 5) : 0 },
+    { key: 'filled', label: 'My Filled Orders', count: showOrders ? filledOrders.length : 0 },
+    { key: 'open', label: 'My Open Orders', count: showOrders ? openOrders.length : 0 },
   ];
 
   const orders = activeTab === 'filled' ? filledOrders : openOrders;
