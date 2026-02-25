@@ -43,7 +43,7 @@ function ProgressBar({ value }: { value: number }) {
   const hasProgress = value > 0;
   return (
     <div className="flex flex-col items-end gap-1">
-      <span className={`text-xs tabular-nums ${hasProgress ? 'text-[#f9f9fa]' : 'text-[#7a7a83]'}`}>
+      <span className={`text-[10px] leading-3 tabular-nums ${hasProgress ? 'text-[#f9f9fa]' : 'text-[#7a7a83]'}`}>
         {value.toFixed(1)}%
       </span>
       <div className="h-1 w-12 rounded-full bg-[#1b1b1c]">
@@ -86,7 +86,7 @@ interface DashboardOpenOrdersProps {
   onCloseOrder?: (orderId: string) => void;
 }
 
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 10;
 
 export default function DashboardOpenOrders({ openOrders, filledOrders, onCloseOrder }: DashboardOpenOrdersProps) {
   const [activeTab, setActiveTab] = useState<DashboardOrdersTab>('open');
@@ -238,6 +238,8 @@ export default function DashboardOpenOrders({ openOrders, filledOrders, onCloseO
               </div>
             )}
           </div>
+
+          <div className="h-4 w-px bg-[#252527]" />
 
           {/* Search — match homepage SearchInput style */}
           <div className="relative">

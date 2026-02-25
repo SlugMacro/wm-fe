@@ -80,7 +80,7 @@ interface DashboardEndedOrdersProps {
   orders: DashboardEndedOrder[];
 }
 
-const ITEMS_PER_PAGE = 8;
+const ITEMS_PER_PAGE = 10;
 
 export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersProps) {
   const [collapsed, setCollapsed] = useState(false);
@@ -286,7 +286,7 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
               </button>
             </div>
             <div className="w-[10%] min-w-[100px] text-right">
-              <span className="text-xs font-medium text-[#7a7a83]" />
+              <span className="text-xs font-medium text-[#7a7a83]">Status</span>
             </div>
             <div className="flex-1 text-right pr-1">
               <span className="text-xs font-medium text-[#7a7a83]">Tx.ID</span>
@@ -355,9 +355,9 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
                   <StatusBadge status={order.status} />
                 </div>
 
-                {/* Tx.ID — icon-only square button */}
+                {/* Tx.ID — w-[52px] button, white icon */}
                 <div className="flex-1 flex justify-end pr-1">
-                  <button className="flex size-7 items-center justify-center rounded border border-[#252527] text-[#7a7a83] transition-colors hover:border-[#3a3a3d] hover:text-[#f9f9fa]">
+                  <button className="inline-flex h-7 w-[52px] items-center justify-center rounded-md border border-[#252527] text-[#f9f9fa] transition-colors hover:border-[#3a3a3d] hover:bg-[#1b1b1c]">
                     <ExternalLinkIcon />
                   </button>
                 </div>
