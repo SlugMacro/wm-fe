@@ -79,6 +79,35 @@ function InfoCell({ label, children }: { label: string; children: React.ReactNod
 /** Mock wallet address — same as in Header AvatarDropdown & dashboard profile */
 const MY_WALLET_SHORT = 'GQ98...iA5Y';
 
+/** Simple hash from string → number for deterministic randomness */
+function hashStr(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) {
+    h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  }
+  return Math.abs(h);
+}
+
+const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+const HEX = '0123456789abcdef';
+
+/** Generate a deterministic shortened wallet address based on order ID and chain */
+function generateWalletShort(orderId: string, chain: string): string {
+  const h = hashStr(orderId);
+  if (chain === 'ethereum' || chain === 'sui') {
+    // 0x prefixed hex: 0xAbCd...eF12
+    const pick = (seed: number) => HEX[seed % HEX.length];
+    const front = Array.from({ length: 4 }, (_, i) => pick(h * (i + 1) + i * 7)).join('');
+    const back = Array.from({ length: 4 }, (_, i) => pick(h * (i + 5) + i * 13)).join('');
+    return `0x${front}...${back}`;
+  }
+  // Solana: Base58 chars like GH3k...Ui81
+  const pick58 = (seed: number) => BASE58[seed % BASE58.length];
+  const front = Array.from({ length: 4 }, (_, i) => pick58(h * (i + 1) + i * 7)).join('');
+  const back = Array.from({ length: 4 }, (_, i) => pick58(h * (i + 5) + i * 13)).join('');
+  return `${front}...${back}`;
+}
+
 export default function OrderInfoModal({
   isOpen,
   order,
@@ -162,7 +191,7 @@ export default function OrderInfoModal({
         <div className="flex flex-col gap-6">
           {/* Message */}
           <p className="text-sm font-normal leading-5 text-[#b4b4ba]">
-            <span>{isOwner ? MY_WALLET_SHORT : 'GH3k...Ui81'} is </span>
+            <span>{isOwner ? MY_WALLET_SHORT : generateWalletShort(order.id, chain)} is </span>
             <span className={isBuy ? 'text-[#5bd197]' : 'text-[#fd5e67]'}>
               {isBuy ? 'buying' : 'selling'}
             </span>
