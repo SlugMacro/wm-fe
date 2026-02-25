@@ -9,6 +9,7 @@ import MyOrders from '../components/MyOrders';
 import DetailRecentTrades from '../components/DetailRecentTrades';
 import BottomStats from '../components/BottomStats';
 import type { OrderBookEntry, PriceDataPoint, MyOrder } from '../types';
+import { useWallet } from '../hooks/useWalletContext';
 import {
   tokenDetails,
   defaultTokenId,
@@ -22,6 +23,7 @@ import {
 export default function TokenDetailPage() {
   const { tokenId } = useParams<{ tokenId: string }>();
   const token = tokenDetails[tokenId ?? defaultTokenId] ?? tokenDetails[defaultTokenId];
+  const wallet = useWallet();
 
   const [selectedOrder, setSelectedOrder] = useState<{ order: OrderBookEntry; side: 'buy' | 'sell' } | null>(null);
   const [flashedOrderId, setFlashedOrderId] = useState<string | null>(null);
@@ -242,6 +244,9 @@ export default function TokenDetailPage() {
 
                 // Add to filled orders (prepend so it appears first)
                 setMyFilledOrders(prev => [newFilledOrder, ...prev]);
+
+                // Deduct collateral from wallet balance
+                wallet.deductBalance(token.chain, filledOrder.collateralToken, collateralAmt);
 
                 // Update the order book — increase fill percent or remove
                 const setOrders = side === 'buy' ? setBuyOrders : setSellOrders;

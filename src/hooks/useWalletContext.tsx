@@ -21,6 +21,8 @@ interface WalletState {
   getBalance: (symbol: string) => number;
   /** Get all balances for connected chain */
   getChainBalances: () => ChainBalances | null;
+  /** Deduct balance for a specific token on a specific chain */
+  deductBalance: (chain: string, symbol: string, amount: number) => void;
   /** Open the connect wallet modal, optionally pre-selecting a network */
   openConnectModal: (defaultNetwork?: string) => void;
   closeConnectModal: () => void;
@@ -53,8 +55,8 @@ function modalNetworkToChain(network: string): string {
   }
 }
 
-/** Mock balances per chain */
-const MOCK_BALANCES: Record<string, ChainBalances> = {
+/** Initial mock balances per chain */
+const INITIAL_BALANCES: Record<string, ChainBalances> = {
   solana: {
     native: { symbol: 'SOL', amount: 18.32 },
     tokens: [
@@ -78,27 +80,64 @@ const MOCK_BALANCES: Record<string, ChainBalances> = {
   },
 };
 
+/** Deep clone balances for mutable state */
+function cloneBalances(src: Record<string, ChainBalances>): Record<string, ChainBalances> {
+  const out: Record<string, ChainBalances> = {};
+  for (const [chain, bal] of Object.entries(src)) {
+    out[chain] = {
+      native: { ...bal.native },
+      tokens: bal.tokens.map(t => ({ ...t })),
+    };
+  }
+  return out;
+}
+
 export function WalletProvider({ children }: { children: ReactNode }) {
   const [isConnected, setIsConnected] = useState(true);
   const [connectedChain, setConnectedChain] = useState('solana');
   const [showConnectModal, setShowConnectModal] = useState(false);
   const [defaultModalNetwork, setDefaultModalNetwork] = useState('solana');
+  const [balances, setBalances] = useState<Record<string, ChainBalances>>(() => cloneBalances(INITIAL_BALANCES));
 
-  const chainBal = MOCK_BALANCES[connectedChain] ?? MOCK_BALANCES.solana;
+  const chainBal = balances[connectedChain] ?? balances.solana;
   const walletBalance = isConnected ? chainBal.native.amount : 0;
 
   const getBalance = useCallback((symbol: string): number => {
     if (!isConnected) return 0;
-    const bal = MOCK_BALANCES[connectedChain] ?? MOCK_BALANCES.solana;
+    const bal = balances[connectedChain] ?? balances.solana;
     if (bal.native.symbol === symbol) return bal.native.amount;
     const token = bal.tokens.find(t => t.symbol === symbol);
     return token?.amount ?? 0;
-  }, [isConnected, connectedChain]);
+  }, [isConnected, connectedChain, balances]);
 
   const getChainBalances = useCallback((): ChainBalances | null => {
     if (!isConnected) return null;
-    return MOCK_BALANCES[connectedChain] ?? MOCK_BALANCES.solana;
-  }, [isConnected, connectedChain]);
+    return balances[connectedChain] ?? balances.solana;
+  }, [isConnected, connectedChain, balances]);
+
+  const deductBalance = useCallback((chain: string, symbol: string, amount: number) => {
+    setBalances(prev => {
+      const chainKey = chain;
+      const chainData = prev[chainKey];
+      if (!chainData) return prev;
+
+      const updated = { ...prev };
+      if (chainData.native.symbol === symbol) {
+        updated[chainKey] = {
+          ...chainData,
+          native: { ...chainData.native, amount: Math.max(0, chainData.native.amount - amount) },
+        };
+      } else {
+        updated[chainKey] = {
+          ...chainData,
+          tokens: chainData.tokens.map(t =>
+            t.symbol === symbol ? { ...t, amount: Math.max(0, t.amount - amount) } : t
+          ),
+        };
+      }
+      return updated;
+    });
+  }, []);
 
   const openConnectModal = useCallback((defaultNetwork?: string) => {
     if (defaultNetwork) {
@@ -133,6 +172,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       walletBalance,
       getBalance,
       getChainBalances,
+      deductBalance,
       openConnectModal,
       closeConnectModal,
       connect,
