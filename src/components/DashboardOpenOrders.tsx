@@ -169,6 +169,14 @@ export default function DashboardOpenOrders({ openOrders, filledOrders, onCloseO
       {/* Header: Tabs + Filters */}
       <div className="flex items-center justify-between py-3">
         <div className="flex items-center gap-3">
+          {/* Collapse toggle — circular bg, leftmost */}
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="flex size-9 items-center justify-center rounded-full bg-[#1b1b1c] text-[#7a7a83] transition-colors hover:bg-[#252527] hover:text-[#f9f9fa]"
+          >
+            <CollapseIcon collapsed={collapsed} />
+          </button>
+
           {/* Tabs — match homepage LiveMarketTable style */}
           <button
             onClick={() => handleTabChange('open')}
@@ -246,13 +254,6 @@ export default function DashboardOpenOrders({ openOrders, filledOrders, onCloseO
             />
           </div>
 
-          {/* Collapse toggle — circular bg */}
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="flex size-9 items-center justify-center rounded-full bg-[#1b1b1c] text-[#7a7a83] transition-colors hover:bg-[#252527] hover:text-[#f9f9fa]"
-          >
-            <CollapseIcon collapsed={collapsed} />
-          </button>
         </div>
       </div>
 
