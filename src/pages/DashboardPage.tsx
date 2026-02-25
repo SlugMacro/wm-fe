@@ -27,7 +27,7 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <div className="mx-auto max-w-[1440px] px-12">
+    <div className="mx-auto max-w-[1440px] px-12 pb-16">
       {/* Breadcrumb */}
       <Breadcrumb items={breadcrumbItems} />
 
@@ -46,7 +46,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Open Orders / Filled Orders */}
-      <div className="mt-6">
+      <div className="mt-3">
         <DashboardOpenOrders
           openOrders={openOrders}
           filledOrders={filledOrders}
@@ -55,7 +55,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Ended Settlement */}
-      <div className="mt-6">
+      <div className="mt-3">
         <DashboardEndedOrders orders={endedOrders} />
       </div>
 
