@@ -465,7 +465,7 @@ export default function OrderBook({
             </span>
             <TokenIcon symbol={order.collateralToken} size="xs" showChain={false} />
           </div>
-          <div className={`${fullWidth ? 'w-28' : 'w-24'} flex items-center justify-end gap-1`}>
+          <div className="w-24 flex items-center justify-end gap-1">
             {/* FULL badge — only for non-resell (resell is inherently full) */}
             {!isResell && order.fillType === 'FULL' && (
               <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium uppercase ${
@@ -473,7 +473,7 @@ export default function OrderBook({
               }`}>Full</span>
             )}
             {showResellBadge && isResell && (
-              <span className="rounded-full bg-[#eab308] px-1.5 py-0.5 text-[10px] font-semibold text-[#0a0a0b] uppercase">RS</span>
+              <span className="inline-flex items-center justify-center rounded-full bg-[#eab308] px-1.5 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b]">RS</span>
             )}
             <button className={`relative rounded px-3 py-1 text-xs font-medium transition-colors ${
               isSelected
@@ -527,7 +527,7 @@ export default function OrderBook({
         <div className={`${fullWidth ? 'w-40' : 'w-28'} text-right`}>
           <span className="text-xs font-medium text-[#7a7a83]">Collateral</span>
         </div>
-        <div className={fullWidth ? 'w-28' : 'w-24'} />
+        <div className="w-24" />
       </div>
 
       {/* Scrollable rows */}
@@ -585,7 +585,7 @@ export default function OrderBook({
       {/* ─── Filter Bar ─────────────────────────────────────────────── */}
       <div className="flex items-center justify-between py-2">
         {/* Left: Type tabs */}
-        <div className="flex items-center rounded-lg border border-[#252527] overflow-hidden h-9">
+        <div className="flex items-center rounded-lg border border-[#252527] h-9">
           {tabs.map((tab, idx) => {
             const isActive = activeTab === tab.key;
             return (
@@ -605,8 +605,8 @@ export default function OrderBook({
                   {tab.hasInfo && (
                     <span className="relative group p-0.5">
                       <InfoLineIcon />
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity z-50">
-                        <div className="rounded-lg border border-[#252527] bg-[#131314] px-3 py-2 text-xs text-[#b4b4ba] font-normal leading-relaxed shadow-lg">
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity z-[150]">
+                        <div className="rounded-lg border border-[#252527] bg-[#131314] px-3 py-2 text-left text-xs text-[#b4b4ba] font-normal leading-relaxed shadow-lg">
                           Resell orders are pre-market buy positions being resold by original buyers. Each order must be filled entirely — partial fills are not supported.
                         </div>
                         <div className="absolute left-1/2 top-full -translate-x-1/2">

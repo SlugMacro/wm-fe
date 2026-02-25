@@ -648,7 +648,7 @@ export default function LiveMarketTable() {
                   <span className="text-xs font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34]">
                     Investors & Backers
                   </span>
-                  <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-left text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-50">
+                  <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-left text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-[150]">
                     Key investors and venture capital backers supporting this project.
                   </span>
                 </span>
@@ -663,7 +663,7 @@ export default function LiveMarketTable() {
                 >
                   Moni Score
                   <SortIcon active={sortConfig.field === 'moniScore'} direction={sortConfig.field === 'moniScore' ? sortConfig.direction : null} />
-                  <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-left text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-50">
+                  <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-left text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-[150]">
                     A composite score from Moni that evaluates project quality based on community, development activity, and investor backing.
                   </span>
                 </button>
@@ -719,7 +719,7 @@ export default function LiveMarketTable() {
                   <span className="text-xs font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34]">
                     Settle Starts (UTC)
                   </span>
-                  <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-left text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-50">
+                  <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-left text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-[150]">
                     The date and time (UTC) when the settlement process begins for ended markets.
                   </span>
                 </span>
@@ -729,7 +729,7 @@ export default function LiveMarketTable() {
                   <span className="text-xs font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34]">
                     Settle Ends (UTC)
                   </span>
-                  <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-left text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-50">
+                  <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-left text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-[150]">
                     The date and time (UTC) when the settlement process completes and final distribution occurs.
                   </span>
                 </span>
@@ -815,7 +815,7 @@ export default function LiveMarketTable() {
                   <span className="text-xs font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34]">
                     Settle Time (UTC)
                   </span>
-                  <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-left text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-50">
+                  <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-left text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-[150]">
                     The date and time (UTC) when the pre-market contracts will settle and tokens will be distributed.
                   </span>
                 </span>

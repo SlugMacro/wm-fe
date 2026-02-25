@@ -37,12 +37,37 @@ function ExternalLinkIcon() {
   );
 }
 
+const infoCellTooltips: Record<string, string> = {
+  'Price': 'The unit price per token for this order.',
+  'Fill Type': 'Determines whether the order must be filled entirely (Full) or can be partially filled (Partial).',
+  'Amount': 'The total number of tokens being offered in this order.',
+  'For': 'The total collateral amount required to fulfill this order.',
+  'Filled Amount': 'How many tokens have already been matched and filled by other traders.',
+  'Remaining Amount': 'Tokens still available to be filled in this order.',
+  'Settle Starts': 'When the settlement period begins. Tokens must be delivered after this time.',
+  'Settle Ends': 'The deadline for settlement. Unfulfilled orders will have collateral refunded after this date.',
+  'Order TX': 'The on-chain transaction hash for when this order was created.',
+  'Countdown': 'Time remaining until the settlement period begins.',
+};
+
 function InfoCell({ label, children }: { label: string; children: React.ReactNode }) {
+  const tooltip = infoCellTooltips[label];
   return (
     <div className="flex flex-1 flex-col gap-2 p-4">
-      <span className="text-xs font-normal leading-4 text-[#b4b4ba] border-b border-dashed border-[#44444b] w-fit">
-        {label}
-      </span>
+      {tooltip ? (
+        <span className="relative group cursor-help inline-flex w-fit">
+          <span className="text-xs font-normal leading-4 text-[#b4b4ba] border-b border-dashed border-[#44444b]">
+            {label}
+          </span>
+          <span className="absolute left-0 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-left text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-[150]">
+            {tooltip}
+          </span>
+        </span>
+      ) : (
+        <span className="text-xs font-normal leading-4 text-[#b4b4ba] border-b border-dashed border-[#44444b] w-fit">
+          {label}
+        </span>
+      )}
       <div className="flex items-center gap-1 text-sm font-medium leading-5 text-[#f9f9fa] tabular-nums">
         {children}
       </div>
@@ -143,7 +168,7 @@ export default function OrderInfoModal({
           </p>
 
           {/* Review info grid */}
-          <div className="overflow-hidden rounded-[10px] border border-[#252527]">
+          <div className="rounded-[10px] border border-[#252527]">
             {/* Row 1: Price | Fill Type */}
             <div className="flex border-b border-[#252527]">
               <div className="flex-1 border-r border-[#252527]">

@@ -35,11 +35,31 @@ function fmtAmount(val: number): string {
   return k >= 1 ? `${k.toFixed(1)}K` : val.toLocaleString('en-US', { maximumFractionDigits: 0 });
 }
 
+const infoRowTooltips: Record<string, string> = {
+  'Order Type': 'Whether this is a buy order (acquiring tokens) or a sell order (selling tokens for collateral).',
+  'Filled / Total Amount': 'The amount already filled by other traders versus the total order size. Filled portions will proceed to settlement.',
+  'To be Received / Total': 'Collateral received from filled trades versus the total collateral locked in this order.',
+  'Price': 'The unit price per token for this order.',
+  'Close Fee': 'The fee charged for closing this order. Currently waived during the promotional period.',
+};
+
 function InfoRow({ label, children, badge }: { label: string; children: React.ReactNode; badge?: React.ReactNode }) {
+  const tooltip = infoRowTooltips[label];
   return (
     <div className="flex items-center justify-between border-b border-[#252527] px-4 py-3 last:border-b-0">
       <div className="flex items-center gap-2">
-        <span className="text-sm font-normal leading-5 text-[#7a7a83]">{label}</span>
+        {tooltip ? (
+          <span className="relative group cursor-help inline-flex">
+            <span className="text-sm font-normal leading-5 text-[#7a7a83] border-b border-dashed border-[#44444b]">
+              {label}
+            </span>
+            <span className="absolute left-0 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-left text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-[150]">
+              {tooltip}
+            </span>
+          </span>
+        ) : (
+          <span className="text-sm font-normal leading-5 text-[#7a7a83]">{label}</span>
+        )}
         {badge}
       </div>
       <div className="flex items-center gap-1 text-sm font-medium leading-5 text-[#f9f9fa] tabular-nums">
@@ -146,7 +166,7 @@ export default function CloseOrderModal({
         </p>
 
         {/* Info table */}
-        <div className="overflow-hidden rounded-[10px] border border-[#252527]">
+        <div className="rounded-[10px] border border-[#252527]">
           {/* Order Type */}
           <InfoRow label="Order Type">
             <span className={isBuy ? 'text-[#5bd197]' : 'text-[#fd5e67]'}>

@@ -31,7 +31,7 @@ function InfoRow({ label, value, children }: { label: string; value?: string; ch
           <span className="text-sm leading-5 font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34]">
             {label}
           </span>
-          <span className="absolute left-0 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-left text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-50">
+          <span className="absolute left-0 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-left text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-[150]">
             {tooltip}
           </span>
         </span>
