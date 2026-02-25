@@ -5,7 +5,7 @@ import TokenIconComponent from './TokenIcon';
 
 function SortIcon({ active, direction }: { active: boolean; direction: 'asc' | 'desc' | null }) {
   return (
-    <span className="ml-0.5 inline-flex flex-col gap-[1px]">
+    <span className="ml-1 inline-flex flex-col gap-[1px]">
       <svg width="6" height="4" viewBox="0 0 6 4" fill="none">
         <path d="M3 0L6 4H0L3 0Z" fill={active && direction === 'asc' ? '#f9f9fa' : '#3a3a3d'} />
       </svg>
@@ -20,15 +20,6 @@ function ChevronDownIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
       <path d="M4.5 6.5L8 10L11.5 6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-      <circle cx="6.5" cy="6.5" r="4" stroke="currentColor" strokeWidth="1.2" />
-      <path d="M9.5 9.5L12 12" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
     </svg>
   );
 }
@@ -52,28 +43,6 @@ function ExternalLinkIcon() {
     <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
       <path d="M3.5 8.5L8.5 3.5M8.5 3.5H4.5M8.5 3.5V7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
-  );
-}
-
-function AssetIcon({ type }: { type: 'sol' | 'usdc' | 'token' }) {
-  if (type === 'sol') {
-    return (
-      <div className="flex size-3.5 items-center justify-center rounded-full bg-[#9945ff]">
-        <span className="text-[6px] font-bold text-white">◎</span>
-      </div>
-    );
-  }
-  if (type === 'usdc') {
-    return (
-      <div className="flex size-3.5 items-center justify-center rounded-full bg-[#2775ca]">
-        <span className="text-[6px] font-bold text-white">U</span>
-      </div>
-    );
-  }
-  return (
-    <div className="flex size-3.5 items-center justify-center rounded-full bg-[#16c284]">
-      <span className="text-[6px] font-bold text-white">T</span>
-    </div>
   );
 }
 
@@ -167,28 +136,38 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
     return 'text-[#facc15]';
   };
 
+  /** Deposited icon = collateral token (SOL/USDC/USDT) */
+  const getDepositedSymbol = (order: DashboardEndedOrder) => order.collateralToken;
+
+  /** Received icon: sell → collateral back, buy/resell → token */
+  const getReceivedSymbol = (order: DashboardEndedOrder) => {
+    if (order.side === 'Sell') return order.collateralToken;
+    return order.tokenSymbol;
+  };
+
   return (
     <div>
-      {/* Header */}
+      {/* Header: Tabs + Filters */}
       <div className="flex items-center justify-between py-3">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          {/* Collapse toggle — circular bg, leftmost */}
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="text-[#7a7a83] transition-colors hover:text-[#f9f9fa]"
+            className="flex size-9 items-center justify-center rounded-full bg-[#1b1b1c] text-[#7a7a83] transition-colors hover:bg-[#252527] hover:text-[#f9f9fa]"
           >
             <CollapseIcon collapsed={collapsed} />
           </button>
 
-          <span className="text-xl font-medium leading-7 text-[#f9f9fa]">
+          <span className="inline-flex items-center gap-2 text-xl font-medium leading-7 text-[#f9f9fa]">
             Ended Settlement
-            <span className="ml-2 inline-flex items-center justify-center rounded-full bg-[#16c284] px-2 py-1 text-[10px] font-medium leading-3 text-[#f9f9fa]">
+            <span className="inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-medium leading-4 bg-[rgba(22,194,132,0.15)] text-[#5bd197]">
               {orders.length}
             </span>
           </span>
         </div>
 
         {/* Right: Filters */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {/* Side dropdown */}
           <div className="relative">
             <button
@@ -241,17 +220,18 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
             )}
           </div>
 
-          <div className="h-4 w-px bg-[#252527]" />
-
-          {/* Search */}
-          <div className="flex items-center gap-2 rounded-lg bg-[#1b1b1c] px-3 py-1.5">
-            <span className="text-[#7a7a83]"><SearchIcon /></span>
+          {/* Search — match homepage SearchInput style */}
+          <div className="relative">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[#7a7a83]" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.5" />
+              <path d="M11 11L14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
             <input
               type="text"
               placeholder="Search"
               value={searchTerm}
               onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-              className="w-40 bg-transparent text-sm text-[#f9f9fa] placeholder-[#7a7a83] outline-none"
+              className="h-9 w-[200px] rounded-lg border border-[#1f1f23] bg-transparent pl-9 pr-3 text-sm text-[#f9f9fa] placeholder-[#7a7a83] outline-none transition-colors focus:border-[#2e2e34]"
             />
           </div>
         </div>
@@ -298,7 +278,7 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
               </button>
             </div>
             <div className="w-[12%] min-w-[120px] text-right">
-              <button onClick={() => handleSort('received')} className="group relative inline-flex items-center text-xs font-medium text-[#7a7a83] hover:text-[#f9f9fa]">
+              <button onClick={() => handleSort('received')} className="group relative inline-flex items-center text-xs font-medium text-[#16c284] hover:text-[#5bd197]">
                 <span className="border-b border-dashed border-[#2e2e34]">Received</span> <SortIcon active={sortField === 'received'} direction={sortField === 'received' ? sortDir : null} />
                 <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-52 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-left text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-[150]">
                   The tokens or collateral received after settlement.
@@ -321,9 +301,9 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
                 key={order.id}
                 className="flex items-center border-b border-[#1b1b1c] h-[60px] px-2 transition-colors hover:bg-[rgba(255,255,255,0.02)]"
               >
-                {/* Pair */}
+                {/* Pair — 16x16 token icon, no chain */}
                 <div className="w-[14%] min-w-[160px] flex items-center gap-2">
-                  <TokenIconComponent symbol={order.pair.split('/')[0]} chain="solana" size="sm" />
+                  <TokenIconComponent symbol={order.tokenSymbol} size="xs" showChain={false} />
                   <span className="text-sm text-[#f9f9fa]">{order.pair}</span>
                   {order.hasBadge === 'RS' && (
                     <span className="inline-flex items-center justify-center rounded-full bg-[#eab308] px-1.5 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b]">
@@ -356,16 +336,18 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
                   <span className="text-sm text-[#f9f9fa] tabular-nums">{order.amount}</span>
                 </div>
 
-                {/* Deposited */}
-                <div className="w-[10%] min-w-[100px] flex items-center justify-end gap-1">
+                {/* Deposited — collateral token icon, 16x16, gap-2 */}
+                <div className="w-[10%] min-w-[100px] flex items-center justify-end gap-2">
                   <span className="text-sm text-[#f9f9fa] tabular-nums">{order.deposited}</span>
-                  <AssetIcon type={order.depositedType} />
+                  <TokenIconComponent symbol={getDepositedSymbol(order)} size="xs" showChain={false} />
                 </div>
 
-                {/* Received */}
-                <div className="w-[12%] min-w-[120px] flex items-center justify-end gap-1">
-                  <span className="text-sm text-[#f9f9fa] tabular-nums">{order.received}</span>
-                  <AssetIcon type={order.receivedType} />
+                {/* Received — token or collateral icon, 16x16, gap-2 */}
+                <div className="w-[12%] min-w-[120px] flex items-center justify-end gap-2">
+                  <span className={`text-sm tabular-nums ${isResell ? 'text-[#16c284]' : 'text-[#f9f9fa]'}`}>
+                    {order.received}
+                  </span>
+                  <TokenIconComponent symbol={getReceivedSymbol(order)} size="xs" showChain={false} />
                 </div>
 
                 {/* Status */}
@@ -373,10 +355,11 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
                   <StatusBadge status={order.status} />
                 </div>
 
-                {/* Action */}
+                {/* Action — View Tx button matching homepage width */}
                 <div className="flex-1 flex justify-end pr-1">
-                  <button className="flex items-center justify-center rounded border border-[#252527] size-7 text-[#7a7a83] transition-colors hover:border-[#3a3a3d] hover:text-[#f9f9fa]">
+                  <button className="inline-flex h-7 items-center justify-center gap-1 rounded-md border border-[#252527] px-2.5 text-xs font-medium text-[#7a7a83] transition-colors hover:border-[#3a3a3d] hover:text-[#f9f9fa]">
                     <ExternalLinkIcon />
+                    <span>View Tx</span>
                   </button>
                 </div>
               </div>

@@ -169,6 +169,9 @@ export interface DashboardOpenOrder {
 export interface DashboardEndedOrder {
   id: string;
   pair: string;
+  tokenSymbol: string;
+  chain: string;
+  collateralToken: string;
   tokenColor: string;
   hasBadge?: 'RS';
   time: string;

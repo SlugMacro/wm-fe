@@ -292,6 +292,9 @@ export const endedOrders: DashboardEndedOrder[] = endedMarketsForOrders.flatMap(
     return {
       id: `eo-${mIdx}-${tIdx}`,
       pair,
+      tokenSymbol: market.tokenSymbol,
+      chain: market.chain,
+      collateralToken: native,
       tokenColor: color,
       hasBadge: tpl.badge,
       time: tpl.timeLabel,
