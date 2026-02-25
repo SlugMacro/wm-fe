@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import type { DashboardOpenOrder, DashboardOrdersTab, OrderBookEntry } from '../types';
 import Pagination from './Pagination';
 import TokenIconComponent from './TokenIcon';
@@ -56,6 +56,34 @@ function ProgressBar({ value }: { value: number }) {
   );
 }
 
+function SkeletonRow({ index }: { index: number }) {
+  return (
+    <div className="flex items-center border-b border-[#1b1b1c] h-[60px] px-2 animate-pulse" style={{ animationDelay: `${index * 50}ms` }}>
+      <div className="w-[14%] min-w-[160px] flex items-center gap-2">
+        <div className="size-4 rounded-full bg-[#1b1b1c]" />
+        <div className="h-3 w-20 rounded bg-[#1b1b1c]" />
+      </div>
+      <div className="w-[12%] min-w-[130px]"><div className="h-3 w-24 rounded bg-[#1b1b1c]" /></div>
+      <div className="w-[8%] min-w-[80px]"><div className="h-3 w-10 rounded bg-[#1b1b1c]" /></div>
+      <div className="w-[10%] min-w-[100px] flex justify-end"><div className="h-3 w-12 rounded bg-[#1b1b1c]" /></div>
+      <div className="w-[10%] min-w-[100px] flex justify-end"><div className="h-3 w-14 rounded bg-[#1b1b1c]" /></div>
+      <div className="w-[10%] min-w-[100px] flex items-center justify-end gap-2">
+        <div className="h-3 w-12 rounded bg-[#1b1b1c]" />
+        <div className="size-4 rounded-full bg-[#1b1b1c]" />
+      </div>
+      <div className="w-[12%] min-w-[120px] flex items-center justify-end gap-2">
+        <div className="h-3 w-14 rounded bg-[#1b1b1c]" />
+        <div className="size-4 rounded-full bg-[#1b1b1c]" />
+      </div>
+      <div className="w-[10%] min-w-[100px] flex flex-col items-end gap-1">
+        <div className="h-2.5 w-8 rounded bg-[#1b1b1c]" />
+        <div className="h-1 w-12 rounded-full bg-[#1b1b1c]" />
+      </div>
+      <div className="flex-1 flex justify-end pr-1"><div className="h-7 w-14 rounded-md bg-[#1b1b1c]" /></div>
+    </div>
+  );
+}
+
 function formatPrice(price: number): string {
   if (price < 0.01) return price.toFixed(4);
   if (price < 0.1) return price.toFixed(3);
@@ -97,6 +125,18 @@ export default function DashboardOpenOrders({ openOrders, filledOrders, onCloseO
   const [sortDir, setSortDir] = useState<'asc' | 'desc' | null>(null);
   const [sideFilter, setSideFilter] = useState<string>('all');
   const [showSideDropdown, setShowSideDropdown] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const loadingTimer = useRef<ReturnType<typeof setTimeout>>(null);
+
+  const triggerLoading = useCallback(() => {
+    if (loadingTimer.current) clearTimeout(loadingTimer.current);
+    setIsLoading(true);
+    loadingTimer.current = setTimeout(() => setIsLoading(false), 300);
+  }, []);
+
+  useEffect(() => {
+    return () => { if (loadingTimer.current) clearTimeout(loadingTimer.current); };
+  }, []);
 
   // Close modal state
   const [closeModalOrder, setCloseModalOrder] = useState<DashboardOpenOrder | null>(null);
@@ -138,8 +178,10 @@ export default function DashboardOpenOrders({ openOrders, filledOrders, onCloseO
   };
 
   const handleTabChange = (tab: DashboardOrdersTab) => {
+    if (tab === activeTab) return;
     setActiveTab(tab);
     setCurrentPage(1);
+    triggerLoading();
   };
 
   const sideColor = (side: string) => {
@@ -320,85 +362,88 @@ export default function DashboardOpenOrders({ openOrders, filledOrders, onCloseO
             </div>
           </div>
 
-          {/* Table Rows */}
-          {paginatedOrders.map((order) => {
-            const isResell = order.side === 'Resell';
-            return (
-              <div
-                key={order.id}
-                className="flex items-center border-b border-[#1b1b1c] h-[60px] px-2 transition-colors hover:bg-[rgba(255,255,255,0.02)]"
-              >
-                {/* Pair */}
-                <div className="w-[14%] min-w-[160px] flex items-center gap-2">
-                  <TokenIconComponent symbol={order.tokenSymbol} size="xs" showChain={false} />
-                  <span className="text-sm text-[#f9f9fa]">{order.pair}</span>
-                  {order.hasBadge === 'FULL' && (
-                    <span className="rounded px-1.5 py-0.5 text-[10px] font-medium bg-[#1b1b1c] text-[#7a7a83]">
-                      FULL
-                    </span>
-                  )}
-                  {order.hasBadge === 'RS' && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-[#eab308] px-1.5 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b]">
-                      RS
-                    </span>
-                  )}
-                </div>
-
-                {/* Created Time */}
-                <div className="w-[12%] min-w-[130px]">
-                  <span className="text-sm text-[#7a7a83]">{order.createdTime}</span>
-                </div>
-
-                {/* Side */}
-                <div className="w-[8%] min-w-[80px]">
-                  <span className={`text-sm font-medium ${sideColor(order.side)}`}>
-                    {order.side}
-                  </span>
-                </div>
-
-                {/* Price */}
-                <div className="w-[10%] min-w-[100px] text-right">
-                  <span className={`text-sm tabular-nums ${isResell ? 'text-[#16c284]' : 'text-[#f9f9fa]'}`}>
-                    {formatPrice(order.price)}
-                  </span>
-                </div>
-
-                {/* Amount */}
-                <div className="w-[10%] min-w-[100px] text-right">
-                  <span className="text-sm text-[#f9f9fa] tabular-nums">{order.amount}</span>
-                </div>
-
-                {/* Deposited — collateral token icon */}
-                <div className="w-[10%] min-w-[100px] flex items-center justify-end gap-2">
-                  <span className="text-sm text-[#f9f9fa] tabular-nums">{order.deposited}</span>
-                  <TokenIconComponent symbol={getDepositedSymbol(order)} size="xs" showChain={false} />
-                </div>
-
-                {/* To be Received — token or collateral icon based on side */}
-                <div className="w-[12%] min-w-[120px] flex items-center justify-end gap-2">
-                  <span className="text-sm tabular-nums text-[#f9f9fa]">
-                    {order.toBeReceived}
-                  </span>
-                  <TokenIconComponent symbol={getReceivedSymbol(order)} size="xs" showChain={false} />
-                </div>
-
-                {/* Progress */}
-                <div className="w-[10%] min-w-[100px] flex justify-end">
-                  <ProgressBar value={order.progress} />
-                </div>
-
-                {/* Action — Close button opens modal */}
-                <div className="flex-1 flex justify-end pr-1">
-                  <button
-                    onClick={() => setCloseModalOrder(order)}
-                    className="rounded-md bg-[#1b1b1c] px-3 py-1.5 text-xs font-medium text-[#f9f9fa] transition-colors hover:bg-[#252527]"
+          {/* Table Rows / Skeleton */}
+          {isLoading
+            ? Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`skel-${i}`} index={i} />)
+            : paginatedOrders.map((order) => {
+                const isResell = order.side === 'Resell';
+                return (
+                  <div
+                    key={order.id}
+                    className="flex items-center border-b border-[#1b1b1c] h-[60px] px-2 transition-colors hover:bg-[rgba(255,255,255,0.02)]"
                   >
-                    Close
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+                    {/* Pair */}
+                    <div className="w-[14%] min-w-[160px] flex items-center gap-2">
+                      <TokenIconComponent symbol={order.tokenSymbol} size="xs" showChain={false} />
+                      <span className="text-sm text-[#f9f9fa]">{order.pair}</span>
+                      {order.hasBadge === 'FULL' && (
+                        <span className="rounded px-1.5 py-0.5 text-[10px] font-medium bg-[#1b1b1c] text-[#7a7a83]">
+                          FULL
+                        </span>
+                      )}
+                      {order.hasBadge === 'RS' && (
+                        <span className="inline-flex items-center justify-center rounded-full bg-[#eab308] px-1.5 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b]">
+                          RS
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Created Time */}
+                    <div className="w-[12%] min-w-[130px]">
+                      <span className="text-sm text-[#7a7a83]">{order.createdTime}</span>
+                    </div>
+
+                    {/* Side */}
+                    <div className="w-[8%] min-w-[80px]">
+                      <span className={`text-sm font-medium ${sideColor(order.side)}`}>
+                        {order.side}
+                      </span>
+                    </div>
+
+                    {/* Price */}
+                    <div className="w-[10%] min-w-[100px] text-right">
+                      <span className={`text-sm tabular-nums ${isResell ? 'text-[#16c284]' : 'text-[#f9f9fa]'}`}>
+                        {formatPrice(order.price)}
+                      </span>
+                    </div>
+
+                    {/* Amount */}
+                    <div className="w-[10%] min-w-[100px] text-right">
+                      <span className="text-sm text-[#f9f9fa] tabular-nums">{order.amount}</span>
+                    </div>
+
+                    {/* Deposited — collateral token icon */}
+                    <div className="w-[10%] min-w-[100px] flex items-center justify-end gap-2">
+                      <span className="text-sm text-[#f9f9fa] tabular-nums">{order.deposited}</span>
+                      <TokenIconComponent symbol={getDepositedSymbol(order)} size="xs" showChain={false} />
+                    </div>
+
+                    {/* To be Received — token or collateral icon based on side */}
+                    <div className="w-[12%] min-w-[120px] flex items-center justify-end gap-2">
+                      <span className="text-sm tabular-nums text-[#f9f9fa]">
+                        {order.toBeReceived}
+                      </span>
+                      <TokenIconComponent symbol={getReceivedSymbol(order)} size="xs" showChain={false} />
+                    </div>
+
+                    {/* Progress */}
+                    <div className="w-[10%] min-w-[100px] flex justify-end">
+                      <ProgressBar value={order.progress} />
+                    </div>
+
+                    {/* Action — Close button opens modal */}
+                    <div className="flex-1 flex justify-end pr-1">
+                      <button
+                        onClick={() => setCloseModalOrder(order)}
+                        className="rounded-md bg-[#1b1b1c] px-3 py-1.5 text-xs font-medium text-[#f9f9fa] transition-colors hover:bg-[#252527]"
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </div>
+                );
+              })
+          }
 
           {/* Pagination */}
           <Pagination
@@ -406,7 +451,7 @@ export default function DashboardOpenOrders({ openOrders, filledOrders, onCloseO
             totalPages={totalPages}
             totalItems={filteredOrders.length}
             itemsPerPage={ITEMS_PER_PAGE}
-            onPageChange={setCurrentPage}
+            onPageChange={(page) => { setCurrentPage(page); triggerLoading(); }}
           />
         </>
       )}
