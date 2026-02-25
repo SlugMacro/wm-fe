@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import type { MyOrder, MyOrdersTab, OrderBookEntry } from '../types';
 import { useWallet } from '../hooks/useWalletContext';
@@ -188,6 +188,24 @@ function toOrderBookEntry(order: MyOrder): OrderBookEntry {
   };
 }
 
+function OrderSkeletonItem({ index }: { index: number }) {
+  return (
+    <div className="flex flex-col gap-3 border-b border-[#1b1b1c] pb-4 animate-pulse" style={{ animationDelay: `${index * 50}ms` }}>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2"><div className="h-3 w-8 rounded bg-[#1b1b1c]" /><div className="h-3 w-20 rounded bg-[#1b1b1c]" /></div>
+        <div className="h-2.5 w-24 rounded bg-[#1b1b1c]" />
+      </div>
+      <div className="flex items-end gap-2.5">
+        <div className="flex flex-1 flex-col gap-1.5">
+          <div className="h-2.5 w-32 rounded bg-[#1b1b1c]" />
+          <div className="h-2.5 w-40 rounded bg-[#1b1b1c]" />
+        </div>
+        <div className="h-7 w-14 rounded bg-[#1b1b1c]" />
+      </div>
+    </div>
+  );
+}
+
 interface MyOrdersProps {
   filledOrders: MyOrder[];
   openOrders: MyOrder[];
@@ -200,6 +218,18 @@ export default function MyOrders({ filledOrders, openOrders, chain, tokenSymbol,
   const wallet = useWallet();
   const [activeTab, setActiveTab] = useState<MyOrdersTab>('filled');
   const [closeModal, setCloseModal] = useState<{ order: MyOrder } | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const loadingTimer = useRef<ReturnType<typeof setTimeout>>(null);
+
+  const triggerLoading = useCallback(() => {
+    if (loadingTimer.current) clearTimeout(loadingTimer.current);
+    setIsLoading(true);
+    loadingTimer.current = setTimeout(() => setIsLoading(false), 300);
+  }, []);
+
+  useEffect(() => {
+    return () => { if (loadingTimer.current) clearTimeout(loadingTimer.current); };
+  }, []);
 
   const isConnected = wallet.isConnected;
   const isWrongNetwork = isConnected && wallet.connectedChain !== chain;
@@ -232,7 +262,7 @@ export default function MyOrders({ filledOrders, openOrders, chain, tokenSymbol,
           return (
             <button
               key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
+              onClick={() => { if (tab.key !== activeTab) { setActiveTab(tab.key); triggerLoading(); } }}
               className="relative flex h-full flex-col items-center justify-between"
             >
               {/* Top spacer */}
@@ -299,6 +329,10 @@ export default function MyOrders({ filledOrders, openOrders, chain, tokenSymbol,
           >
             Switch Network
           </button>
+        </div>
+      ) : isLoading ? (
+        <div className="flex flex-col gap-4">
+          {Array.from({ length: 3 }, (_, i) => <OrderSkeletonItem key={`skel-${i}`} index={i} />)}
         </div>
       ) : orders.length === 0 ? (
         <div className="flex h-[240px] flex-col items-center justify-center gap-3 rounded-[10px] border border-[#1b1b1c] px-16">

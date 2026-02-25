@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { MarketTab, SortConfig, SortField, UpcomingSortField, EndedSortField, UpcomingMarket, EndedMarket, InvestorAvatar } from '../types';
 import { upcomingMarkets, endedMarkets, marketTabCounts } from '../mock-data/markets';
@@ -455,6 +455,60 @@ function NetworkDropdown({ value, onChange }: { value: NetworkFilter; onChange: 
   );
 }
 
+/* ───── Skeleton Rows ───── */
+
+function LiveSkeletonRow({ index }: { index: number }) {
+  return (
+    <div className="flex items-center border-b border-[#1b1b1c] h-[76px] px-2 animate-pulse" style={{ animationDelay: `${index * 50}ms` }}>
+      <div className="flex-1 min-w-0 flex items-center gap-3">
+        <div className="size-10 rounded-full bg-[#1b1b1c]" />
+        <div className="flex flex-col gap-1.5"><div className="h-3 w-16 rounded bg-[#1b1b1c]" /><div className="h-2.5 w-24 rounded bg-[#1b1b1c]" /></div>
+      </div>
+      <div className="w-[112px] shrink-0 flex items-center pr-4"><div className="h-8 w-20 rounded bg-[#1b1b1c]" /></div>
+      <div className="w-[180px] shrink-0 flex flex-col items-end gap-1"><div className="h-3 w-14 rounded bg-[#1b1b1c]" /><div className="h-2.5 w-10 rounded bg-[#1b1b1c]" /></div>
+      <div className="w-[180px] shrink-0 flex flex-col items-end gap-1"><div className="h-3 w-14 rounded bg-[#1b1b1c]" /><div className="h-2.5 w-10 rounded bg-[#1b1b1c]" /></div>
+      <div className="w-[180px] shrink-0 flex flex-col items-end gap-1"><div className="h-3 w-14 rounded bg-[#1b1b1c]" /><div className="h-2.5 w-10 rounded bg-[#1b1b1c]" /></div>
+      <div className="w-[180px] shrink-0 flex justify-end"><div className="h-3 w-16 rounded bg-[#1b1b1c]" /></div>
+      <div className="w-[180px] shrink-0 flex flex-col items-end gap-1"><div className="h-3 w-16 rounded bg-[#1b1b1c]" /><div className="h-2.5 w-12 rounded bg-[#1b1b1c]" /></div>
+    </div>
+  );
+}
+
+function UpcomingSkeletonRow({ index }: { index: number }) {
+  return (
+    <div className="flex items-center border-b border-[#1b1b1c] h-[76px] px-2 animate-pulse" style={{ animationDelay: `${index * 50}ms` }}>
+      <div className="flex-1 min-w-0 flex items-center gap-3">
+        <div className="size-10 rounded-full bg-[#1b1b1c]" />
+        <div className="flex flex-col gap-1.5"><div className="h-3 w-16 rounded bg-[#1b1b1c]" /><div className="h-2.5 w-24 rounded bg-[#1b1b1c]" /></div>
+      </div>
+      <div className="w-[192px] shrink-0"><div className="h-3 w-12 rounded bg-[#1b1b1c]" /></div>
+      <div className="w-[192px] shrink-0 flex items-start pr-[6px]">
+        {Array.from({ length: 3 }, (_, i) => <div key={i} className="size-5 rounded-full bg-[#1b1b1c] -mr-1.5" />)}
+      </div>
+      <div className="w-[192px] shrink-0 flex gap-1">
+        <div className="h-5 w-14 rounded-full bg-[#1b1b1c]" />
+        <div className="h-5 w-10 rounded-full bg-[#1b1b1c]" />
+      </div>
+      <div className="w-[192px] shrink-0"><div className="h-2 w-24 rounded-full bg-[#1b1b1c]" /></div>
+    </div>
+  );
+}
+
+function EndedSkeletonRow({ index }: { index: number }) {
+  return (
+    <div className="flex items-center border-b border-[#1b1b1c] h-[76px] px-2 animate-pulse" style={{ animationDelay: `${index * 50}ms` }}>
+      <div className="flex-1 min-w-0 flex items-center gap-3">
+        <div className="size-10 rounded-full bg-[#1b1b1c]" />
+        <div className="flex flex-col gap-1.5"><div className="h-3 w-16 rounded bg-[#1b1b1c]" /><div className="h-2.5 w-24 rounded bg-[#1b1b1c]" /></div>
+      </div>
+      <div className="w-[192px] shrink-0 flex justify-end"><div className="h-3 w-16 rounded bg-[#1b1b1c]" /></div>
+      <div className="w-[192px] shrink-0 flex justify-end"><div className="h-3 w-16 rounded bg-[#1b1b1c]" /></div>
+      <div className="w-[192px] shrink-0 flex flex-col items-end gap-1"><div className="h-3 w-20 rounded bg-[#1b1b1c]" /><div className="h-2.5 w-14 rounded bg-[#1b1b1c]" /></div>
+      <div className="w-[192px] shrink-0 flex flex-col items-end gap-1"><div className="h-3 w-20 rounded bg-[#1b1b1c]" /><div className="h-2.5 w-14 rounded bg-[#1b1b1c]" /></div>
+    </div>
+  );
+}
+
 /* ═══════════════════════════════════════════════ */
 /* ───────────── Main Component ──────────────── */
 /* ═══════════════════════════════════════════════ */
@@ -468,6 +522,18 @@ export default function LiveMarketTable() {
   const [endedPage, setEndedPage] = useState(1);
   const [endedSearch, setEndedSearch] = useState('');
   const [endedNetwork, setEndedNetwork] = useState<NetworkFilter>('all');
+  const [isLoading, setIsLoading] = useState(false);
+  const loadingTimer = useRef<ReturnType<typeof setTimeout>>(null);
+
+  const triggerLoading = useCallback(() => {
+    if (loadingTimer.current) clearTimeout(loadingTimer.current);
+    setIsLoading(true);
+    loadingTimer.current = setTimeout(() => setIsLoading(false), 300);
+  }, []);
+
+  useEffect(() => {
+    return () => { if (loadingTimer.current) clearTimeout(loadingTimer.current); };
+  }, []);
 
   // Live-updating markets from shared context
   const { markets: liveData } = useLiveMarkets();
@@ -489,7 +555,9 @@ export default function LiveMarketTable() {
   };
 
   const handleTabChange = (tab: MarketTab) => {
+    if (tab === activeTab) return;
     setActiveTab(tab);
+    triggerLoading();
     if (tab === 'upcoming') {
       setSortConfig({ field: 'watchers', direction: 'desc' });
     } else if (tab === 'ended') {
@@ -671,7 +739,7 @@ export default function LiveMarketTable() {
             </div>
 
             <div className="min-h-[228px]">
-            {getUpcomingMarkets().map((market) => (
+            {isLoading ? Array.from({ length: 3 }, (_, i) => <UpcomingSkeletonRow key={`skel-${i}`} index={i} />) : getUpcomingMarkets().map((market) => (
               <div
                 key={market.id}
                 onClick={() => navigate('/coming-soon')}
@@ -687,6 +755,7 @@ export default function LiveMarketTable() {
               </div>
             ))}
             </div>
+
           </>
         ) : isEnded ? (
           /* ════════════ ENDED TABLE ════════════ */
@@ -738,7 +807,7 @@ export default function LiveMarketTable() {
 
             {/* Ended Rows — min-height = 3 rows to prevent layout jank */}
             <div className="min-h-[228px]">
-            {pagedEndedMarkets.length === 0 ? (
+            {isLoading ? Array.from({ length: 3 }, (_, i) => <EndedSkeletonRow key={`skel-${i}`} index={i} />) : pagedEndedMarkets.length === 0 ? (
               <div className="flex items-center justify-center min-h-[228px] text-sm text-[#7a7a83]">
                 No results found
               </div>
@@ -789,7 +858,7 @@ export default function LiveMarketTable() {
             </div>
 
             {/* Pagination */}
-            <Pagination currentPage={endedPage} totalPages={endedTotalPages} onPageChange={setEndedPage} />
+            <Pagination currentPage={endedPage} totalPages={endedTotalPages} onPageChange={(page) => { setEndedPage(page); triggerLoading(); }} />
           </>
         ) : (
           /* ════════════ LIVE TABLE ════════════ */
@@ -823,7 +892,7 @@ export default function LiveMarketTable() {
             </div>
 
             <div className="min-h-[228px]">
-            {getLiveMarkets().map((market) => (
+            {isLoading ? Array.from({ length: 3 }, (_, i) => <LiveSkeletonRow key={`skel-${i}`} index={i} />) : getLiveMarkets().map((market) => (
               <div
                 key={market.id}
                 onClick={() => navigate(`/markets/${market.id}`)}

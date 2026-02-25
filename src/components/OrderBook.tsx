@@ -243,6 +243,26 @@ function useColumnScroll() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
+   Skeleton Row
+   ═══════════════════════════════════════════════════════════════════════ */
+
+function OrderBookSkeletonRow({ index, fullWidth }: { index: number; fullWidth?: boolean }) {
+  return (
+    <div className="flex items-center h-10 mt-0.5 px-2 rounded-md animate-pulse" style={{ animationDelay: `${index * 40}ms` }}>
+      <div className="flex-1 flex items-center gap-1">
+        <div className="h-3 w-14 rounded bg-[#1b1b1c]" />
+      </div>
+      <div className={`${fullWidth ? 'w-40' : 'w-28'} flex justify-end`}><div className="h-3 w-12 rounded bg-[#1b1b1c]" /></div>
+      <div className={`${fullWidth ? 'w-40' : 'w-28'} flex items-center justify-end gap-2`}>
+        <div className="h-3 w-12 rounded bg-[#1b1b1c]" />
+        <div className="size-4 rounded-full bg-[#1b1b1c]" />
+      </div>
+      <div className="w-[112px] flex justify-end"><div className="h-7 w-12 rounded bg-[#1b1b1c]" /></div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
    Main OrderBook Component
    ═══════════════════════════════════════════════════════════════════════ */
 
@@ -269,6 +289,18 @@ export default function OrderBook({
 }: OrderBookProps) {
   const [activeTab, setActiveTab] = useState<OrderBookTab>('regular');
   const [hoveredOrderId, setHoveredOrderId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const obLoadingTimer = useRef<ReturnType<typeof setTimeout>>(null);
+
+  const triggerLoading = useCallback(() => {
+    if (obLoadingTimer.current) clearTimeout(obLoadingTimer.current);
+    setIsLoading(true);
+    obLoadingTimer.current = setTimeout(() => setIsLoading(false), 300);
+  }, []);
+
+  useEffect(() => {
+    return () => { if (obLoadingTimer.current) clearTimeout(obLoadingTimer.current); };
+  }, []);
 
   // Filter state
   const [sizeFilters, setSizeFilters] = useState<Set<SizeRange>>(new Set(['all']));
@@ -592,7 +624,7 @@ export default function OrderBook({
               <div key={tab.key} className="flex items-center h-full">
                 {idx > 0 && <div className="self-stretch w-px bg-[#252527]" />}
                 <button
-                  onClick={() => setActiveTab(tab.key)}
+                  onClick={() => { if (tab.key !== activeTab) { setActiveTab(tab.key); triggerLoading(); } }}
                   className={`flex items-center h-full text-sm font-medium leading-5 transition-colors ${
                     tab.hasInfo ? 'gap-1.5 pl-4 pr-2' : 'px-4'
                   } ${
@@ -877,7 +909,33 @@ export default function OrderBook({
       )}
 
       {/* ─── Order Columns ──────────────────────────────────────────── */}
-      {activeTab === 'resell' ? (
+      {isLoading ? (
+        activeTab === 'resell' ? (
+          <div>
+            <div className="flex items-center border-b border-[#1b1b1c] h-8 px-2">
+              <div className="flex-1"><span className="text-xs font-medium text-[#7a7a83]">Price ($)</span></div>
+              <div className="w-40 text-right"><span className="text-xs font-medium text-[#7a7a83]">Amount</span></div>
+              <div className="w-40 text-right"><span className="text-xs font-medium text-[#7a7a83]">Collateral</span></div>
+              <div className="w-[112px]" />
+            </div>
+            {Array.from({ length: 5 }, (_, i) => <OrderBookSkeletonRow key={`skel-${i}`} index={i} fullWidth />)}
+          </div>
+        ) : (
+          <div className="flex gap-4">
+            {[0, 1].map(col => (
+              <div key={col} className="flex-1">
+                <div className="flex items-center border-b border-[#1b1b1c] h-8 px-2">
+                  <div className="flex-1"><span className="text-xs font-medium text-[#7a7a83]">Price ($)</span></div>
+                  <div className="w-28 text-right"><span className="text-xs font-medium text-[#7a7a83]">Amount</span></div>
+                  <div className="w-28 text-right"><span className="text-xs font-medium text-[#7a7a83]">Collateral</span></div>
+                  <div className="w-[112px]" />
+                </div>
+                {Array.from({ length: 5 }, (_, i) => <OrderBookSkeletonRow key={`skel-${col}-${i}`} index={i} />)}
+              </div>
+            ))}
+          </div>
+        )
+      ) : activeTab === 'resell' ? (
         /* Resell: single full-width column for resell buy orders */
         renderColumn(filteredBuyOrders, 'buy', buyScroll, true, true)
       ) : (
