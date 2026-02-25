@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { MarketTab, SortConfig, SortField, UpcomingSortField, EndedSortField, UpcomingMarket, EndedMarket, InvestorAvatar } from '../types';
-import { liveMarkets, upcomingMarkets, endedMarkets, marketTabCounts } from '../mock-data/markets';
+import { upcomingMarkets, endedMarkets, marketTabCounts } from '../mock-data/markets';
 import { formatPrice, formatVolume, formatPercent } from '../utils/formatNumber';
 import MiniChart from './MiniChart';
 import MoniScoreBar from './MoniScoreBar';
 import TokenIcon from './TokenIcon';
-import { useMarketLiveUpdates, type FlashDirection, type LiveMarket } from '../hooks/useMarketLiveUpdates';
+import { useLiveMarkets } from '../hooks/useLiveMarketContext';
+import type { FlashDirection, LiveMarket } from '../hooks/useMarketLiveUpdates';
 
 const ENDED_PAGE_SIZE = 6;
 
@@ -389,8 +390,8 @@ export default function LiveMarketTable() {
   const [endedSearch, setEndedSearch] = useState('');
   const [endedNetwork, setEndedNetwork] = useState<NetworkFilter>('all');
 
-  // Live-updating markets (only for live tab)
-  const liveData = useMarketLiveUpdates(liveMarkets);
+  // Live-updating markets from shared context
+  const { markets: liveData } = useLiveMarkets();
 
   const tabs: { key: MarketTab; label: string; count: number }[] = [
     { key: 'live', label: 'Live Market', count: marketTabCounts.live },

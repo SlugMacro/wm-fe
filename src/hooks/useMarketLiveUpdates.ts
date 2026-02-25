@@ -88,11 +88,15 @@ export function useMarketLiveUpdates(initialMarkets: Market[]): LiveMarket[] {
             );
           }
 
-          // Slightly adjust volumes (±0.1% to ±2%)
-          const volChange = rand(-2, 2) / 100;
+          // Volumes are cumulative (new trades) — only increase
+          const tradeSize = rand(50, 500); // simulate a new trade $50-$500
           market.volume24h = parseFloat(
-            (market.volume24h * (1 + volChange)).toFixed(2)
+            (market.volume24h + tradeSize).toFixed(2)
           );
+          market.totalVolume = parseFloat(
+            (market.totalVolume + tradeSize).toFixed(2)
+          );
+
           market.volumeChange24h = parseFloat(
             (market.volumeChange24h + rand(-1, 1)).toFixed(2)
           );

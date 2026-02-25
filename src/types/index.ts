@@ -94,6 +94,7 @@ export interface TokenDetail {
   totalVolumeChange: number;
   impliedFdv: string;
   settleTime: string | null;
+  settlementStatus?: 'in-progress' | 'upcoming' | 'new-market';
   category: 'Pre-market' | 'Points';
   chartData: number[];
 }

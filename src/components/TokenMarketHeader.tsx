@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { TokenDetail } from '../types';
 import TokenIcon from './TokenIcon';
 
@@ -36,9 +36,42 @@ function formatVol(value: number): string {
   return `$${value.toFixed(2)}`;
 }
 
+function useSettleCountdown(settleTime: string | null, settlementStatus?: string) {
+  const isCountdown = settlementStatus === 'in-progress' || settlementStatus === 'upcoming';
+
+  const calculateCountdown = useCallback(() => {
+    if (!settleTime) return '';
+    const diff = new Date(settleTime).getTime() - Date.now();
+    if (diff <= 0) return '0h:00m:00s';
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    return `${h}h:${String(m).padStart(2, '0')}m:${String(s).padStart(2, '0')}s`;
+  }, [settleTime]);
+
+  const [countdown, setCountdown] = useState(isCountdown ? calculateCountdown() : '');
+
+  useEffect(() => {
+    if (!settleTime || !isCountdown) return;
+    setCountdown(calculateCountdown());
+    const timer = setInterval(() => setCountdown(calculateCountdown()), 1000);
+    return () => clearInterval(timer);
+  }, [settleTime, isCountdown, calculateCountdown]);
+
+  return { countdown, isCountdown };
+}
+
 export default function TokenMarketHeader({ token }: { token: TokenDetail }) {
   const [aboutOpen, setAboutOpen] = useState(false);
   const isPositive = token.priceChange >= 0;
+  const { countdown, isCountdown } = useSettleCountdown(token.settleTime, token.settlementStatus);
+
+  const settleTimeValue = isCountdown ? countdown : formatSettleTime(token.settleTime);
+  const settleTimeColor = token.settlementStatus === 'in-progress'
+    ? 'text-[#fb923c]'
+    : token.settlementStatus === 'upcoming'
+      ? 'text-[#5bd197]'
+      : undefined;
 
   const stats = [
     {
@@ -61,7 +94,13 @@ export default function TokenMarketHeader({ token }: { token: TokenDetail }) {
     },
     {
       label: 'Settle Time (UTC)',
-      value: formatSettleTime(token.settleTime),
+      value: settleTimeValue,
+      valueColor: settleTimeColor,
+      badge: token.settlementStatus === 'in-progress'
+        ? { label: 'In Progress', color: 'text-[#fb923c]', bg: 'bg-[rgba(249,115,22,0.1)]' }
+        : token.settlementStatus === 'upcoming'
+          ? { label: 'Upcoming', color: 'text-[#5bd197]', bg: 'bg-[rgba(22,194,132,0.1)]' }
+          : undefined,
       dashed: true,
       tooltip: 'The date and time (UTC) when the pre-market contracts will settle and tokens will be distributed to buyers.',
     },
@@ -110,9 +149,14 @@ export default function TokenMarketHeader({ token }: { token: TokenDetail }) {
                 </span>
               )}
               <div className="flex items-center gap-1">
-                <span className="text-xs leading-4 font-normal text-[#f9f9fa] tabular-nums">{stat.value}</span>
+                <span className={`text-xs leading-4 font-normal tabular-nums ${stat.valueColor ?? 'text-[#f9f9fa]'}`}>{stat.value}</span>
                 {stat.change && (
                   <span className={`text-xs leading-4 font-normal tabular-nums ${stat.changeColor}`}>{stat.change}</span>
+                )}
+                {stat.badge && (
+                  <span className={`inline-flex items-center rounded-full ${stat.badge.bg} px-1.5 py-0.5 text-[10px] font-medium uppercase leading-3 ${stat.badge.color}`}>
+                    {stat.badge.label}
+                  </span>
                 )}
               </div>
             </div>

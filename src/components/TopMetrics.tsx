@@ -1,10 +1,39 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useFearGreedIndex, useAltcoinSeasonIndex } from '../hooks/useMarketMetrics';
+import { useLiveMarkets } from '../hooks/useLiveMarketContext';
 import TokenIcon from './TokenIcon';
 
-function SparklineChart() {
-  const linePath = 'M0 40 L20 34 L40 36 L60 28 L80 30 L100 22 L120 24 L140 16 L160 18 L180 10 L200 12 L220 6 L240 3 L260 5 L280 2';
-  const areaPath = `${linePath} L280 48 L0 48 Z`;
+/* ───── Live Sparkline Chart ───── */
+
+function LiveSparklineChart({ data }: { data: number[] }) {
+  const { linePath, areaPath } = useMemo(() => {
+    if (data.length < 2) return { linePath: '', areaPath: '' };
+
+    const width = 280;
+    const height = 48;
+    const padding = 2;
+    const min = Math.min(...data);
+    const max = Math.max(...data);
+    const range = max - min || 1;
+
+    const points = data.map((val, i) => {
+      const x = (i / (data.length - 1)) * width;
+      const y = height - padding - ((val - min) / range) * (height - padding * 2);
+      return { x, y };
+    });
+
+    const line = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+    const area = `${line} L${width} ${height} L0 ${height} Z`;
+
+    return { linePath: line, areaPath: area };
+  }, [data]);
+
+  // Determine trend color: compare last value to first
+  const isUp = data.length >= 2 && data[data.length - 1] >= data[0];
+  const strokeColor = isUp ? '#5bd197' : '#fd5e67';
+  const gradientColor = isUp ? '#16c284' : '#fd5e67';
+  const gradientId = isUp ? 'sparkGradUp' : 'sparkGradDown';
+
   return (
     <svg
       className="w-full"
@@ -15,15 +44,17 @@ function SparklineChart() {
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
-        <linearGradient id="sparklineGradient" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#16c284" stopOpacity="0.15" />
-          <stop offset="100%" stopColor="#16c284" stopOpacity="0" />
+        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={gradientColor} stopOpacity="0.15" />
+          <stop offset="100%" stopColor={gradientColor} stopOpacity="0" />
         </linearGradient>
       </defs>
-      <path d={areaPath} fill="url(#sparklineGradient)" />
+      <path d={areaPath} fill={`url(#${gradientId})`}>
+        <animate attributeName="d" dur="0.5s" fill="freeze" />
+      </path>
       <path
         d={linePath}
-        stroke="#5bd197"
+        stroke={strokeColor}
         strokeWidth="1"
         fill="none"
         strokeLinecap="round"
@@ -32,6 +63,16 @@ function SparklineChart() {
     </svg>
   );
 }
+
+/* ───── Format volume value ───── */
+
+function formatVol(value: number): string {
+  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(2)}M`;
+  if (value >= 1_000) return `$${(value / 1_000).toFixed(2)}K`;
+  return `$${value.toFixed(2)}`;
+}
+
+/* ───── Sub-components ───── */
 
 function FearGreedGauge({ value, label }: { value: number; label: string }) {
   // Arc goes left(0%) → top(50%) → right(100%), parametric angle from π to 0
@@ -142,25 +183,34 @@ function CountdownTimer() {
   );
 }
 
+/* ───── Main Component ───── */
+
 export default function TopMetrics() {
   const fearGreed = useFearGreedIndex();
   const altcoinSeason = useAltcoinSeasonIndex();
+  const { vol24h, vol24hChange, volHistory } = useLiveMarkets();
+
+  const changeColor = vol24hChange >= 0 ? 'text-[#5bd197]' : 'text-[#fd5e67]';
+  const changeText = `${vol24hChange >= 0 ? '+' : ''}${vol24hChange.toFixed(2)}%`;
 
   return (
     <div className="grid grid-cols-4 gap-4">
-      {/* Pre-market 24h vol */}
+      {/* Pre-market 24h vol — LIVE from market data */}
       <div className="relative flex flex-col rounded-[10px] bg-[rgba(255,255,255,0.03)] overflow-hidden">
         <div className="flex flex-col gap-2 px-5 pt-4">
-          <span className="text-xs font-normal text-[#7a7a83]">Pre-market 24 vol.</span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-normal text-[#7a7a83]">Pre-market 24h vol.</span>
+            <div className="size-1.5 rounded-full bg-[#16c284] animate-pulse" />
+          </div>
           <div className="flex items-baseline gap-1">
             <span className="text-2xl font-medium text-[#f9f9fa]" style={{ fontFeatureSettings: "'lnum', 'tnum'" }}>
-              $4.2M
+              {formatVol(vol24h)}
             </span>
-            <span className="text-xs font-normal text-[#5bd197]">+12.5%</span>
+            <span className={`text-xs font-normal ${changeColor}`}>{changeText}</span>
           </div>
         </div>
         <div className="mt-auto">
-          <SparklineChart />
+          <LiveSparklineChart data={volHistory} />
         </div>
       </div>
 

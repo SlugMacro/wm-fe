@@ -20,6 +20,7 @@ export const tokenDetails: Record<string, TokenDetail> = Object.fromEntries(
       totalVolumeChange: m.totalVolumeChange,
       impliedFdv: `$${m.impliedFdv}`,
       settleTime: m.settleTime,
+      settlementStatus: m.settlementStatus,
       category: 'Pre-market' as const,
       chartData: m.chartData,
     },

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useLiveMarkets } from '../hooks/useLiveMarketContext';
 
 /* ───── Icons ───── */
 
@@ -84,19 +85,7 @@ function AnimatedValue({ value }: { value: number }) {
 /* ───── Main Component ───── */
 
 export default function BottomStats() {
-  const [totalVol, setTotalVol] = useState(5_375_032.81);
-  const [vol24h, setVol24h] = useState(832_750.55);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Increase by random $100-$200
-      const totalInc = 100 + Math.random() * 100;
-      const vol24Inc = 30 + Math.random() * 70;
-      setTotalVol((prev) => prev + totalInc);
-      setVol24h((prev) => prev + vol24Inc);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
+  const { totalVol, vol24h } = useLiveMarkets();
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-between bg-[#0a0a0b] px-12 py-3">

@@ -41,6 +41,149 @@ function GlobeIcon() {
   );
 }
 
+function SearchIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <path d="M18.031 16.617l4.283 4.282-1.415 1.415-4.282-4.283A8.96 8.96 0 0 1 11 20c-4.968 0-9-4.032-9-9s4.032-9 9-9 9 4.032 9 9a8.96 8.96 0 0 1-1.969 5.617zM16.025 15.87A6.981 6.981 0 0 0 18 11c0-3.868-3.133-7-7-7-3.868 0-7 3.132-7 7 0 3.867 3.132 7 7 7a6.981 6.981 0 0 0 4.875-1.975l.15-.155z" fill="currentColor" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <path d="M9.55 18l-5.7-5.7 1.425-1.425L9.55 15.15l9.175-9.175L20.15 7.4 9.55 18z" fill="#19fb9b" />
+    </svg>
+  );
+}
+
+/* ───── Language Data ───── */
+
+interface Language {
+  code: string;
+  label: string;
+}
+
+const LANGUAGES: Language[] = [
+  { code: 'en', label: 'English' },
+  { code: 'zh-CN', label: '简体中文' },
+  { code: 'zh-TW', label: '繁體中文' },
+  { code: 'es', label: 'Español' },
+  { code: 'ru', label: 'Русский' },
+  { code: 'fr', label: 'Français' },
+  { code: 'de', label: 'Deutsch' },
+  { code: 'ja', label: '日本語' },
+  { code: 'ko', label: '한국어' },
+  { code: 'vi', label: 'Tiếng Việt' },
+  { code: 'pt', label: 'Português' },
+  { code: 'tr', label: 'Türkçe' },
+];
+
+/* ───── Language Dropdown ───── */
+
+function LanguageDropdown() {
+  const [open, setOpen] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [selectedLang, setSelectedLang] = useState('en');
+  const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    if (open) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setVisible(true));
+      });
+    } else {
+      setVisible(false);
+    }
+  }, [open]);
+
+  const handleClose = () => {
+    setVisible(false);
+    setTimeout(() => {
+      setOpen(false);
+      setSearch('');
+    }, 150);
+  };
+
+  const handleSelect = (code: string) => {
+    setSelectedLang(code);
+    handleClose();
+  };
+
+  const filteredLanguages = LANGUAGES.filter((lang) =>
+    lang.label.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div className="relative">
+      {/* Globe Button */}
+      <button
+        onClick={() => (open ? handleClose() : setOpen(true))}
+        className="flex items-center justify-center rounded-full bg-[#1b1b1c] p-2 text-[#f9f9fa] transition-colors hover:bg-[#252527]"
+      >
+        <GlobeIcon />
+      </button>
+
+      {/* Dropdown */}
+      {open && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={handleClose} />
+          <div
+            className={`absolute right-0 top-full mt-2 z-50 w-[256px] rounded-xl bg-[#1b1b1c] shadow-[0_0_32px_rgba(0,0,0,0.2)] overflow-hidden transition-all duration-150 origin-top-right ${
+              visible
+                ? 'opacity-100 scale-100 translate-y-0'
+                : 'opacity-0 scale-95 -translate-y-1'
+            }`}
+          >
+            {/* Search */}
+            <div className="flex items-center gap-2 h-10 px-3 border-b border-[#272727]">
+              <div className="flex items-center p-0.5 text-[#717171] shrink-0">
+                <SearchIcon />
+              </div>
+              <input
+                type="text"
+                placeholder="Search language"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="flex-1 bg-transparent text-sm text-[#f9f9fa] placeholder-[#717171] outline-none min-w-0"
+                autoFocus
+              />
+            </div>
+
+            {/* Language List */}
+            <div className="flex flex-col gap-1 p-2 max-h-[280px] overflow-y-auto scrollbar-thin">
+              {filteredLanguages.map((lang) => {
+                const isSelected = lang.code === selectedLang;
+                return (
+                  <button
+                    key={lang.code}
+                    onClick={() => handleSelect(lang.code)}
+                    className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 transition-colors ${
+                      isSelected ? 'bg-[#252527]' : 'hover:bg-[#252527]'
+                    }`}
+                  >
+                    <span className="text-sm font-medium text-[#f9f9fa]">
+                      {lang.label}
+                    </span>
+                    {isSelected && (
+                      <div className="flex items-center p-0.5 shrink-0 ml-auto">
+                        <CheckIcon />
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+              {filteredLanguages.length === 0 && (
+                <div className="px-2 py-3 text-sm text-[#717171] text-center">No results</div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 function CopyIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -358,15 +501,18 @@ export default function Header() {
             {/* Divider */}
             <div className="h-4 w-px bg-[#252527]" />
 
-            {/* Help */}
-            <button className="flex items-center justify-center rounded-full bg-[#1b1b1c] p-2 text-[#f9f9fa] transition-colors hover:bg-[#252527]">
+            {/* Help → GitHub Docs */}
+            <a
+              href="https://github.com/SlugMacro/wm-fe"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center rounded-full bg-[#1b1b1c] p-2 text-[#f9f9fa] transition-colors hover:bg-[#252527]"
+            >
               <QuestionIcon />
-            </button>
+            </a>
 
-            {/* Globe */}
-            <button className="flex items-center justify-center rounded-full bg-[#1b1b1c] p-2 text-[#f9f9fa] transition-colors hover:bg-[#252527]">
-              <GlobeIcon />
-            </button>
+            {/* Language Selector */}
+            <LanguageDropdown />
           </div>
         </div>
       </header>
