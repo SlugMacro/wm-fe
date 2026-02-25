@@ -431,7 +431,7 @@ export default function OrderBook({
             ? isBuy ? 'bg-[rgba(22,194,132,0.18)]' : 'bg-[rgba(255,59,70,0.18)]'
             : isSelected
               ? 'bg-[#1e1e1f]'
-              : 'bg-[#121213] hover:bg-[#161617]'
+              : 'bg-[#121213] hover:bg-[#1b1b1c]'
         }`}
         onClick={() => onSelectOrder(order, side)}
         onMouseEnter={() => setHoveredOrderId(order.id)}
@@ -475,7 +475,7 @@ export default function OrderBook({
             {showResellBadge && isResell && (
               <span className="inline-flex items-center justify-center rounded-full bg-[#eab308] px-1.5 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b]">RS</span>
             )}
-            <button className={`relative rounded px-3 py-1 text-xs font-medium transition-colors ${
+            <button className={`relative h-7 rounded px-3 text-xs font-medium transition-colors ${
               isSelected
                 ? isResell
                   ? 'bg-[#eab308] hover:bg-[#d4a207]'
@@ -493,7 +493,7 @@ export default function OrderBook({
               </span>
               {isSelected && (
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="absolute inset-0 m-auto">
-                  <path d="M4.5 2.5L8.5 6L4.5 9.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M4.5 2.5L8.5 6L4.5 9.5" stroke={isResell ? '#0a0a0b' : 'white'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               )}
             </button>

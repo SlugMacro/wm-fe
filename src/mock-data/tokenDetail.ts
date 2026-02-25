@@ -112,7 +112,7 @@ export function generateBuyOrders(basePrice: number, chain = 'solana'): OrderBoo
       collateral,
       collateralIcon: useNative ? native.icon : '/tokens/usdc.svg',
       collateralToken: useNative ? native.symbol : 'USDC' as const,
-      isOwner: i === 0,
+      isOwner: i === 0 || i === 2,
       fillPercent: fillPercents[i],
       filledAmount,
       totalAmount,
@@ -242,19 +242,77 @@ export function generateMyOpenOrders(tokenSymbol: string, chain = 'solana', base
   const sym = tokenSymbol.toUpperCase();
   const colSymbol = native.symbol;
 
-  const spreadFactors = [0.97, 1.03, 0.95, 1.05, 0.98, 1.02, 0.96, 1.04, 0.99, 1.01, 0.94, 1.06];
-  const amounts = [1.20, 0.85, 3.50, 0.60, 2.10, 1.45, 0.90, 4.20, 1.80, 0.55, 2.70, 1.10];
-  const collaterals = [1.8, 1.2, 5.5, 0.9, 3.2, 2.1, 1.4, 6.5, 2.7, 0.8, 4.1, 1.7];
+  // Vary count per token — some have 0, some 3-4
+  const upper = sym.toUpperCase();
+  if (upper === 'LOUD' || upper === 'NEXO') return [];
+  if (upper === 'MMT' || upper === 'XPL') {
+    // Only 2 orders
+    return [
+      {
+        id: 'oo-0',
+        side: 'Buy' as const,
+        pair: `${sym}/${colSymbol}`,
+        date: '24/02/2024 09:12:45',
+        price: Math.round(basePrice * 0.97 * 10000) / 10000,
+        amount: '1.20K',
+        collateral: `1.8 ${colSymbol}`,
+      },
+      {
+        id: 'oo-1',
+        side: 'Sell' as const,
+        pair: `${sym}/${colSymbol}`,
+        date: '23/02/2024 18:44:02',
+        price: Math.round(basePrice * 1.03 * 10000) / 10000,
+        amount: '0.85K',
+        collateral: `1.2 ${colSymbol}`,
+      },
+    ];
+  }
 
-  return Array.from({ length: 12 }, (_, i) => ({
-    id: `oo-${i}`,
-    side: (i % 2 === 0 ? 'Buy' : 'Sell') as 'Buy' | 'Sell',
-    pair: `${sym}/${colSymbol}`,
-    date: '23/02/2024 15:33:15',
-    price: Math.round(basePrice * spreadFactors[i] * 10000) / 10000,
-    amount: `${amounts[i].toFixed(2)}K`,
-    collateral: `${collaterals[i].toFixed(1)} ${colSymbol}`,
-  }));
+  // Default: 4-5 orders including a resell
+  const orders: MyOrder[] = [
+    {
+      id: 'oo-0',
+      side: 'Buy',
+      pair: `${sym}/${colSymbol}`,
+      date: '24/02/2024 11:22:33',
+      price: Math.round(basePrice * 0.97 * 10000) / 10000,
+      amount: '1.00K',
+      collateral: `1.5 ${colSymbol}`,
+    },
+    {
+      id: 'oo-1',
+      side: 'Buy',
+      pair: `${sym}/${colSymbol}`,
+      hasBadge: 'RS',
+      date: '23/02/2024 15:33:15',
+      price: Math.round(basePrice * 0.80 * 10000) / 10000,
+      entryPrice: Math.round(basePrice * 0.80 * 10000) / 10000,
+      originalPrice: Math.round(basePrice * 1.0 * 10000) / 10000,
+      amount: '1.00K',
+      collateral: `1.8 ${colSymbol}`,
+    },
+    {
+      id: 'oo-2',
+      side: 'Sell',
+      pair: `${sym}/${colSymbol}`,
+      date: '23/02/2024 14:10:08',
+      price: Math.round(basePrice * 1.03 * 10000) / 10000,
+      amount: '2.50K',
+      collateral: `4.2 ${colSymbol}`,
+    },
+    {
+      id: 'oo-3',
+      side: 'Sell',
+      pair: `${sym}/${colSymbol}`,
+      date: '22/02/2024 20:55:41',
+      price: Math.round(basePrice * 1.05 * 10000) / 10000,
+      amount: '0.60K',
+      collateral: `0.9 ${colSymbol}`,
+    },
+  ];
+
+  return orders;
 }
 
 export function generatePriceData(basePrice = 0.055, chartData?: number[]): PriceDataPoint[] {

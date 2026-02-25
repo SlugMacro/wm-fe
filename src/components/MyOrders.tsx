@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import type { MyOrder, MyOrdersTab } from '../types';
+import type { MyOrder, MyOrdersTab, OrderBookEntry } from '../types';
 import { useWallet } from '../hooks/useWalletContext';
+import CloseOrderModal from './CloseOrderModal';
 
 function RightArrowIcon() {
   return (
@@ -62,21 +63,50 @@ const CHAIN_NAMES: Record<string, string> = {
   sui: 'Sui',
 };
 
-function OrderItem({ order, isFilled }: { order: MyOrder; isFilled?: boolean }) {
+interface OrderItemProps {
+  order: MyOrder;
+  isFilled?: boolean;
+  onClose?: (order: MyOrder) => void;
+}
+
+function OrderItem({ order, isFilled, onClose }: OrderItemProps) {
   const isBuy = order.side === 'Buy';
-  const showResell = isFilled && isBuy;
+  const isResellOrder = !isFilled && order.hasBadge === 'RS';
+  const isOpenOrder = !isFilled;
+
+  // Determine side label + color
+  let sideLabel: string = order.side;
+  let sideColor = isBuy ? 'text-[#5bd197]' : 'text-[#fd5e67]';
+  if (isResellOrder) {
+    sideLabel = 'Resell';
+    sideColor = 'text-[#facc15]';
+  }
+
+  // Determine price row label + format
+  const isResellPriceLayout = order.entryPrice != null && order.originalPrice != null;
+  const priceLabel = isResellOrder
+    ? 'Price / Original Price'
+    : isResellPriceLayout
+      ? 'Your Entry / Original Price'
+      : 'Price';
+
+  // Button logic:
+  // Filled orders: Buy → "Resell" (yellow theme)
+  // Open orders: all → "Close" (ghost pill)
+  const showFilledResell = isFilled && isBuy;
+  const showOpenButton = isOpenOrder;
 
   return (
     <div className="flex flex-col gap-3 border-b border-[#1b1b1c] pb-4">
       {/* Row 1: Side + Pair + Badge | Date */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1">
-          <span className={`text-sm font-medium leading-5 ${isBuy ? 'text-[#5bd197]' : 'text-[#fd5e67]'}`}>
-            {order.side}
+          <span className={`text-sm font-medium leading-5 ${sideColor}`}>
+            {sideLabel}
           </span>
           <span className="text-sm font-medium leading-5 text-[#f9f9fa]">{order.pair}</span>
           {order.hasBadge && (
-            <span className="inline-flex items-center justify-center rounded-full bg-[#eab308] px-2 py-1 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b]">
+            <span className="inline-flex items-center justify-center rounded-full bg-[#eab308] px-1.5 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b]">
               {order.hasBadge}
             </span>
           )}
@@ -84,17 +114,17 @@ function OrderItem({ order, isFilled }: { order: MyOrder; isFilled?: boolean }) 
         <span className="text-xs leading-4 font-normal text-[#7a7a83] tabular-nums">{order.date}</span>
       </div>
 
-      {/* Row 2+3: Price and Amount info + Resell button */}
+      {/* Row 2+3: Price and Amount info + button */}
       <div className="flex items-end gap-2.5">
         <div className="flex flex-1 flex-col gap-1">
           {/* Price row */}
           <div className="flex items-center gap-1 text-xs leading-4">
-            {order.entryPrice != null && order.originalPrice != null ? (
+            {isResellPriceLayout ? (
               <>
-                <span className="text-[#7a7a83]">Your Entry / Original Price</span>
-                <span className="text-[#facc15] tabular-nums">${order.entryPrice.toFixed(4)}</span>
+                <span className="text-[#7a7a83]">{priceLabel}</span>
+                <span className="text-[#facc15] tabular-nums">${order.entryPrice!.toFixed(4)}</span>
                 <span className="text-[#f9f9fa]">/</span>
-                <span className="text-[#f9f9fa] tabular-nums">${order.originalPrice.toFixed(4)}</span>
+                <span className="text-[#f9f9fa] tabular-nums">${order.originalPrice!.toFixed(4)}</span>
               </>
             ) : (
               <>
@@ -114,9 +144,20 @@ function OrderItem({ order, isFilled }: { order: MyOrder; isFilled?: boolean }) 
           </div>
         </div>
 
-        {showResell && (
+        {/* Filled order: Resell button (yellow theme) */}
+        {showFilledResell && (
           <button className="shrink-0 overflow-clip rounded-[4px] bg-[rgba(234,179,8,0.1)] px-3 py-1.5 text-xs font-medium leading-4 text-[#eab308] transition-colors hover:bg-[rgba(234,179,8,0.18)]">
             Resell
+          </button>
+        )}
+
+        {/* Open order: Close button */}
+        {showOpenButton && (
+          <button
+            onClick={() => onClose?.(order)}
+            className="shrink-0 overflow-clip rounded-[4px] bg-[rgba(255,255,255,0.08)] px-3 py-1.5 text-xs font-medium leading-4 text-[rgba(255,255,255,0.9)] transition-colors hover:bg-[rgba(255,255,255,0.14)]"
+          >
+            Close
           </button>
         )}
       </div>
@@ -124,15 +165,41 @@ function OrderItem({ order, isFilled }: { order: MyOrder; isFilled?: boolean }) 
   );
 }
 
+/** Convert a MyOrder into a mock OrderBookEntry for CloseOrderModal */
+function toOrderBookEntry(order: MyOrder): OrderBookEntry {
+  const colParts = order.collateral.split(' ');
+  const collateralVal = parseFloat(colParts[0]);
+  const collateralToken = (colParts[1] ?? 'SOL') as OrderBookEntry['collateralToken'];
+  const amountStr = order.amount.replace(/[^\d.]/g, '');
+  const amountNum = parseFloat(amountStr) * (order.amount.includes('K') ? 1000 : 1);
+  return {
+    id: order.id,
+    price: order.entryPrice ?? order.price,
+    amount: amountNum,
+    amountFormatted: order.amount,
+    collateral: collateralVal,
+    collateralIcon: '',
+    collateralToken,
+    fillPercent: 0,
+    filledAmount: 0,
+    totalAmount: amountNum,
+    isResell: order.hasBadge === 'RS',
+    originalPrice: order.originalPrice,
+  };
+}
+
 interface MyOrdersProps {
   filledOrders: MyOrder[];
   openOrders: MyOrder[];
   chain: string;
+  tokenSymbol: string;
+  onCloseOrder?: (orderId: string) => void;
 }
 
-export default function MyOrders({ filledOrders, openOrders, chain }: MyOrdersProps) {
+export default function MyOrders({ filledOrders, openOrders, chain, tokenSymbol, onCloseOrder }: MyOrdersProps) {
   const wallet = useWallet();
   const [activeTab, setActiveTab] = useState<MyOrdersTab>('filled');
+  const [closeModal, setCloseModal] = useState<{ order: MyOrder } | null>(null);
 
   const isConnected = wallet.isConnected;
   const isWrongNetwork = isConnected && wallet.connectedChain !== chain;
@@ -144,6 +211,17 @@ export default function MyOrders({ filledOrders, openOrders, chain }: MyOrdersPr
   ];
 
   const orders = activeTab === 'filled' ? filledOrders : openOrders;
+
+  const handleCloseOrder = (order: MyOrder) => {
+    setCloseModal({ order });
+  };
+
+  const handleConfirmClose = () => {
+    if (closeModal && onCloseOrder) {
+      onCloseOrder(closeModal.order.id);
+    }
+    setCloseModal(null);
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -236,7 +314,12 @@ export default function MyOrders({ filledOrders, openOrders, chain }: MyOrdersPr
       ) : (
         <div className="flex flex-col gap-4">
           {orders.slice(0, 5).map(order => (
-            <OrderItem key={order.id} order={order} isFilled={activeTab === 'filled'} />
+            <OrderItem
+              key={order.id}
+              order={order}
+              isFilled={activeTab === 'filled'}
+              onClose={handleCloseOrder}
+            />
           ))}
         </div>
       )}
@@ -256,6 +339,19 @@ export default function MyOrders({ filledOrders, openOrders, chain }: MyOrdersPr
           <RightArrowIcon />
         </span>
       </Link>
+
+      {/* Close Order Modal */}
+      {closeModal && (
+        <CloseOrderModal
+          isOpen={!!closeModal}
+          order={toOrderBookEntry(closeModal.order)}
+          side={closeModal.order.side === 'Sell' ? 'sell' : 'buy'}
+          tokenSymbol={tokenSymbol}
+          chain={chain}
+          onClose={() => setCloseModal(null)}
+          onConfirm={handleConfirmClose}
+        />
+      )}
     </div>
   );
 }

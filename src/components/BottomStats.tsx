@@ -5,7 +5,7 @@ import { useLiveMarkets } from '../hooks/useLiveMarketContext';
 
 function ArrowRightUpIcon() {
   return (
-    <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
       <path
         d="M3.5 8.5L8.5 3.5M8.5 3.5H4.5M8.5 3.5V7.5"
         stroke="currentColor"

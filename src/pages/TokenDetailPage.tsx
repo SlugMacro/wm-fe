@@ -42,7 +42,9 @@ export default function TokenDetailPage() {
   const [myFilledOrders, setMyFilledOrders] = useState<MyOrder[]>(() =>
     token.tokenSymbol === 'LOUD' ? [] : generateMyFilledOrders(token.tokenSymbol, token.chain, token.price)
   );
-  const myOpenOrders = useMemo(() => token.tokenSymbol === 'LOUD' ? [] : generateMyOpenOrders(token.tokenSymbol, token.chain, token.price), [token.id]);
+  const [myOpenOrders, setMyOpenOrders] = useState<MyOrder[]>(() =>
+    token.tokenSymbol === 'LOUD' ? [] : generateMyOpenOrders(token.tokenSymbol, token.chain, token.price)
+  );
 
   // When a trade executes in Recent Trades, update a matching order's fill AND chart
   const handleTradeExecuted = useCallback((side: 'Buy' | 'Sell') => {
@@ -285,6 +287,8 @@ export default function TokenDetailPage() {
               filledOrders={myFilledOrders}
               openOrders={myOpenOrders}
               chain={token.chain}
+              tokenSymbol={token.tokenSymbol}
+              onCloseOrder={(orderId) => setMyOpenOrders(prev => prev.filter(o => o.id !== orderId))}
             />
           </div>
         </div>

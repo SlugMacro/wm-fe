@@ -192,6 +192,7 @@ export default function TradePanel({
   const isBuy = selectedOrder?.side === 'buy';
   const isOwner = hasOrder && selectedOrder.order.isOwner === true;
   const isResell = hasOrder && !isOwner && selectedOrder.order.isResell === true;
+  const isOwnerResell = isOwner && hasOrder && !!selectedOrder.order.isResell;
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showCloseModal, setShowCloseModal] = useState(false);
   const [showFillModal, setShowFillModal] = useState(false);
@@ -449,7 +450,7 @@ export default function TradePanel({
   const buttonConfig = getButtonConfig();
 
   // Balance display
-  const showBalance = wallet.isConnected && !isWrongNetwork && !isOwner;
+  const showBalance = wallet.isConnected && !isWrongNetwork && (!isOwner || isOwnerResell);
   const balanceDisplay = showBalance
     ? `Balance: ${collateralBalance.toFixed(2)} ${orderCollateralToken}`
     : '';
@@ -472,11 +473,13 @@ export default function TradePanel({
             <h3 className={`text-lg font-medium leading-7 ${hasOrder ? (isOwner ? 'text-[#f9f9fa]' : isResell ? 'text-[#5bd197]' : accentText) : 'text-[#f9f9fa]'}`}>
               {!hasOrder
                 ? `Trade ${tokenSymbol}`
-                : isOwner
-                  ? <>My <span className={accentText}>{isBuy ? 'Buy' : 'Sell'}</span> Order</>
-                  : isResell
-                    ? `Buy ${tokenSymbol}`
-                    : `${isBuy ? 'Buy' : 'Sell'} ${tokenSymbol}`
+                : isOwnerResell
+                  ? <>My <span className="text-[#facc15]">Resell</span> Order</>
+                  : isOwner
+                    ? <>My <span className={accentText}>{isBuy ? 'Buy' : 'Sell'}</span> Order</>
+                    : isResell
+                      ? `Buy ${tokenSymbol}`
+                      : `${isBuy ? 'Buy' : 'Sell'} ${tokenSymbol}`
               }
             </h3>
             {/* Badge: RS for resell, FULL/PARTIAL for regular */}
@@ -491,8 +494,20 @@ export default function TradePanel({
               </span>
             )}
           </div>
-          {/* Price subtitle — different for resell */}
-          {isResell ? (
+          {/* Price subtitle — different for resell / owner resell */}
+          {isOwnerResell ? (
+            <div className="flex items-center gap-1 flex-wrap">
+              <span className="text-xs leading-4 font-normal text-[#7a7a83]">Price</span>
+              <span className="text-xs leading-4 font-normal text-[#facc15] tabular-nums">
+                ${price.toFixed(4)}
+              </span>
+              <span className="text-xs leading-4 text-[#44444b]">·</span>
+              <span className="text-xs leading-4 font-normal text-[#7a7a83]">Org. Price / Collateral</span>
+              <span className="text-xs leading-4 font-normal text-[#f9f9fa] tabular-nums">
+                ${(selectedOrder.order.originalPrice ?? price).toFixed(4)} / {(selectedOrder.order.originalCollateral ?? maxCollateral).toFixed(1)} {orderCollateralToken}
+              </span>
+            </div>
+          ) : isResell ? (
             <div className="flex items-center gap-1 flex-wrap">
               <span className="text-xs leading-4 font-normal text-[#7a7a83]">Price</span>
               <span className="text-xs leading-4 font-normal text-[#facc15] tabular-nums">
@@ -532,7 +547,7 @@ export default function TradePanel({
             <div className={`flex flex-col gap-2 p-4 border-b ${isDisplayOnly ? 'border-[#1b1b1c]' : 'bg-[#1b1b1c] border-transparent'}`}>
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium leading-4 text-[#7a7a83]">
-                  {isBuy ? 'Buying' : 'Selling'}
+                  {isOwnerResell ? 'Selling' : isBuy ? 'Buying' : 'Selling'}
                 </span>
               </div>
               <div className="flex items-center justify-between gap-4">
@@ -569,7 +584,7 @@ export default function TradePanel({
             <div className="flex flex-col gap-2 p-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium leading-4 text-[#7a7a83]">
-                  {isBuy ? 'Selling' : 'Buying'}
+                  {isOwnerResell ? 'Buying' : isBuy ? 'Selling' : 'Buying'}
                 </span>
                 {balanceDisplay && (
                   <span className="text-xs font-normal leading-4 text-[#7a7a83]">
@@ -590,7 +605,9 @@ export default function TradePanel({
           </div>
 
           {/* Slider / progress inside the grid cell */}
-          {!isOwner ? (
+          {isOwnerResell ? (
+            <ProgressSlider value={100} onChange={() => {}} disabled />
+          ) : !isOwner ? (
             <ProgressSlider value={sliderValue} onChange={handleSliderChange} disabled={isFixedFill} />
           ) : (
             <FillProgressBar filledAmount={ownerFilledAmount} totalAmount={ownerTotalAmount} tokenSymbol={tokenSymbol} />
@@ -620,7 +637,20 @@ export default function TradePanel({
       </button>
 
       {/* Info rows */}
-      {hasOrder && isOwner ? (
+      {hasOrder && isOwnerResell ? (
+        /* ── Owner resell info rows ── */
+        <div className="flex flex-col gap-2">
+          <InfoRow label="Price / Original Price">
+            <span className="text-sm leading-5 font-medium tabular-nums">
+              <span className="text-[#facc15]">${price.toFixed(4)}</span>
+              <span className="text-[#f9f9fa]"> / </span>
+              <span className="text-[#f9f9fa]">${(selectedOrder.order.originalPrice ?? price).toFixed(4)}</span>
+            </span>
+          </InfoRow>
+          <InfoRow label="Amount Deliver" value={`${bottomAmount} ${orderCollateralToken}`} />
+          <InfoRow label="To be Received" value={`${topAmount} ${tokenSymbol}`} />
+        </div>
+      ) : hasOrder && isOwner ? (
         /* ── Owner info rows ── */
         <div className="flex flex-col gap-2">
           <InfoRow label="Price" value={`$${price.toFixed(4)}`} />

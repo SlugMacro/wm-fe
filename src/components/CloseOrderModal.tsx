@@ -39,26 +39,31 @@ const infoRowTooltips: Record<string, string> = {
   'Order Type': 'Whether this is a buy order (acquiring tokens) or a sell order (selling tokens for collateral).',
   'Filled / Total Amount': 'The amount already filled by other traders versus the total order size. Filled portions will proceed to settlement.',
   'To be Received / Total': 'Collateral received from filled trades versus the total collateral locked in this order.',
+  'Total Amount': 'The total order size for this resell listing.',
+  'To be Received': 'The collateral you will receive back when this resell order is closed.',
   'Price': 'The unit price per token for this order.',
+  'Price / Original Price': 'Your resell listing price versus the original position entry price.',
   'Close Fee': 'The fee charged for closing this order. Currently waived during the promotional period.',
 };
 
-function InfoRow({ label, children, badge }: { label: string; children: React.ReactNode; badge?: React.ReactNode }) {
+function InfoRow({ label, labelContent, children, badge }: { label: string; labelContent?: React.ReactNode; children: React.ReactNode; badge?: React.ReactNode }) {
   const tooltip = infoRowTooltips[label];
   return (
     <div className="flex items-center justify-between border-b border-[#252527] px-4 py-3 last:border-b-0">
       <div className="flex items-center gap-2">
-        {tooltip ? (
-          <span className="relative group cursor-help inline-flex">
-            <span className="text-sm font-normal leading-5 text-[#7a7a83] border-b border-dashed border-[#44444b]">
-              {label}
+        {labelContent ?? (
+          tooltip ? (
+            <span className="relative group cursor-help inline-flex">
+              <span className="text-sm font-normal leading-5 text-[#7a7a83] border-b border-dashed border-[#44444b]">
+                {label}
+              </span>
+              <span className="absolute left-0 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-left text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-[150]">
+                {tooltip}
+              </span>
             </span>
-            <span className="absolute left-0 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-left text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-[150]">
-              {tooltip}
-            </span>
-          </span>
-        ) : (
-          <span className="text-sm font-normal leading-5 text-[#7a7a83]">{label}</span>
+          ) : (
+            <span className="text-sm font-normal leading-5 text-[#7a7a83]">{label}</span>
+          )
         )}
         {badge}
       </div>
@@ -116,6 +121,7 @@ export default function CloseOrderModal({
   if (!isOpen && !animating) return null;
 
   const isBuy = side === 'buy';
+  const isResell = !!order.isResell;
   const collateralToken = order.collateralToken;
 
   // Compute amounts
@@ -147,7 +153,7 @@ export default function CloseOrderModal({
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex-1" />
-          <p className="text-lg font-medium text-[#f9f9fa]">Close Order</p>
+          <p className="text-lg font-medium text-[#f9f9fa]">{isResell ? 'Confirm Transaction' : 'Close Order'}</p>
           <div className="flex flex-1 justify-end">
             <button
               onClick={handleClose}
@@ -159,8 +165,8 @@ export default function CloseOrderModal({
         </div>
 
         {/* Subtitle */}
-        <p className="text-center text-sm font-normal leading-5 text-[#7a7a83]">
-          You are closing this order.
+        <p className="text-center text-sm font-normal leading-5 text-[#b4b4ba]">
+          You are <span className="text-[#b4b4ba]">closing</span> this order.
           <br />
           Are you sure?
         </p>
@@ -169,40 +175,77 @@ export default function CloseOrderModal({
         <div className="rounded-[10px] border border-[#252527]">
           {/* Order Type */}
           <InfoRow label="Order Type">
-            <span className={isBuy ? 'text-[#5bd197]' : 'text-[#fd5e67]'}>
-              {isBuy ? 'Buy' : 'Sell'}
+            <span className={isResell ? 'text-[#facc15]' : isBuy ? 'text-[#5bd197]' : 'text-[#fd5e67]'}>
+              {isResell ? 'Resell' : isBuy ? 'Buy' : 'Sell'}
             </span>
           </InfoRow>
 
-          {/* Filled / Total Amount */}
-          <InfoRow label="Filled / Total Amount">
-            <span>{fmtAmount(filledAmount)}</span>
-            <TokenIcon symbol={tokenSymbol} size="xs" showChain={false} />
-            <span className="text-[#7a7a83] mx-0.5">/</span>
-            <span>{fmtAmount(totalAmount)}</span>
-            <TokenIcon symbol={tokenSymbol} size="xs" showChain={false} />
-          </InfoRow>
+          {isResell ? (
+            <>
+              {/* Total Amount (resell: no filled breakdown) */}
+              <InfoRow label="Total Amount">
+                <span>{fmtAmount(totalAmount)}</span>
+                <TokenIcon symbol={tokenSymbol} size="xs" showChain={false} />
+              </InfoRow>
 
-          {/* To be Received / Total */}
-          <InfoRow label="To be Received / Total">
-            <span>{filledCollateral.toFixed(2)}</span>
-            <TokenIcon symbol={collateralSymbol} size="xs" showChain={false} />
-            <span className="text-[#7a7a83] mx-0.5">/</span>
-            <span>{totalCollateral.toFixed(2)}</span>
-            <TokenIcon symbol={collateralSymbol} size="xs" showChain={false} />
-          </InfoRow>
+              {/* To be Received (resell: just the collateral back) */}
+              <InfoRow label="To be Received">
+                <span>{totalCollateral.toFixed(2)}</span>
+                <TokenIcon symbol={collateralSymbol} size="xs" showChain={false} />
+              </InfoRow>
 
-          {/* Price */}
-          <InfoRow label="Price">
-            <span>${order.price.toFixed(4)}</span>
-          </InfoRow>
+              {/* Price / Original Price */}
+              <InfoRow
+                label="Price / Original Price"
+                labelContent={
+                  <span className="relative group cursor-help inline-flex items-center gap-1 text-sm font-normal leading-5 text-[#b4b4ba]">
+                    <span className="border-b border-dashed border-[#44444b]">Price</span>
+                    <span>/</span>
+                    <span className="border-b border-dashed border-[#44444b]">Original Price</span>
+                    <span className="absolute left-0 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-left text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-[150]">
+                      Your resell listing price versus the original position entry price.
+                    </span>
+                  </span>
+                }
+              >
+                <span className="text-[#facc15]">${order.price.toFixed(4)}</span>
+                <span className="text-[#f9f9fa]">/</span>
+                <span>${(order.originalPrice ?? order.price).toFixed(4)}</span>
+              </InfoRow>
+            </>
+          ) : (
+            <>
+              {/* Filled / Total Amount */}
+              <InfoRow label="Filled / Total Amount">
+                <span>{fmtAmount(filledAmount)}</span>
+                <TokenIcon symbol={tokenSymbol} size="xs" showChain={false} />
+                <span className="text-[#7a7a83] mx-0.5">/</span>
+                <span>{fmtAmount(totalAmount)}</span>
+                <TokenIcon symbol={tokenSymbol} size="xs" showChain={false} />
+              </InfoRow>
+
+              {/* To be Received / Total */}
+              <InfoRow label="To be Received / Total">
+                <span>{filledCollateral.toFixed(2)}</span>
+                <TokenIcon symbol={collateralSymbol} size="xs" showChain={false} />
+                <span className="text-[#7a7a83] mx-0.5">/</span>
+                <span>{totalCollateral.toFixed(2)}</span>
+                <TokenIcon symbol={collateralSymbol} size="xs" showChain={false} />
+              </InfoRow>
+
+              {/* Price */}
+              <InfoRow label="Price">
+                <span>${order.price.toFixed(4)}</span>
+              </InfoRow>
+            </>
+          )}
 
           {/* Close Fee */}
           <InfoRow
             label="Close Fee"
             badge={
-              <span className="rounded-full bg-[rgba(22,194,132,0.12)] px-1.5 py-0.5 text-[10px] font-medium text-[#16c284]">
-                -0% FEE
+              <span className="rounded-full bg-[rgba(22,194,132,0.1)] px-2 py-1 text-[10px] font-medium uppercase text-[#5bd197]">
+                -0% Fee
               </span>
             }
           >
@@ -212,13 +255,15 @@ export default function CloseOrderModal({
         </div>
 
         {/* Notice */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
             <WarningIcon />
             <span className="text-sm font-medium text-[#f9f9fa]">Notice</span>
           </div>
-          <p className="text-sm font-normal leading-5 text-[#7a7a83]">
-            When you close this order, the filled amount will remain for settlement. The unfilled amount will be canceled and sent back to your wallet immediately.
+          <p className="text-sm font-normal leading-5 text-[#b4b4ba]">
+            {isResell
+              ? "This resell order has no buyers yet. Closing will cancel your resell listing and you'll keep your original position. You remain responsible for the underlying order settlement."
+              : 'When you close this order, the filled amount will remain for settlement. The unfilled amount will be canceled and sent back to your wallet immediately.'}
           </p>
         </div>
 

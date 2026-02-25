@@ -187,7 +187,7 @@ export default function RecentTradesTable() {
                     {trade.side}
                   </span>
                   {trade.hasBadge && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-[#eab308] px-2 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b]">
+                    <span className="inline-flex items-center justify-center rounded-full bg-[#eab308] px-1.5 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b]">
                       {trade.hasBadge}
                     </span>
                   )}

@@ -32,7 +32,7 @@ function CloseIcon() {
 
 function ExternalLinkIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 12 12" fill="none">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
       <path d="M3.5 8.5L8.5 3.5M8.5 3.5H4.5M8.5 3.5V7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
@@ -46,9 +46,12 @@ const infoCellTooltips: Record<string, string> = {
   'Filled Amount': 'How many tokens have already been matched and filled by other traders.',
   'Remaining Amount': 'Tokens still available to be filled in this order.',
   'Settle Starts': 'When the settlement period begins. Tokens must be delivered after this time.',
+  'Settle Start': 'When the settlement period begins. Tokens must be delivered after this time.',
   'Settle Ends': 'The deadline for settlement. Unfulfilled orders will have collateral refunded after this date.',
   'Order TX': 'The on-chain transaction hash for when this order was created.',
   'Countdown': 'Time remaining until the settlement period begins.',
+  'Original Price': 'The price the original buyer paid when first entering this position.',
+  'Original Collateral': 'The collateral deposited by the original buyer for this position.',
 };
 
 function InfoCell({ label, children }: { label: string; children: React.ReactNode }) {
@@ -143,6 +146,7 @@ export default function OrderInfoModal({
   if (!isOpen && !animating) return null;
 
   const isBuy = side === 'buy';
+  const isResell = order.isResell === true;
   const amountK = order.amount / 1000;
   const amountFormatted = amountK >= 1 ? `${amountK.toFixed(2)}K` : order.amount.toFixed(0);
   const filledK = order.filledAmount / 1000;
@@ -150,8 +154,10 @@ export default function OrderInfoModal({
   const remaining = order.totalAmount - order.filledAmount;
   const remainingK = remaining / 1000;
   const remainingFormatted = remaining === 0 ? '0' : (remainingK >= 1 ? `${remainingK.toFixed(2)}K` : remaining.toFixed(0));
-  const fillTypeLabel = order.fillType ?? (order.isResell ? 'RESELL' : 'Partial');
+  const fillTypeLabel = order.fillType ?? (isResell ? 'RESELL' : 'Partial');
   const explorer = getExplorer(chain);
+  const originalPrice = order.originalPrice ?? order.price * 0.6;
+  const originalCollateral = order.originalCollateral ?? order.collateral * 1.14;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center">
@@ -190,71 +196,138 @@ export default function OrderInfoModal({
         {/* Body */}
         <div className="flex flex-col gap-6">
           {/* Message */}
-          <p className="text-sm font-normal leading-5 text-[#b4b4ba]">
-            <span>{isOwner ? MY_WALLET_SHORT : generateWalletShort(order.id, chain)} is </span>
-            <span className={isBuy ? 'text-[#5bd197]' : 'text-[#fd5e67]'}>
-              {isBuy ? 'buying' : 'selling'}
-            </span>
-            <span> </span>
-            <span className="text-[#f9f9fa]">{amountFormatted} {tokenSymbol}</span>
-            <span> for </span>
-            <span className="text-[#f9f9fa]">{order.collateral} {order.collateralToken}</span>
-          </p>
+          <div className="flex items-center gap-2 text-sm font-normal leading-5 text-[#b4b4ba]">
+            {isResell && (
+              <span className="inline-flex items-center justify-center rounded-full bg-[#eab308] px-1.5 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b]">
+                RS
+              </span>
+            )}
+            <p>
+              <span>{isOwner ? MY_WALLET_SHORT : generateWalletShort(order.id, chain)} is </span>
+              {isResell ? (
+                <span className="text-[#facc15]">exiting</span>
+              ) : (
+                <span className={isBuy ? 'text-[#5bd197]' : 'text-[#fd5e67]'}>
+                  {isBuy ? 'buying' : 'selling'}
+                </span>
+              )}
+              <span> </span>
+              <span className="text-[#f9f9fa]">{amountFormatted} {tokenSymbol}</span>
+              <span> for </span>
+              <span className="text-[#f9f9fa]">{order.collateral} {order.collateralToken}</span>
+            </p>
+          </div>
 
           {/* Review info grid */}
           <div className="rounded-[10px] border border-[#252527]">
-            {/* Row 1: Price | Fill Type */}
-            <div className="flex border-b border-[#252527]">
-              <div className="flex-1 border-r border-[#252527]">
-                <InfoCell label="Price">
-                  <span>${order.price.toFixed(4)}</span>
-                </InfoCell>
-              </div>
-              <div className="flex-1">
-                <InfoCell label="Fill Type">
-                  <span className="rounded-full bg-[rgba(255,255,255,0.06)] px-2 py-1 text-[10px] font-medium uppercase leading-3 text-[#7a7a83]">
-                    {fillTypeLabel}
-                  </span>
-                </InfoCell>
-              </div>
-            </div>
+            {isResell ? (
+              <>
+                {/* Resell Row 1: Price / Amount | Original Price */}
+                <div className="flex border-b border-[#252527]">
+                  <div className="flex-1 border-r border-[#252527]">
+                    <div className="flex flex-1 flex-col gap-2 p-4">
+                      <div className="flex items-center gap-1">
+                        <span className="relative group cursor-help inline-flex w-fit">
+                          <span className="text-xs font-normal leading-4 text-[#b4b4ba] border-b border-dashed border-[#44444b]">Price</span>
+                          <span className="absolute left-0 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-left text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-[150]">
+                            The resell entry price for this position.
+                          </span>
+                        </span>
+                        <span className="text-xs font-normal leading-4 text-[#b4b4ba]">/</span>
+                        <span className="relative group cursor-help inline-flex w-fit">
+                          <span className="text-xs font-normal leading-4 text-[#b4b4ba] border-b border-dashed border-[#44444b]">Amount</span>
+                          <span className="absolute left-0 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-left text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-[150]">
+                            The total number of tokens in this resell position.
+                          </span>
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1 text-sm font-medium leading-5 tabular-nums">
+                        <span className="text-[#facc15]">${order.price.toFixed(4)}</span>
+                        <span className="text-[#f9f9fa]">/</span>
+                        <span className="text-[#f9f9fa]">{amountFormatted}</span>
+                        <TokenIcon symbol={tokenSymbol} size="xs" showChain={false} />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <InfoCell label="Original Price">
+                      <span>${originalPrice.toFixed(4)}</span>
+                    </InfoCell>
+                  </div>
+                </div>
 
-            {/* Row 2: Amount | For */}
-            <div className="flex border-b border-[#252527]">
-              <div className="flex-1 border-r border-[#252527]">
-                <InfoCell label="Amount">
-                  <span>{amountFormatted}</span>
-                  <TokenIcon symbol={tokenSymbol} size="xs" showChain={false} />
-                </InfoCell>
-              </div>
-              <div className="flex-1">
-                <InfoCell label="For">
-                  <span>{order.collateral}</span>
-                  <TokenIcon symbol={order.collateralToken} size="xs" showChain={false} />
-                </InfoCell>
-              </div>
-            </div>
+                {/* Resell Row 2: For | Original Collateral */}
+                <div className="flex border-b border-[#252527]">
+                  <div className="flex-1 border-r border-[#252527]">
+                    <InfoCell label="For">
+                      <span>{order.collateral}</span>
+                      <TokenIcon symbol={order.collateralToken} size="xs" showChain={false} />
+                    </InfoCell>
+                  </div>
+                  <div className="flex-1">
+                    <InfoCell label="Original Collateral">
+                      <span>{originalCollateral.toFixed(1)}</span>
+                      <TokenIcon symbol={order.collateralToken} size="xs" showChain={false} />
+                    </InfoCell>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Row 1: Price | Fill Type */}
+                <div className="flex border-b border-[#252527]">
+                  <div className="flex-1 border-r border-[#252527]">
+                    <InfoCell label="Price">
+                      <span>${order.price.toFixed(4)}</span>
+                    </InfoCell>
+                  </div>
+                  <div className="flex-1">
+                    <InfoCell label="Fill Type">
+                      <span className="rounded-full bg-[rgba(255,255,255,0.06)] px-2 py-1 text-[10px] font-medium uppercase leading-3 text-[#7a7a83]">
+                        {fillTypeLabel}
+                      </span>
+                    </InfoCell>
+                  </div>
+                </div>
 
-            {/* Row 3: Filled Amount | Remaining Amount */}
-            <div className="flex border-b border-[#252527]">
-              <div className="flex-1 border-r border-[#252527]">
-                <InfoCell label="Filled Amount">
-                  <span>{filledFormatted}</span>
-                  <TokenIcon symbol={tokenSymbol} size="xs" showChain={false} />
-                </InfoCell>
-              </div>
-              <div className="flex-1">
-                <InfoCell label="Remaining Amount">
-                  <span>{remainingFormatted}</span>
-                  <TokenIcon symbol={tokenSymbol} size="xs" showChain={false} />
-                </InfoCell>
-              </div>
-            </div>
+                {/* Row 2: Amount | For */}
+                <div className="flex border-b border-[#252527]">
+                  <div className="flex-1 border-r border-[#252527]">
+                    <InfoCell label="Amount">
+                      <span>{amountFormatted}</span>
+                      <TokenIcon symbol={tokenSymbol} size="xs" showChain={false} />
+                    </InfoCell>
+                  </div>
+                  <div className="flex-1">
+                    <InfoCell label="For">
+                      <span>{order.collateral}</span>
+                      <TokenIcon symbol={order.collateralToken} size="xs" showChain={false} />
+                    </InfoCell>
+                  </div>
+                </div>
 
-            {/* Row 4: Settle Starts | Settle Ends */}
+                {/* Row 3: Filled Amount | Remaining Amount */}
+                <div className="flex border-b border-[#252527]">
+                  <div className="flex-1 border-r border-[#252527]">
+                    <InfoCell label="Filled Amount">
+                      <span>{filledFormatted}</span>
+                      <TokenIcon symbol={tokenSymbol} size="xs" showChain={false} />
+                    </InfoCell>
+                  </div>
+                  <div className="flex-1">
+                    <InfoCell label="Remaining Amount">
+                      <span>{remainingFormatted}</span>
+                      <TokenIcon symbol={tokenSymbol} size="xs" showChain={false} />
+                    </InfoCell>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* Settle Starts | Settle Ends */}
             <div className="flex border-b border-[#252527]">
               <div className="flex-1 border-r border-[#252527]">
-                <InfoCell label="Settle Starts">
+                <InfoCell label={isResell ? 'Settle Start' : 'Settle Starts'}>
                   <span>10/08/2025 10:24 AM</span>
                 </InfoCell>
               </div>
@@ -265,7 +338,7 @@ export default function OrderInfoModal({
               </div>
             </div>
 
-            {/* Row 5: Order TX | Countdown */}
+            {/* Order TX | Countdown */}
             <div className="flex">
               <div className="flex-1 border-r border-[#252527]">
                 <InfoCell label="Order TX">
