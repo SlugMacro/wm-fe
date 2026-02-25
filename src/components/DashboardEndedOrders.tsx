@@ -49,8 +49,8 @@ function CollapseIcon({ collapsed }: { collapsed: boolean }) {
 
 function ExternalLinkIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-      <path d="M4 10L10 4M10 4H5.5M10 4V8.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width="14" height="14" viewBox="0 0 12 12" fill="none">
+      <path d="M3.5 8.5L8.5 3.5M8.5 3.5H4.5M8.5 3.5V7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }

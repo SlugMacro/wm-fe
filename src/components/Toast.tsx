@@ -33,8 +33,8 @@ function CheckCircleIcon() {
 
 function ExternalLinkIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-      <path d="M15.64 7.025h-3.622v-2h7v7h-2v-3.55l-4.914 4.914-1.414-1.414 4.95-4.95zM10.982 6.975h-6v12h12v-6h-2v4h-8v-8h4v-2z" fill="currentColor" />
+    <svg width="14" height="14" viewBox="0 0 12 12" fill="none">
+      <path d="M3.5 8.5L8.5 3.5M8.5 3.5H4.5M8.5 3.5V7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }

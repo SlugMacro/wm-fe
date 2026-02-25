@@ -15,8 +15,8 @@ import {
   generateBuyOrders,
   generateSellOrders,
   generatePriceData,
-  myFilledOrders,
-  myOpenOrders,
+  generateMyFilledOrders,
+  generateMyOpenOrders,
 } from '../mock-data/tokenDetail';
 
 export default function TokenDetailPage() {
@@ -35,6 +35,10 @@ export default function TokenDetailPage() {
     generateSellOrders(token.price, token.chain)
   );
   const [priceData, setPriceData] = useState<PriceDataPoint[]>(() => generatePriceData(token.price, token.chartData));
+
+  // My orders — generated per token (LOUD has no orders for testing empty state)
+  const myFilledOrders = useMemo(() => token.tokenSymbol === 'LOUD' ? [] : generateMyFilledOrders(token.tokenSymbol, token.chain, token.price), [token.id]);
+  const myOpenOrders = useMemo(() => token.tokenSymbol === 'LOUD' ? [] : generateMyOpenOrders(token.tokenSymbol, token.chain, token.price), [token.id]);
 
   // When a trade executes in Recent Trades, update a matching order's fill AND chart
   const handleTradeExecuted = useCallback((side: 'Buy' | 'Sell') => {
@@ -218,6 +222,7 @@ export default function TokenDetailPage() {
             <MyOrders
               filledOrders={myFilledOrders}
               openOrders={myOpenOrders}
+              chain={token.chain}
             />
           </div>
         </div>

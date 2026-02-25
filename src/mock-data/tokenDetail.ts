@@ -187,69 +187,63 @@ export function generateSellOrders(basePrice: number, chain = 'solana'): OrderBo
   });
 }
 
-export const myFilledOrders: MyOrder[] = [
-  {
-    id: 'fo-1',
-    side: 'Buy',
-    pair: 'ZBT/SOL',
-    date: '23/02/2024 15:33:15',
-    price: 0.055,
-    amount: '1.00K',
-    collateral: '1.5 SOL',
-    canResell: true,
-  },
-  {
-    id: 'fo-2',
-    side: 'Buy',
-    pair: 'ZBT/SOL',
-    hasBadge: 'RS',
-    date: '23/02/2024 15:33:15',
-    price: 0.055,
-    entryPrice: 0.042,
-    originalPrice: 0.055,
-    amount: '1.00K',
-    collateral: '1.3 SOL',
-    canResell: true,
-  },
-  {
-    id: 'fo-3',
-    side: 'Buy',
-    pair: 'ZBT/SOL',
-    date: '23/02/2024 15:33:15',
-    price: 0.055,
-    amount: '1.00K',
-    collateral: '1.8 SOL',
-    canResell: true,
-  },
-  {
-    id: 'fo-4',
-    side: 'Sell',
-    pair: 'ZBT/SOL',
-    date: '23/02/2024 15:33:15',
-    price: 0.055,
-    amount: '1.00K',
-    collateral: '1.5 SOL',
-  },
-  {
-    id: 'fo-5',
-    side: 'Sell',
-    pair: 'ZBT/SOL',
-    date: '23/02/2024 15:33:15',
-    price: 0.055,
-    amount: '1.00K',
-    collateral: '1.5 SOL',
-  },
-];
+export function generateMyFilledOrders(tokenSymbol: string, chain = 'solana', basePrice = 0.055): MyOrder[] {
+  const native = getNativeToken(chain);
+  const sym = tokenSymbol.toUpperCase();
+  const colSymbol = native.symbol;
 
-export const myOpenOrders: MyOrder[] = Array.from({ length: 12 }, (_, i) => ({
-  id: `oo-${i}`,
-  side: (i % 2 === 0 ? 'Buy' : 'Sell') as 'Buy' | 'Sell',
-  pair: 'ZBT/SOL',
-  date: '23/02/2024 15:33:15',
-  price: 0.055,
-  amount: `${(Math.random() * 5 + 0.5).toFixed(2)}K`,
-  collateral: `${(Math.random() * 3 + 0.5).toFixed(1)} SOL`,
-}));
+  const priceVariants = [1.0, 0.96, 1.02, 0.98, 1.01];
+  const amounts = [1.0, 1.0, 2.5, 0.5, 1.0];
+  const collaterals = [1.5, 1.3, 4.2, 0.8, 1.5];
+  const sides: ('Buy' | 'Sell')[] = ['Buy', 'Buy', 'Buy', 'Sell', 'Sell'];
+  const dates = [
+    '23/02/2024 15:33:15',
+    '23/02/2024 14:21:08',
+    '22/02/2024 20:45:30',
+    '22/02/2024 18:12:44',
+    '21/02/2024 09:55:22',
+  ];
+
+  return sides.map((side, i) => {
+    const price = Math.round(basePrice * priceVariants[i] * 10000) / 10000;
+    const order: MyOrder = {
+      id: `fo-${i + 1}`,
+      side,
+      pair: `${sym}/${colSymbol}`,
+      date: dates[i],
+      price,
+      amount: `${amounts[i].toFixed(2)}K`,
+      collateral: `${collaterals[i].toFixed(1)} ${colSymbol}`,
+      canResell: side === 'Buy' ? true : undefined,
+    };
+    if (i === 1) {
+      order.hasBadge = 'RS';
+      order.entryPrice = Math.round(basePrice * 0.76 * 10000) / 10000;
+      order.originalPrice = price;
+    }
+    return order;
+  });
+}
+
+export function generateMyOpenOrders(tokenSymbol: string, chain = 'solana', basePrice = 0.055): MyOrder[] {
+  const native = getNativeToken(chain);
+  const sym = tokenSymbol.toUpperCase();
+  const colSymbol = native.symbol;
+
+  const spreadFactors = [0.97, 1.03, 0.95, 1.05, 0.98, 1.02, 0.96, 1.04, 0.99, 1.01, 0.94, 1.06];
+  const amounts = [1.20, 0.85, 3.50, 0.60, 2.10, 1.45, 0.90, 4.20, 1.80, 0.55, 2.70, 1.10];
+  const collaterals = [1.8, 1.2, 5.5, 0.9, 3.2, 2.1, 1.4, 6.5, 2.7, 0.8, 4.1, 1.7];
+
+  return Array.from({ length: 12 }, (_, i) => ({
+    id: `oo-${i}`,
+    side: (i % 2 === 0 ? 'Buy' : 'Sell') as 'Buy' | 'Sell',
+    pair: `${sym}/${colSymbol}`,
+    date: '23/02/2024 15:33:15',
+    price: Math.round(basePrice * spreadFactors[i] * 10000) / 10000,
+    amount: `${amounts[i].toFixed(2)}K`,
+    collateral: `${collaterals[i].toFixed(1)} ${colSymbol}`,
+  }));
+}
 
 export function generatePriceData(basePrice = 0.055, chartData?: number[]): PriceDataPoint[] {
   const points: PriceDataPoint[] = [];
