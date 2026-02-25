@@ -86,6 +86,9 @@ export function generateBuyOrders(basePrice: number, chain = 'solana'): OrderBoo
     false, true, true, false, true, false, true, true,
     false, true, false, true, true, false,
   ];
+  // Mark some buy orders as resell
+  const resellIndices = new Set([2, 5, 9, 13, 18, 22, 26]);
+
   const native = getNativeToken(chain);
 
   return prices.map((price, i) => {
@@ -106,6 +109,7 @@ export function generateBuyOrders(basePrice: number, chain = 'solana'): OrderBoo
       filledAmount,
       totalAmount,
       fillType: fillTypes[i],
+      isResell: resellIndices.has(i),
     };
   });
 }

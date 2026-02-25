@@ -25,6 +25,7 @@ export default function TokenDetailPage() {
 
   const [selectedOrder, setSelectedOrder] = useState<{ order: OrderBookEntry; side: 'buy' | 'sell' } | null>(null);
   const [flashedOrderId, setFlashedOrderId] = useState<string | null>(null);
+  const [showChart, setShowChart] = useState(true);
 
   // Orders as mutable state — updated when trades execute
   const [buyOrders, setBuyOrders] = useState<OrderBookEntry[]>(() =>
@@ -152,14 +153,22 @@ export default function TokenDetailPage() {
       <div className="flex">
         {/* Left column */}
         <div className="flex-1 min-w-0">
-          {/* Chart */}
-          <div className="pt-4">
-            <PriceChart
-              data={priceData}
-              currentPrice={livePrice}
-              priceChange={livePriceChange}
-              impliedFdv={token.impliedFdv}
-            />
+          {/* Chart — toggleable from OrderBook with smooth transition */}
+          <div
+            className="overflow-hidden transition-all duration-300 ease-in-out"
+            style={{
+              maxHeight: showChart ? '600px' : '0px',
+              opacity: showChart ? 1 : 0,
+            }}
+          >
+            <div className="pt-4">
+              <PriceChart
+                data={priceData}
+                currentPrice={livePrice}
+                priceChange={livePriceChange}
+                impliedFdv={token.impliedFdv}
+              />
+            </div>
           </div>
 
           {/* Order Book */}
@@ -171,6 +180,8 @@ export default function TokenDetailPage() {
               selectedOrderId={selectedOrder?.order.id ?? null}
               tokenSymbol={token.tokenSymbol}
               flashedOrderId={flashedOrderId}
+              showChart={showChart}
+              onToggleChart={() => setShowChart(prev => !prev)}
             />
           </div>
 

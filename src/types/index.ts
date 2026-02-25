@@ -112,6 +112,7 @@ export interface OrderBookEntry {
   filledAmount: number; // filled amount in token units
   totalAmount: number; // total amount in token units
   fillType?: 'FULL' | 'PARTIAL'; // optional fill type label
+  isResell?: boolean; // resell order from buy side
 }
 
 export interface MyOrder {
