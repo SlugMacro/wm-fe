@@ -373,7 +373,6 @@ export default function DashboardOpenOrders({ openOrders, filledOrders, onCloseO
           {isLoading
             ? Array.from({ length: 5 }, (_, i) => <SkeletonRow key={`skel-${i}`} index={i} />)
             : paginatedOrders.map((order) => {
-                const isResell = order.side === 'Resell';
                 return (
                   <div
                     key={order.id}
@@ -409,7 +408,7 @@ export default function DashboardOpenOrders({ openOrders, filledOrders, onCloseO
 
                     {/* Price */}
                     <div className="w-[10%] min-w-[100px] text-right">
-                      <span className={`text-sm tabular-nums ${isResell ? 'text-[#16c284]' : 'text-[#f9f9fa]'}`}>
+                      <span className="text-sm tabular-nums text-[#f9f9fa]">
                         {formatPrice(order.price)}
                       </span>
                     </div>
