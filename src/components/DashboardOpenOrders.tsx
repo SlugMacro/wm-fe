@@ -25,15 +25,6 @@ function ChevronDownIcon() {
   );
 }
 
-function SearchIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-      <circle cx="6.5" cy="6.5" r="4" stroke="currentColor" strokeWidth="1.2" />
-      <path d="M9.5 9.5L12 12" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
 function CollapseIcon({ collapsed }: { collapsed: boolean }) {
   return (
     <svg
@@ -175,28 +166,21 @@ export default function DashboardOpenOrders({ openOrders, filledOrders, onCloseO
 
   return (
     <div>
-      {/* Header: Collapse + Tabs + Filters */}
+      {/* Header: Tabs + Filters */}
       <div className="flex items-center justify-between py-3">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="text-[#7a7a83] transition-colors hover:text-[#f9f9fa]"
-          >
-            <CollapseIcon collapsed={collapsed} />
-          </button>
-
-          {/* Tabs */}
+        <div className="flex items-center gap-3">
+          {/* Tabs — match homepage LiveMarketTable style */}
           <button
             onClick={() => handleTabChange('open')}
-            className={`text-xl font-medium leading-7 transition-colors ${
+            className={`inline-flex items-center gap-2 text-xl font-medium leading-7 transition-colors ${
               activeTab === 'open' ? 'text-[#f9f9fa]' : 'text-[#7a7a83] hover:text-[#f9f9fa]'
             }`}
           >
             Open Orders
-            <span className={`ml-2 inline-flex items-center justify-center rounded-full px-2 py-1 text-[10px] font-medium leading-3 ${
+            <span className={`inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-medium leading-4 ${
               activeTab === 'open'
-                ? 'bg-[#16c284] text-[#f9f9fa]'
-                : 'bg-[#1b1b1c] text-[#b4b4ba]'
+                ? 'bg-[rgba(22,194,132,0.15)] text-[#5bd197]'
+                : 'bg-[#252527] text-[#7a7a83]'
             }`}>
               {openOrders.length}
             </span>
@@ -204,23 +188,23 @@ export default function DashboardOpenOrders({ openOrders, filledOrders, onCloseO
 
           <button
             onClick={() => handleTabChange('filled')}
-            className={`text-xl font-medium leading-7 transition-colors ${
+            className={`inline-flex items-center gap-2 text-xl font-medium leading-7 transition-colors ${
               activeTab === 'filled' ? 'text-[#f9f9fa]' : 'text-[#7a7a83] hover:text-[#f9f9fa]'
             }`}
           >
             Filled Orders
-            <span className={`ml-2 inline-flex items-center justify-center rounded-full px-2 py-1 text-[10px] font-medium leading-3 ${
+            <span className={`inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-medium leading-4 ${
               activeTab === 'filled'
-                ? 'bg-[#16c284] text-[#f9f9fa]'
-                : 'bg-[#1b1b1c] text-[#b4b4ba]'
+                ? 'bg-[rgba(22,194,132,0.15)] text-[#5bd197]'
+                : 'bg-[#252527] text-[#7a7a83]'
             }`}>
               {filledOrders.length}
             </span>
           </button>
         </div>
 
-        {/* Right: Filters */}
-        <div className="flex items-center gap-2">
+        {/* Right: Filters + Collapse */}
+        <div className="flex items-center gap-3">
           {/* Side dropdown */}
           <div className="relative">
             <button
@@ -247,17 +231,28 @@ export default function DashboardOpenOrders({ openOrders, filledOrders, onCloseO
             )}
           </div>
 
-          {/* Search */}
-          <div className="flex items-center gap-2 rounded-lg bg-[#1b1b1c] px-3 py-1.5">
-            <span className="text-[#7a7a83]"><SearchIcon /></span>
+          {/* Search — match homepage SearchInput style */}
+          <div className="relative">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[#7a7a83]" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.5" />
+              <path d="M11 11L14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
             <input
               type="text"
               placeholder="Search"
               value={searchTerm}
               onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-              className="w-40 bg-transparent text-sm text-[#f9f9fa] placeholder-[#7a7a83] outline-none"
+              className="h-9 w-[200px] rounded-lg border border-[#1f1f23] bg-transparent pl-9 pr-3 text-sm text-[#f9f9fa] placeholder-[#7a7a83] outline-none transition-colors focus:border-[#2e2e34]"
             />
           </div>
+
+          {/* Collapse toggle — circular bg */}
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="flex size-9 items-center justify-center rounded-full bg-[#1b1b1c] text-[#7a7a83] transition-colors hover:bg-[#252527] hover:text-[#f9f9fa]"
+          >
+            <CollapseIcon collapsed={collapsed} />
+          </button>
         </div>
       </div>
 
