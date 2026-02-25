@@ -289,7 +289,7 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
               <span className="text-xs font-medium text-[#7a7a83]" />
             </div>
             <div className="flex-1 text-right pr-1">
-              <span className="text-xs font-medium text-[#7a7a83]">Action</span>
+              <span className="text-xs font-medium text-[#7a7a83]">Tx.ID</span>
             </div>
           </div>
 
@@ -355,11 +355,10 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
                   <StatusBadge status={order.status} />
                 </div>
 
-                {/* Action — View Tx button matching homepage width */}
+                {/* Tx.ID — icon-only square button */}
                 <div className="flex-1 flex justify-end pr-1">
-                  <button className="inline-flex h-7 items-center justify-center gap-1 rounded-md border border-[#252527] px-2.5 text-xs font-medium text-[#7a7a83] transition-colors hover:border-[#3a3a3d] hover:text-[#f9f9fa]">
+                  <button className="flex size-7 items-center justify-center rounded border border-[#252527] text-[#7a7a83] transition-colors hover:border-[#3a3a3d] hover:text-[#f9f9fa]">
                     <ExternalLinkIcon />
-                    <span>View Tx</span>
                   </button>
                 </div>
               </div>
