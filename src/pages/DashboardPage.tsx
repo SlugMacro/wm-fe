@@ -18,7 +18,7 @@ const breadcrumbItems = [
 
 export default function DashboardPage() {
   return (
-    <div className="mx-auto max-w-[1440px] px-8">
+    <div className="mx-auto max-w-[1440px] px-12">
       {/* Breadcrumb */}
       <Breadcrumb items={breadcrumbItems} />
 

@@ -179,9 +179,9 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
             <CollapseIcon collapsed={collapsed} />
           </button>
 
-          <span className="text-lg font-medium text-[#f9f9fa]">
+          <span className="text-xl font-medium leading-7 text-[#f9f9fa]">
             Ended Settlement
-            <span className="ml-2 inline-flex items-center justify-center rounded-full bg-[rgba(22,194,132,0.2)] px-2 py-0.5 text-[10px] font-medium text-[#5bd197]">
+            <span className="ml-2 inline-flex items-center justify-center rounded-full bg-[#16c284] px-2 py-1 text-[10px] font-medium leading-3 text-[#f9f9fa]">
               {orders.length}
             </span>
           </span>
@@ -261,7 +261,7 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
       {!collapsed && (
         <>
           {/* Table Header */}
-          <div className="flex items-center border-b border-[#1b1b1c] h-9">
+          <div className="flex items-center border-b border-[#1b1b1c] h-9 px-2">
             <div className="w-[14%] min-w-[160px]">
               <span className="text-xs font-medium text-[#7a7a83]">Pair</span>
             </div>
@@ -319,14 +319,14 @@ export default function DashboardEndedOrders({ orders }: DashboardEndedOrdersPro
             return (
               <div
                 key={order.id}
-                className="flex items-center border-b border-[#1b1b1c] h-[52px] transition-colors hover:bg-[rgba(255,255,255,0.02)]"
+                className="flex items-center border-b border-[#1b1b1c] h-[60px] px-2 transition-colors hover:bg-[rgba(255,255,255,0.02)]"
               >
                 {/* Pair */}
                 <div className="w-[14%] min-w-[160px] flex items-center gap-2">
                   <TokenIconComponent symbol={order.pair.split('/')[0]} chain="solana" size="sm" />
                   <span className="text-sm text-[#f9f9fa]">{order.pair}</span>
                   {order.hasBadge === 'RS' && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-[#eab308] px-2 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b]">
+                    <span className="inline-flex items-center justify-center rounded-full bg-[#eab308] px-1.5 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b]">
                       RS
                     </span>
                   )}

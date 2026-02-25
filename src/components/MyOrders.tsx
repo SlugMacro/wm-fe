@@ -67,15 +67,13 @@ function OrderItem({ order }: { order: MyOrder }) {
     <div className="flex flex-col gap-3 border-b border-[#1b1b1c] pb-4">
       {/* Row 1: Side + Pair + Badge | Date */}
       <div className="flex items-center justify-between">
-        <div className="flex items-start gap-1">
+        <div className="flex items-center gap-1">
           <span className={`text-sm font-medium leading-5 ${order.side === 'Buy' ? 'text-[#5bd197]' : 'text-[#fd5e67]'}`}>
             {order.side}
           </span>
-          <div className="flex items-center gap-1">
-            <span className="text-sm font-medium leading-5 text-[#f9f9fa]">{order.pair}</span>
-          </div>
+          <span className="text-sm font-medium leading-5 text-[#f9f9fa]">{order.pair}</span>
           {order.hasBadge && (
-            <span className="inline-flex items-center justify-center rounded-full bg-[#eab308] px-2 py-1 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b]">
+            <span className="inline-flex items-center justify-center rounded-full bg-[#eab308] px-1.5 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b]">
               {order.hasBadge}
             </span>
           )}

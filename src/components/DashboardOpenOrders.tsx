@@ -171,15 +171,15 @@ export default function DashboardOpenOrders({ openOrders, filledOrders }: Dashbo
           {/* Tabs */}
           <button
             onClick={() => handleTabChange('open')}
-            className={`text-lg font-medium transition-colors ${
+            className={`text-xl font-medium leading-7 transition-colors ${
               activeTab === 'open' ? 'text-[#f9f9fa]' : 'text-[#7a7a83] hover:text-[#f9f9fa]'
             }`}
           >
             Open Orders
-            <span className={`ml-2 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-[10px] font-medium ${
+            <span className={`ml-2 inline-flex items-center justify-center rounded-full px-2 py-1 text-[10px] font-medium leading-3 ${
               activeTab === 'open'
-                ? 'bg-[rgba(22,194,132,0.2)] text-[#5bd197]'
-                : 'bg-[#1b1b1c] text-[#7a7a83]'
+                ? 'bg-[#16c284] text-[#f9f9fa]'
+                : 'bg-[#1b1b1c] text-[#b4b4ba]'
             }`}>
               {openOrders.length}
             </span>
@@ -187,15 +187,15 @@ export default function DashboardOpenOrders({ openOrders, filledOrders }: Dashbo
 
           <button
             onClick={() => handleTabChange('filled')}
-            className={`text-lg font-medium transition-colors ${
+            className={`text-xl font-medium leading-7 transition-colors ${
               activeTab === 'filled' ? 'text-[#f9f9fa]' : 'text-[#7a7a83] hover:text-[#f9f9fa]'
             }`}
           >
             Filled Orders
-            <span className={`ml-2 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-[10px] font-medium ${
+            <span className={`ml-2 inline-flex items-center justify-center rounded-full px-2 py-1 text-[10px] font-medium leading-3 ${
               activeTab === 'filled'
-                ? 'bg-[rgba(22,194,132,0.2)] text-[#5bd197]'
-                : 'bg-[#1b1b1c] text-[#7a7a83]'
+                ? 'bg-[#16c284] text-[#f9f9fa]'
+                : 'bg-[#1b1b1c] text-[#b4b4ba]'
             }`}>
               {filledOrders.length}
             </span>
@@ -248,7 +248,7 @@ export default function DashboardOpenOrders({ openOrders, filledOrders }: Dashbo
       {!collapsed && (
         <>
           {/* Table Header */}
-          <div className="flex items-center border-b border-[#1b1b1c] h-9">
+          <div className="flex items-center border-b border-[#1b1b1c] h-9 px-2">
             <div className="w-[14%] min-w-[160px]">
               <span className="text-xs font-medium text-[#7a7a83]">Pair</span>
             </div>
@@ -311,7 +311,7 @@ export default function DashboardOpenOrders({ openOrders, filledOrders }: Dashbo
             return (
               <div
                 key={order.id}
-                className="flex items-center border-b border-[#1b1b1c] h-[52px] transition-colors hover:bg-[rgba(255,255,255,0.02)]"
+                className="flex items-center border-b border-[#1b1b1c] h-[60px] px-2 transition-colors hover:bg-[rgba(255,255,255,0.02)]"
               >
                 {/* Pair */}
                 <div className="w-[14%] min-w-[160px] flex items-center gap-2">
@@ -323,7 +323,7 @@ export default function DashboardOpenOrders({ openOrders, filledOrders }: Dashbo
                     </span>
                   )}
                   {order.hasBadge === 'RS' && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-[#eab308] px-2 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b]">
+                    <span className="inline-flex items-center justify-center rounded-full bg-[#eab308] px-1.5 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b]">
                       RS
                     </span>
                   )}
@@ -374,7 +374,7 @@ export default function DashboardOpenOrders({ openOrders, filledOrders }: Dashbo
 
                 {/* Action */}
                 <div className="flex-1 flex justify-end pr-1">
-                  <button className="rounded border border-[#252527] px-3 py-1 text-xs font-medium text-[#7a7a83] transition-colors hover:border-[#3a3a3d] hover:text-[#f9f9fa]">
+                  <button className="rounded-md bg-[#1b1b1c] px-3 py-1.5 text-xs font-medium text-[#f9f9fa] transition-colors hover:bg-[#252527]">
                     Close
                   </button>
                 </div>
