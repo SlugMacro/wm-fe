@@ -20,10 +20,100 @@ import {
   generateMyOpenOrders,
 } from '../mock-data/tokenDetail';
 
+function TokenDetailSkeleton() {
+  return (
+    <div className="mx-auto max-w-[1440px] px-12 animate-pulse">
+      {/* Breadcrumb skeleton */}
+      <div className="flex items-center gap-2 py-3">
+        <div className="h-3 w-24 rounded bg-[#1b1b1c]" />
+        <div className="h-3 w-3 rounded bg-[#1b1b1c]" />
+        <div className="h-3 w-16 rounded bg-[#1b1b1c]" />
+        <div className="h-3 w-3 rounded bg-[#1b1b1c]" />
+        <div className="h-3 w-12 rounded bg-[#1b1b1c]" />
+      </div>
+      {/* Header skeleton */}
+      <div className="flex items-center gap-4 py-3">
+        <div className="size-10 rounded-full bg-[#1b1b1c]" />
+        <div className="flex flex-col gap-1.5">
+          <div className="h-5 w-32 rounded bg-[#1b1b1c]" />
+          <div className="h-3 w-48 rounded bg-[#1b1b1c]" />
+        </div>
+        <div className="ml-auto flex gap-6">
+          {[0, 1, 2].map(i => (
+            <div key={i} className="flex flex-col gap-1.5 items-end">
+              <div className="h-3 w-16 rounded bg-[#1b1b1c]" />
+              <div className="h-4 w-20 rounded bg-[#1b1b1c]" />
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* Main content columns */}
+      <div className="flex">
+        {/* Left column */}
+        <div className="flex-1 min-w-0">
+          {/* Chart skeleton */}
+          <div className="pt-4">
+            <div className="h-[300px] rounded-[10px] bg-[#1b1b1c]" />
+          </div>
+          {/* Order book skeleton */}
+          <div className="pt-4">
+            <div className="flex items-center gap-4 mb-3">
+              <div className="h-5 w-24 rounded bg-[#1b1b1c]" />
+              <div className="h-5 w-20 rounded bg-[#1b1b1c]" />
+            </div>
+            {Array.from({ length: 6 }, (_, i) => (
+              <div key={i} className="flex items-center border-b border-[#1b1b1c] h-[52px] px-2" style={{ animationDelay: `${i * 50}ms` }}>
+                <div className="h-3 w-16 rounded bg-[#1b1b1c] flex-1" />
+                <div className="h-3 w-20 rounded bg-[#1b1b1c]" />
+                <div className="h-3 w-16 rounded bg-[#1b1b1c] ml-6" />
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* Divider */}
+        <div className="mx-4 w-px shrink-0 bg-[#1b1b1c]" />
+        {/* Right column */}
+        <div className="w-[384px] shrink-0 pt-4">
+          {/* Trade panel skeleton */}
+          <div className="rounded-[10px] border border-[#1b1b1c] p-5">
+            <div className="flex gap-2 mb-5">
+              <div className="h-9 flex-1 rounded-lg bg-[#1b1b1c]" />
+              <div className="h-9 flex-1 rounded-lg bg-[#1b1b1c]" />
+            </div>
+            <div className="flex flex-col gap-4">
+              <div className="h-[72px] rounded-[10px] bg-[#1b1b1c]" />
+              <div className="h-[72px] rounded-[10px] bg-[#1b1b1c]" />
+              <div className="h-11 rounded-[10px] bg-[#1b1b1c]" />
+            </div>
+          </div>
+          {/* My orders skeleton */}
+          <div className="mt-4">
+            <div className="h-5 w-24 rounded bg-[#1b1b1c] mb-3" />
+            {Array.from({ length: 3 }, (_, i) => (
+              <div key={i} className="flex items-center border-b border-[#1b1b1c] h-[52px] px-2" style={{ animationDelay: `${i * 50}ms` }}>
+                <div className="h-3 w-20 rounded bg-[#1b1b1c] flex-1" />
+                <div className="h-3 w-16 rounded bg-[#1b1b1c]" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="h-12" />
+      <BottomStats />
+    </div>
+  );
+}
+
 export default function TokenDetailPage() {
   const { tokenId } = useParams<{ tokenId: string }>();
   const token = tokenDetails[tokenId ?? defaultTokenId] ?? tokenDetails[defaultTokenId];
   const wallet = useWallet();
+
+  const [isPageLoading, setIsPageLoading] = useState(true);
+  useEffect(() => {
+    const timer = setTimeout(() => setIsPageLoading(false), 400);
+    return () => clearTimeout(timer);
+  }, []);
 
   const [selectedOrder, setSelectedOrder] = useState<{ order: OrderBookEntry; side: 'buy' | 'sell' } | null>(null);
   const [flashedOrderId, setFlashedOrderId] = useState<string | null>(null);
@@ -150,6 +240,8 @@ export default function TokenDetailPage() {
 
   // Determine collateral token based on chain
   const collateralToken = token.chain === 'ethereum' ? 'ETH' : token.chain === 'sui' ? 'SUI' : 'SOL';
+
+  if (isPageLoading) return <TokenDetailSkeleton />;
 
   return (
     <div className="mx-auto max-w-[1440px] px-12">
