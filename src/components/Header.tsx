@@ -620,7 +620,7 @@ export default function Header() {
   return (
     <>
       <header className="flex items-center justify-center border-b border-[#1b1b1c] bg-[#0a0a0b] px-0 py-3">
-        <div className="flex flex-1 items-center gap-4 max-w-[1440px] px-4 md:px-12">
+        <div className="flex flex-1 items-center gap-4 max-w-[1440px] px-4 lg:px-12">
           {/* Logo + Menu */}
           <div className="flex flex-1 items-center gap-2">
             {/* Mobile hamburger */}
