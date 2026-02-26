@@ -35,15 +35,15 @@ interface SettlementMarket {
 
 /* ───── Helpers ───── */
 
-function formatSettleDate(isoStr: string): string {
-  const d = new Date(isoStr);
-  const hours = d.getHours().toString().padStart(2, '0');
-  const mins = d.getMinutes().toString().padStart(2, '0');
-  const day = d.getDate();
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const month = months[d.getMonth()];
-  const year = d.getFullYear();
-  return `${hours}:${mins}, ${day} ${month} ${year}`;
+/** Same UTC format as homepage Next Settlement metric: DD/MM/YYYY HH:MM (UTC) */
+function formatSettleDate(iso: string): string {
+  const d = new Date(iso);
+  const dd = String(d.getUTCDate()).padStart(2, '0');
+  const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const yyyy = d.getUTCFullYear();
+  const hh = String(d.getUTCHours()).padStart(2, '0');
+  const min = String(d.getUTCMinutes()).padStart(2, '0');
+  return `${dd}/${mm}/${yyyy} ${hh}:${min} (UTC)`;
 }
 
 /* ───── Countdown hook ───── */
@@ -280,9 +280,12 @@ function Banner({ title, variant, markets, type, emptyText }: BannerProps) {
 /* ───── Main component ───── */
 
 export default function SettlementBanners() {
-  // Upcoming: markets with settlementStatus === 'upcoming'
+  // Upcoming: all markets with a future settleTime, sorted by nearest first
+  // (same logic as homepage "Next settlement" metric)
+  const now = Date.now();
   const upcomingMarkets: SettlementMarket[] = liveMarkets
-    .filter((m) => m.settlementStatus === 'upcoming' && m.settleTime)
+    .filter((m) => m.settleTime && new Date(m.settleTime).getTime() > now)
+    .sort((a, b) => new Date(a.settleTime!).getTime() - new Date(b.settleTime!).getTime())
     .map((m) => ({
       id: m.id,
       tokenSymbol: m.tokenSymbol,
