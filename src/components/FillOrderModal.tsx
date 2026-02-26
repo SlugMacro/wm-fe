@@ -337,7 +337,7 @@ export default function FillOrderModal({
         <button
           onClick={handleConfirm}
           disabled={!confirmed}
-          className={`flex w-full items-center justify-center rounded-[10px] px-5 py-2.5 text-base font-medium leading-6 transition-colors ${
+          className={`flex w-full h-11 items-center justify-center rounded-[10px] px-5 text-base font-medium leading-6 transition-colors ${
             confirmed
               ? `${activeColor} text-[#f9f9fa] hover:opacity-90 cursor-pointer`
               : `${activeColor} cursor-not-allowed opacity-40 text-[#f9f9fa]`

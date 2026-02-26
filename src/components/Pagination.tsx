@@ -68,7 +68,7 @@ export default function Pagination({
         <button
           onClick={() => onPageChange(Math.max(1, currentPage - 1))}
           disabled={currentPage === 1}
-          className="flex size-7 items-center justify-center rounded text-[#7a7a83] transition-colors hover:text-[#f9f9fa] disabled:opacity-30"
+          className="flex size-7 items-center justify-center rounded-[6px] text-[#7a7a83] transition-colors hover:text-[#f9f9fa] disabled:opacity-30"
         >
           <ChevronLeftIcon />
         </button>
@@ -83,7 +83,7 @@ export default function Pagination({
             <button
               key={page}
               onClick={() => onPageChange(page)}
-              className={`flex size-7 items-center justify-center rounded text-xs font-medium transition-colors ${
+              className={`flex size-7 items-center justify-center rounded-[6px] text-xs font-medium transition-colors ${
                 currentPage === page
                   ? 'bg-[rgba(22,194,132,0.2)] text-[#5bd197]'
                   : 'text-[#7a7a83] hover:text-[#f9f9fa]'
@@ -98,7 +98,7 @@ export default function Pagination({
         <button
           onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
           disabled={currentPage === totalPages}
-          className="flex size-7 items-center justify-center rounded text-[#7a7a83] transition-colors hover:text-[#f9f9fa] disabled:opacity-30"
+          className="flex size-7 items-center justify-center rounded-[6px] text-[#7a7a83] transition-colors hover:text-[#f9f9fa] disabled:opacity-30"
         >
           <ChevronRightIcon />
         </button>
@@ -111,7 +111,7 @@ export default function Pagination({
             <select
               value={currentPage}
               onChange={(e) => onPageChange(Number(e.target.value))}
-              className="h-7 rounded border border-[#252527] bg-[#1b1b1c] px-2 text-xs text-[#f9f9fa] outline-none"
+              className="h-7 rounded-[6px] border border-[#252527] bg-[#1b1b1c] px-2 text-xs text-[#f9f9fa] outline-none"
             >
               {Array.from({ length: totalPages }, (_, i) => (
                 <option key={i + 1} value={i + 1}>

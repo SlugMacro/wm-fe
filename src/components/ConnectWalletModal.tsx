@@ -168,7 +168,7 @@ export default function ConnectWalletModal({ isOpen, onClose, onConnect, default
             <button
               key={network.id}
               onClick={() => setActiveNetwork(network.id)}
-              className={`flex h-11 items-center gap-2 rounded-lg pl-3 pr-6 py-3 transition-colors ${
+              className={`flex h-11 items-center gap-2 rounded-[10px] pl-3 pr-6 py-3 transition-colors ${
                 activeNetwork === network.id
                   ? 'bg-[#2e2e34]'
                   : 'hover:bg-[#252527]/50'

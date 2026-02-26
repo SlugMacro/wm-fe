@@ -629,7 +629,7 @@ export default function TradePanel({
 
       {/* CTA button */}
       <button
-        className={`w-full rounded-[10px] px-5 py-2.5 text-base font-medium leading-6 transition-colors ${buttonConfig.className}`}
+        className={`w-full h-11 rounded-[10px] px-5 text-base font-medium leading-6 transition-colors ${buttonConfig.className}`}
         disabled={buttonConfig.disabled}
         onClick={buttonConfig.onClick}
       >

@@ -288,7 +288,7 @@ export default function CloseOrderModal({
         <button
           onClick={handleConfirm}
           disabled={!confirmed}
-          className={`w-full rounded-[10px] px-5 py-2.5 text-base font-medium leading-6 transition-colors ${
+          className={`w-full h-11 rounded-[10px] px-5 text-base font-medium leading-6 transition-colors ${
             confirmed
               ? 'bg-[rgba(253,94,103,0.12)] text-[#fd5e67] hover:bg-[rgba(253,94,103,0.2)] cursor-pointer'
               : 'bg-[rgba(253,94,103,0.06)] text-[#fd5e67]/40 cursor-not-allowed'

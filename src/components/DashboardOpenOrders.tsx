@@ -441,7 +441,7 @@ export default function DashboardOpenOrders({ openOrders, filledOrders, onCloseO
                     <div className="flex-1 flex justify-end pr-1">
                       <button
                         onClick={() => setCloseModalOrder(order)}
-                        className="rounded-md bg-[#1b1b1c] px-3 py-1.5 text-xs font-medium text-[#f9f9fa] transition-colors hover:bg-[#252527]"
+                        className="h-7 rounded-[6px] bg-[#1b1b1c] px-3 text-xs font-medium text-[#f9f9fa] transition-colors hover:bg-[#252527]"
                       >
                         Close
                       </button>

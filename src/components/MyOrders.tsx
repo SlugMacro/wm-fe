@@ -200,7 +200,7 @@ function OrderSkeletonItem({ index }: { index: number }) {
           <div className="h-2.5 w-32 rounded bg-[#1b1b1c]" />
           <div className="h-2.5 w-40 rounded bg-[#1b1b1c]" />
         </div>
-        <div className="h-7 w-14 rounded bg-[#1b1b1c]" />
+        <div className="h-7 w-14 rounded-[6px] bg-[#1b1b1c]" />
       </div>
     </div>
   );

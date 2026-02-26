@@ -252,14 +252,14 @@ export default function ResellRiskModal({
         <div className="flex gap-4">
           <button
             onClick={handleClose}
-            className="flex flex-1 items-center justify-center rounded-[10px] bg-[#252527] px-5 py-2.5 text-base font-medium leading-6 text-[#f9f9fa] transition-colors hover:bg-[#2e2e34] cursor-pointer"
+            className="flex flex-1 h-11 items-center justify-center rounded-[10px] bg-[#252527] px-5 text-base font-medium leading-6 text-[#f9f9fa] transition-colors hover:bg-[#2e2e34] cursor-pointer"
           >
             Cancel
           </button>
           <button
             onClick={handleConfirm}
             disabled={!confirmed}
-            className={`flex flex-1 items-center justify-center rounded-[10px] px-5 py-2.5 text-base font-medium leading-6 transition-colors ${
+            className={`flex flex-1 h-11 items-center justify-center rounded-[10px] px-5 text-base font-medium leading-6 transition-colors ${
               confirmed
                 ? 'bg-[#16c284] text-[#f9f9fa] hover:opacity-90 cursor-pointer'
                 : 'bg-[#16c284] cursor-not-allowed opacity-40 text-[#f9f9fa]'

@@ -257,7 +257,7 @@ function OrderBookSkeletonRow({ index, fullWidth }: { index: number; fullWidth?:
         <div className="h-3 w-12 rounded bg-[#1b1b1c]" />
         <div className="size-4 rounded-full bg-[#1b1b1c]" />
       </div>
-      <div className="w-[112px] flex justify-end"><div className="h-7 w-12 rounded bg-[#1b1b1c]" /></div>
+      <div className="w-[112px] flex justify-end"><div className="h-7 w-12 rounded-[6px] bg-[#1b1b1c]" /></div>
     </div>
   );
 }
@@ -507,7 +507,7 @@ export default function OrderBook({
             {showResellBadge && isResell && (
               <span className="inline-flex items-center justify-center rounded-full bg-[#eab308] px-1.5 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b]">RS</span>
             )}
-            <button className={`relative h-7 rounded px-3 text-xs font-medium transition-colors ${
+            <button className={`relative h-7 rounded-[6px] px-3 text-xs font-medium transition-colors ${
               isSelected
                 ? isResell
                   ? 'bg-[#eab308] hover:bg-[#d4a207]'

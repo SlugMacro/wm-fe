@@ -4,12 +4,13 @@ import type { MarketTab, SortConfig, SortField, UpcomingSortField, EndedSortFiel
 import { upcomingMarkets, endedMarkets, marketTabCounts } from '../mock-data/markets';
 import { formatPrice, formatVolume, formatPercent } from '../utils/formatNumber';
 import MiniChart from './MiniChart';
+import SharedPagination from './Pagination';
 import MoniScoreBar from './MoniScoreBar';
 import TokenIcon from './TokenIcon';
 import { useLiveMarkets } from '../hooks/useLiveMarketContext';
 import type { FlashDirection, LiveMarket } from '../hooks/useMarketLiveUpdates';
 
-const ENDED_PAGE_SIZE = 6;
+const ENDED_PAGE_SIZE = 8;
 
 /* ───── Shared helpers ───── */
 
@@ -239,68 +240,7 @@ function EndedSettleCell({ time }: { time: string }) {
   );
 }
 
-/* ───── Pagination ───── */
-
-function Pagination({ currentPage, totalPages, onPageChange }: { currentPage: number; totalPages: number; onPageChange: (page: number) => void }) {
-  if (totalPages <= 1) return null;
-
-  const getPageNumbers = (): (number | 'ellipsis')[] => {
-    const pages: (number | 'ellipsis')[] = [];
-    if (totalPages <= 5) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
-    } else {
-      pages.push(1);
-      if (currentPage > 3) pages.push('ellipsis');
-      const start = Math.max(2, currentPage - 1);
-      const end = Math.min(totalPages - 1, currentPage + 1);
-      for (let i = start; i <= end; i++) pages.push(i);
-      if (currentPage < totalPages - 2) pages.push('ellipsis');
-      pages.push(totalPages);
-    }
-    return pages;
-  };
-
-  return (
-    <div className="flex items-center justify-center gap-1 mt-4">
-      {/* Prev */}
-      <button
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-        className="flex items-center justify-center size-8 rounded-lg border border-[#2e2e34] text-[#7a7a83] hover:text-[#f9f9fa] hover:border-[#3a3a3d] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-      >
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M8.5 3.5L5.5 7L8.5 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-      </button>
-
-      {/* Page Numbers */}
-      {getPageNumbers().map((page, i) =>
-        page === 'ellipsis' ? (
-          <span key={`e-${i}`} className="flex items-center justify-center size-8 text-xs text-[#7a7a83]">…</span>
-        ) : (
-          <button
-            key={page}
-            onClick={() => onPageChange(page)}
-            className={`flex items-center justify-center size-8 rounded-lg text-xs font-medium transition-colors ${
-              page === currentPage
-                ? 'bg-[#16c284] text-[#0a0a0b]'
-                : 'text-[#7a7a83] hover:text-[#f9f9fa] hover:bg-[#1b1b1c]'
-            }`}
-          >
-            {page}
-          </button>
-        ),
-      )}
-
-      {/* Next */}
-      <button
-        onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
-        className="flex items-center justify-center size-8 rounded-lg border border-[#2e2e34] text-[#7a7a83] hover:text-[#f9f9fa] hover:border-[#3a3a3d] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-      >
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5.5 3.5L8.5 7L5.5 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-      </button>
-    </div>
-  );
-}
+/* ───── Pagination (uses shared component) ───── */
 
 /* ───── Search Input ───── */
 
@@ -858,7 +798,13 @@ export default function LiveMarketTable() {
             </div>
 
             {/* Pagination */}
-            <Pagination currentPage={endedPage} totalPages={endedTotalPages} onPageChange={(page) => { setEndedPage(page); triggerLoading(); }} />
+            <SharedPagination
+              currentPage={endedPage}
+              totalPages={endedTotalPages}
+              totalItems={filteredEndedMarkets.length}
+              itemsPerPage={ENDED_PAGE_SIZE}
+              onPageChange={(page) => { setEndedPage(page); triggerLoading(); }}
+            />
           </>
         ) : (
           /* ════════════ LIVE TABLE ════════════ */

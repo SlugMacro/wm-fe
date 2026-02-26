@@ -27,7 +27,7 @@ export default function ComingSoonPage() {
         {/* Button */}
         <button
           onClick={() => navigate('/markets')}
-          className="flex items-center justify-center rounded-[10px] bg-[#f9f9fa] px-5 py-2.5 text-base font-medium leading-6 text-[#0a0a0b] hover:bg-[#e0e0e2] transition-colors"
+          className="flex items-center justify-center h-11 rounded-[10px] bg-[#f9f9fa] px-5 text-base font-medium leading-6 text-[#0a0a0b] hover:bg-[#e0e0e2] transition-colors"
         >
           Back to Markets
         </button>
