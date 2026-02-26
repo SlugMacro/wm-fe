@@ -1,5 +1,9 @@
 # Whales Market FE — Presentation Notes
 
+## Live Demo
+
+https://wm-fe-slug.vercel.app
+
 ## Overview
 
 Clone giao dien **Whales Market** — nen tang giao dich OTC/Pre-Market cho crypto.
@@ -101,7 +105,7 @@ Khong co backend — toan bo data la mock, nhung mo phong real-time.
 | 7 | Layout matches Figma | **Pass** |
 | 8 | Responsive on mobile | **Pass** |
 | 9 | No console errors | **Pass** |
-| 10 | Code pushed to GitHub | **Pending** |
+| 10 | Code pushed to GitHub | **Pass** |
 
 ---
 
