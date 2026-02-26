@@ -112,6 +112,7 @@ export default function DashboardPage() {
       <Breadcrumb items={breadcrumbItems} />
       <DashboardProfile
         walletShort={profileData.walletShort}
+        walletAddress={profileData.walletAddress}
         totalTradingVol={profileData.totalTradingVol}
         discountTier={profileData.discountTier}
         xWhalesHolding={profileData.xWhalesHolding}

@@ -1,35 +1,54 @@
 import { useState } from 'react';
 import type { LinkedWallet } from '../types';
+import avatarPng from '../assets/images/avatar.png';
+import tokenFeePng from '../assets/images/token-fee.png';
+import chainEthereumPng from '../assets/images/chain-ethereum.png';
+import chainSolanaPng from '../assets/images/chain-solana.png';
+import chainSuiPng from '../assets/images/chain-sui.png';
+
+/* ───── Icons ───── */
 
 function CopyIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <rect x="5.5" y="5.5" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1" />
-      <path d="M10.5 5.5V4C10.5 3.17 9.83 2.5 9 2.5H4C3.17 2.5 2.5 3.17 2.5 4V9C2.5 9.83 3.17 10.5 4 10.5H5.5" stroke="currentColor" strokeWidth="1" />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <rect x="8" y="8" width="10" height="10" rx="2" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M16 8V6C16 4.9 15.1 4 14 4H6C4.9 4 4 4.9 4 6V14C4 15.1 4.9 16 6 16H8" stroke="currentColor" strokeWidth="1.5" />
     </svg>
   );
 }
 
-function WalletIcon() {
+function ExternalArrowIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <rect x="2" y="4" width="12" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.2" />
-      <path d="M2 7H14" stroke="currentColor" strokeWidth="1.2" />
-      <circle cx="11" cy="9.5" r="1" fill="currentColor" />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path d="M7 17L17 7M17 7H9M17 7V15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 
-function ExternalArrow() {
+function WalletLinkIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-      <path d="M3.5 8.5L8.5 3.5M8.5 3.5H4.5M8.5 3.5V7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <rect x="3" y="6" width="18" height="13" rx="2" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M3 10H21" stroke="currentColor" strokeWidth="1.5" />
+      <circle cx="16.5" cy="14.5" r="1.5" fill="currentColor" />
     </svg>
   );
 }
+
+/* ───── Chain icon map ───── */
+
+const CHAIN_ICONS: Record<string, string> = {
+  ethereum: chainEthereumPng,
+  solana: chainSolanaPng,
+  sui: chainSuiPng,
+  sei: chainSuiPng, // fallback
+};
+
+/* ───── Props ───── */
 
 interface DashboardProfileProps {
   walletShort: string;
+  walletAddress: string;
   totalTradingVol: string;
   discountTier: string;
   xWhalesHolding: number;
@@ -38,6 +57,7 @@ interface DashboardProfileProps {
 
 export default function DashboardProfile({
   walletShort,
+  walletAddress,
   totalTradingVol,
   discountTier,
   xWhalesHolding,
@@ -46,84 +66,91 @@ export default function DashboardProfile({
   const [copied, setCopied] = useState<string | null>(null);
 
   const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text).catch(() => {/* noop */});
     setCopied(text);
     setTimeout(() => setCopied(null), 1500);
   };
 
   return (
-    <div className="flex items-center justify-between rounded-lg bg-[rgba(255,255,255,0.03)] px-5 py-4">
-      {/* Left: Avatar + Wallet Info + Stats */}
-      <div className="flex items-center gap-8">
-        {/* Avatar + Wallet */}
-        <div className="flex items-center gap-3">
-          {/* Avatar */}
-          <div className="flex size-11 items-center justify-center rounded-full bg-gradient-to-br from-[#16c284] to-[#0a8a5e]">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <circle cx="10" cy="8" r="4" fill="white" opacity="0.9" />
-              <path d="M3 18C3 14.13 6.13 11 10 11C13.87 11 17 14.13 17 18" stroke="white" strokeWidth="1.5" opacity="0.9" />
-            </svg>
+    <div className="flex items-center gap-4 border-b-4 border-[#1b1b1c] py-6">
+      {/* Left: Token info (avatar + wallet + stats) */}
+      <div className="flex flex-1 items-center gap-8 overflow-hidden">
+        {/* Avatar + Wallet info */}
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Avatar slot — 44px container, 32px image */}
+          <div className="flex size-[44px] items-center justify-center">
+            <img src={avatarPng} alt="Avatar" className="size-8 rounded-full object-cover" />
           </div>
-          {/* Wallet info */}
-          <div className="flex flex-col gap-0.5">
-            <div className="flex items-center gap-1.5">
-              <span className="text-lg font-medium text-[#f9f9fa]">{walletShort}</span>
+
+          {/* Wallet address + explorer link */}
+          <div className="flex flex-col w-[168px]">
+            <div className="flex items-center gap-1">
+              <span className="text-lg font-medium leading-7 text-[#f9f9fa] tabular-nums">
+                {walletShort}
+              </span>
               <button
-                onClick={() => handleCopy(walletShort)}
-                className="text-[#7a7a83] transition-colors hover:text-[#f9f9fa]"
-                title={copied === walletShort ? 'Copied!' : 'Copy address'}
+                onClick={() => handleCopy(walletAddress)}
+                className="flex items-center p-1 text-[#7a7a83] transition-colors hover:text-[#f9f9fa]"
+                title={copied === walletAddress ? 'Copied!' : 'Copy address'}
               >
                 <CopyIcon />
               </button>
             </div>
-            <button className="flex items-center gap-1 text-xs text-[#7a7a83] transition-colors hover:text-[#f9f9fa]">
-              Open in Explorer <ExternalArrow />
-            </button>
+            <a
+              href={`https://solscan.io/account/${walletAddress}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-0.5 border-b border-[#252527] self-start text-sm text-[#b4b4ba] transition-colors hover:text-[#f9f9fa] tabular-nums"
+            >
+              Open in Explorer
+              <span className="flex items-center p-0.5">
+                <ExternalArrowIcon />
+              </span>
+            </a>
           </div>
         </div>
 
         {/* Stats */}
-        <div className="flex items-start gap-8">
+        <div className="flex items-center gap-8 shrink-0">
           {/* Total Trading Vol */}
-          <div className="flex flex-col gap-1">
-            <span className="text-xs text-[#7a7a83]">Total Trading Vol.</span>
-            <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">{totalTradingVol}</span>
-          </div>
+          <StatItem label="Total Trading Vol." value={totalTradingVol} />
 
           {/* Discount Tier */}
-          <div className="flex flex-col gap-1">
-            <span className="text-xs text-[#7a7a83]">Discount Tier</span>
-            <span className="text-sm font-medium text-[#5bd197]">{discountTier}</span>
-          </div>
+          <StatItem label="Discount Tier" value={discountTier} valueColor="text-[#5bd197]" />
 
           {/* XWhales Holding */}
-          <div className="flex flex-col gap-1">
-            <span className="text-xs text-[#7a7a83]">XWhales Holding</span>
-            <div className="flex items-center gap-1.5">
-              <div className="flex size-4 items-center justify-center rounded-full bg-[#eab308]">
-                <span className="text-[7px] font-bold text-white">W</span>
+          <div className="flex flex-col">
+            <StatLabel>XWhales Holding</StatLabel>
+            <div className="flex items-center gap-1 px-0 py-0.5">
+              <div className="flex items-center p-0.5">
+                <img src={tokenFeePng} alt="XWhales" className="size-4 rounded-full" />
               </div>
-              <span className="text-sm font-medium text-[#f9f9fa] tabular-nums">{xWhalesHolding.toFixed(2)}</span>
+              <span className="text-xs text-[#f9f9fa] tabular-nums text-center leading-4">
+                {xWhalesHolding.toFixed(2)}
+              </span>
             </div>
           </div>
 
           {/* Linked Wallets */}
-          <div className="flex flex-col gap-1">
-            <span className="text-xs text-[#7a7a83]">Linked Wallets</span>
+          <div className="flex flex-col">
+            <StatLabel>Linked Wallets</StatLabel>
             <div className="flex items-center gap-4">
               {linkedWallets.map((wallet) => (
-                <div key={wallet.address} className="flex items-center gap-1">
-                  <div
-                    className="flex size-4 items-center justify-center rounded-full"
-                    style={{ backgroundColor: wallet.chainColor }}
-                  >
-                    <span className="text-[6px] font-bold text-white">
-                      {wallet.chain === 'ethereum' ? 'E' : wallet.chain === 'solana' ? '◎' : 'S'}
-                    </span>
+                <div key={wallet.address} className="flex items-center gap-1 rounded-md">
+                  <div className="flex items-center p-0.5">
+                    <img
+                      src={CHAIN_ICONS[wallet.chain] ?? chainSolanaPng}
+                      alt={wallet.chain}
+                      className="size-4 rounded border-2 border-[#0a0a0b]"
+                    />
                   </div>
-                  <span className="text-sm text-[#f9f9fa] tabular-nums">{wallet.address}</span>
+                  <span className="text-xs text-[#f9f9fa] tabular-nums leading-4">
+                    {wallet.address}
+                  </span>
                   <button
                     onClick={() => handleCopy(wallet.address)}
-                    className="text-[#7a7a83] transition-colors hover:text-[#f9f9fa]"
+                    className="flex items-center p-0.5 text-[#7a7a83] transition-colors hover:text-[#f9f9fa]"
+                    title={copied === wallet.address ? 'Copied!' : 'Copy'}
                   >
                     <CopyIcon />
                   </button>
@@ -135,10 +162,39 @@ export default function DashboardProfile({
       </div>
 
       {/* Right: Link Wallet button */}
-      <button className="flex items-center gap-2 rounded-lg bg-[#f9f9fa] px-4 py-2 text-sm font-medium text-[#0a0a0b] transition-colors hover:bg-[#e4e4e6]">
-        <WalletIcon />
-        Link Wallet
-      </button>
+      <div className="flex items-center justify-end shrink-0">
+        <button className="flex items-center gap-1.5 rounded-lg bg-[#f9f9fa] pl-2 pr-4 py-2 text-sm font-medium leading-5 text-[#0a0a0b] transition-colors hover:bg-[#e4e4e6]">
+          <span className="flex items-center p-0.5">
+            <WalletLinkIcon />
+          </span>
+          Link Wallet
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ───── Helpers ───── */
+
+function StatLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center py-1.5">
+      <span className="border-b border-dashed border-[#2e2e34] text-xs text-[#7a7a83] leading-4">
+        {children}
+      </span>
+    </div>
+  );
+}
+
+function StatItem({ label, value, valueColor = 'text-[#f9f9fa]' }: { label: string; value: string; valueColor?: string }) {
+  return (
+    <div className="flex flex-col">
+      <StatLabel>{label}</StatLabel>
+      <div className="flex items-center justify-center px-0 py-0.5">
+        <span className={`text-xs ${valueColor} tabular-nums text-center leading-4`}>
+          {value}
+        </span>
+      </div>
     </div>
   );
 }
