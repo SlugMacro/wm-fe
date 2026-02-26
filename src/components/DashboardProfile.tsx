@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useRef, useLayoutEffect } from 'react';
+import { createPortal } from 'react-dom';
 import type { LinkedWallet } from '../types';
 import avatarPng from '../assets/images/avatar.png';
 import tokenFeePng from '../assets/images/token-fee.png';
@@ -42,15 +43,40 @@ function WalletLinkIcon() {
   );
 }
 
+/* ───── CopiedTooltip — portal-rendered so it's never clipped ───── */
+
+function CopiedTooltip({ anchorRef }: { anchorRef: React.RefObject<HTMLButtonElement | null> }) {
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+
+  useLayoutEffect(() => {
+    const el = anchorRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    setPos({ x: r.left + r.width / 2, y: r.top - 4 });
+  }, [anchorRef]);
+
+  return createPortal(
+    <span
+      className="fixed z-[9999] -translate-x-1/2 -translate-y-full rounded bg-[#252527] px-1.5 py-0.5 text-[10px] leading-3 text-[#16c284] whitespace-nowrap shadow-lg pointer-events-none animate-[fadeIn_150ms_ease-out]"
+      style={{ left: pos.x, top: pos.y }}
+    >
+      Copied!
+    </span>,
+    document.body,
+  );
+}
+
 /* ───── CopyButton — reusable animated copy button ───── */
 
 function CopyButton({ text, copied, onCopy }: { text: string; copied: string | null; onCopy: (t: string) => void }) {
   const isCopied = copied === text;
+  const btnRef = useRef<HTMLButtonElement>(null);
+
   return (
     <button
+      ref={btnRef}
       onClick={() => onCopy(text)}
-      className="relative flex items-center justify-center size-4 text-[#7a7a83] transition-colors hover:text-[#f9f9fa] group"
-      title={isCopied ? 'Copied!' : 'Copy'}
+      className="relative flex items-center justify-center size-4 text-[#7a7a83] transition-colors hover:text-[#f9f9fa]"
     >
       {/* Copy icon */}
       <span className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${isCopied ? 'opacity-0 scale-75' : 'opacity-100 scale-100'}`}>
@@ -60,12 +86,8 @@ function CopyButton({ text, copied, onCopy }: { text: string; copied: string | n
       <span className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${isCopied ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
         <CheckIcon />
       </span>
-      {/* Tooltip */}
-      {isCopied && (
-        <span className="absolute -top-7 left-1/2 -translate-x-1/2 rounded bg-[#252527] px-1.5 py-0.5 text-[10px] leading-3 text-[#16c284] whitespace-nowrap animate-[fadeIn_150ms_ease-out]">
-          Copied!
-        </span>
-      )}
+      {/* Tooltip — rendered via portal at body level */}
+      {isCopied && <CopiedTooltip anchorRef={btnRef} />}
     </button>
   );
 }
