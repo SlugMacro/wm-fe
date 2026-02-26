@@ -73,10 +73,10 @@ function useCountdown(targetTime: string) {
 
 function InfoIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+    <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
       <path
         d="M10 0C15.523 0 20 4.477 20 10C20 15.523 15.523 20 10 20C4.477 20 0 15.523 0 10C0 4.477 4.477 0 10 0ZM10 2C7.87827 2 5.84344 2.84285 4.34315 4.34315C2.84285 5.84344 2 7.87827 2 10C2 12.1217 2.84285 14.1566 4.34315 15.6569C5.84344 17.1571 7.87827 18 10 18C12.1217 18 14.1566 17.1571 15.6569 15.6569C17.1571 14.1566 18 12.1217 18 10C18 7.87827 17.1571 5.84344 15.6569 4.34315C14.1566 2.84285 12.1217 2 10 2ZM9.99 8C10.548 8 11 8.452 11 9.01V14.134C11.1906 14.2441 11.3396 14.414 11.4238 14.6173C11.5081 14.8207 11.5229 15.0462 11.4659 15.2588C11.4089 15.4714 11.2834 15.6593 11.1087 15.7933C10.9341 15.9273 10.7201 16 10.5 16H10.01C9.87737 16 9.74603 15.9739 9.62349 15.9231C9.50095 15.8724 9.38961 15.798 9.29582 15.7042C9.20203 15.6104 9.12764 15.499 9.07688 15.3765C9.02612 15.254 9 15.1226 9 14.99V10C8.73478 10 8.48043 9.89464 8.29289 9.70711C8.10536 9.51957 8 9.26522 8 9C8 8.73478 8.10536 8.48043 8.29289 8.29289C8.48043 8.10536 8.73478 8 9 8H9.99ZM10 5C10.2652 5 10.5196 5.10536 10.7071 5.29289C10.8946 5.48043 11 5.73478 11 6C11 6.26522 10.8946 6.51957 10.7071 6.70711C10.5196 6.89464 10.2652 7 10 7C9.73478 7 9.48043 6.89464 9.29289 6.70711C9.10536 6.51957 9 6.26522 9 6C9 5.73478 9.10536 5.48043 9.29289 5.29289C9.48043 5.10536 9.73478 5 10 5Z"
-        fill="#7A7A83"
+        fill="#f9f9fa"
       />
     </svg>
   );
@@ -152,11 +152,15 @@ function SettlingPill({ market }: { market: SettlementMarket }) {
 
 /* ───── Empty state pill ───── */
 
-function EmptyPill({ text }: { text: string }) {
+function EmptyPill({ text, tooltip }: { text: string; tooltip: string }) {
   return (
     <div className="flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-[16px] pl-2 pr-4 py-2">
-      <div className="p-0.5">
+      {/* Info icon — 16x16 icon, 20x20 tap area (2px padding), with hover tooltip */}
+      <div className="relative group cursor-help flex items-center justify-center size-5 shrink-0">
         <InfoIcon />
+        <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-left text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-[9999] whitespace-normal">
+          {tooltip}
+        </span>
       </div>
       <span className="text-sm font-medium leading-5 text-[#f9f9fa] tabular-nums">{text}</span>
     </div>
@@ -171,9 +175,10 @@ interface BannerProps {
   markets: SettlementMarket[];
   type: 'upcoming' | 'settling';
   emptyText: string;
+  emptyTooltip: string;
 }
 
-function Banner({ title, variant, markets, type, emptyText }: BannerProps) {
+function Banner({ title, variant, markets, type, emptyText, emptyTooltip }: BannerProps) {
   const isBlue = variant === 'blue';
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showScroll, setShowScroll] = useState(false);
@@ -253,7 +258,7 @@ function Banner({ title, variant, markets, type, emptyText }: BannerProps) {
                     <SettlingPill key={m.id} market={m} />
                   ),
                 )
-              : <EmptyPill text={emptyText} />}
+              : <EmptyPill text={emptyText} tooltip={emptyTooltip} />}
           </div>
 
           {/* Gradient mask + scroll button (when pills overflow) */}
@@ -307,6 +312,7 @@ export default function SettlementBanners() {
         markets={upcomingMarkets}
         type="upcoming"
         emptyText="No markets in upcoming settlements"
+        emptyTooltip="Markets approaching their settlement date will appear here. Check back later or explore live markets."
       />
       <Banner
         title="Current Settlements"
@@ -314,6 +320,7 @@ export default function SettlementBanners() {
         markets={settlingMarkets}
         type="settling"
         emptyText="No markets in current settlements"
+        emptyTooltip="When a market enters its settlement window, it will be listed here with a live countdown until settlement completes."
       />
     </div>
   );
