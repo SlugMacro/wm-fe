@@ -92,6 +92,28 @@ function CopyButton({ text, copied, onCopy }: { text: string; copied: string | n
   );
 }
 
+/* ───── StatLabel — dashed underline label with optional hover tooltip ───── */
+
+function StatLabel({ children, tooltip }: { children: React.ReactNode; tooltip?: string }) {
+  if (!tooltip) {
+    return (
+      <span className="text-xs leading-4 font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34] self-start">
+        {children}
+      </span>
+    );
+  }
+  return (
+    <span className="relative group cursor-help inline-flex self-start">
+      <span className="text-xs leading-4 font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34]">
+        {children}
+      </span>
+      <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-52 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-left text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-[9999]">
+        {tooltip}
+      </span>
+    </span>
+  );
+}
+
 /* ───── Chain icon map ───── */
 
 const CHAIN_ICONS: Record<string, string> = {
@@ -163,9 +185,9 @@ export default function DashboardProfile({
         <div className="flex items-center gap-8">
           {/* Total Trading Vol */}
           <div className="flex flex-col gap-1.5 shrink-0">
-            <span className="text-xs leading-4 font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34] self-start">
+            <StatLabel tooltip="Your total pre-market trading volume across all markets on Whales Market.">
               Total Trading Vol.
-            </span>
+            </StatLabel>
             <span className="text-xs leading-4 font-normal tabular-nums text-[#f9f9fa]">
               {totalTradingVol}
             </span>
@@ -173,9 +195,9 @@ export default function DashboardProfile({
 
           {/* Discount Tier */}
           <div className="flex flex-col gap-1.5 shrink-0">
-            <span className="text-xs leading-4 font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34] self-start">
+            <StatLabel tooltip="Fee discount based on your trading volume and XWhales token holdings. Trade more or hold XWhales to unlock higher tiers.">
               Discount Tier
-            </span>
+            </StatLabel>
             <span className="text-xs leading-4 font-normal tabular-nums text-[#5bd197]">
               {discountTier}
             </span>
@@ -183,9 +205,9 @@ export default function DashboardProfile({
 
           {/* XWhales Holding */}
           <div className="flex flex-col gap-1.5 shrink-0">
-            <span className="text-xs leading-4 font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34] self-start">
+            <StatLabel tooltip="Your current XWhales token balance. Hold more to unlock higher fee discounts and platform benefits.">
               XWhales Holding
-            </span>
+            </StatLabel>
             <div className="flex items-center gap-1">
               <img src={tokenFeePng} alt="XWhales" className="size-4 rounded-full" />
               <span className="text-xs leading-4 font-normal tabular-nums text-[#f9f9fa]">
@@ -196,9 +218,9 @@ export default function DashboardProfile({
 
           {/* Linked Wallets */}
           <div className="flex flex-col gap-1.5 shrink-0">
-            <span className="text-xs leading-4 font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34] self-start">
+            <StatLabel tooltip="External wallets linked to your Whales Market account for cross-chain pre-market trading.">
               Linked Wallets
-            </span>
+            </StatLabel>
             <div className="flex items-center gap-4">
               {linkedWallets.map((wallet) => (
                 <div key={wallet.address} className="flex items-center gap-1">
