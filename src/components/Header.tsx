@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import mascotSvg from '../assets/images/mascot.svg';
 import logoTopSvg from '../assets/images/logo-top.svg';
@@ -192,6 +193,43 @@ function CopyIcon() {
     <svg width="12" height="12" viewBox="0 0 20 20" fill="none">
       <path fillRule="evenodd" clipRule="evenodd" d="M7 0C6.46957 0 5.96086 0.210714 5.58579 0.585786C5.21071 0.960859 5 1.46957 5 2V4H7V2H18V13H16V15H18C18.5304 15 19.0391 14.7893 19.4142 14.4142C19.7893 14.0391 20 13.5304 20 13V2C20 1.46957 19.7893 0.960859 19.4142 0.585786C19.0391 0.210714 18.5304 0 18 0H7ZM2 5C1.46957 5 0.960859 5.21071 0.585786 5.58579C0.210714 5.96086 0 6.46957 0 7V18C0 18.5304 0.210714 19.0391 0.585786 19.4142C0.960859 19.7893 1.46957 20 2 20H13C13.5304 20 14.0391 19.7893 14.4142 19.4142C14.7893 19.0391 15 18.5304 15 18V7C15 6.46957 14.7893 5.96086 14.4142 5.58579C14.0391 5.21071 13.5304 5 13 5H2ZM2 7H13V18H2V7Z" fill="currentColor" />
     </svg>
+  );
+}
+
+function HeaderCopyButton({ copied, onCopy }: { copied: boolean; onCopy: () => void }) {
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+
+  useLayoutEffect(() => {
+    if (!copied || !btnRef.current) return;
+    const r = btnRef.current.getBoundingClientRect();
+    setPos({ x: r.left + r.width / 2, y: r.top - 4 });
+  }, [copied]);
+
+  return (
+    <button
+      ref={btnRef}
+      onClick={onCopy}
+      className="relative flex items-center justify-center size-4 text-[#7a7a83] hover:text-[#f9f9fa] transition-colors"
+    >
+      <span className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${copied ? 'opacity-0 scale-75' : 'opacity-100 scale-100'}`}>
+        <CopyIcon />
+      </span>
+      <span className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${copied ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
+        <svg width="12" height="12" viewBox="0 0 20 20" fill="none">
+          <path d="M3 10.5L7.5 15L17 5" stroke="#16c284" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </span>
+      {copied && createPortal(
+        <span
+          className="fixed z-[9999] -translate-x-1/2 -translate-y-full rounded bg-[#252527] px-1.5 py-0.5 text-[10px] leading-3 text-[#16c284] whitespace-nowrap shadow-lg pointer-events-none animate-[fadeIn_150ms_ease-out]"
+          style={{ left: pos.x, top: pos.y }}
+        >
+          Copied!
+        </span>,
+        document.body,
+      )}
+    </button>
   );
 }
 
@@ -543,25 +581,7 @@ function AvatarDropdown({ onDisconnect }: { onDisconnect: () => void }) {
               <div className="flex flex-col gap-0.5 min-w-0">
                 <div className="flex items-center gap-1">
                   <span className="text-base font-medium text-[#f9f9fa] tabular-nums">{walletAddress}</span>
-                  <button
-                    onClick={handleCopy}
-                    className="relative flex items-center justify-center size-4 text-[#7a7a83] hover:text-[#f9f9fa] transition-colors"
-                    title={copied ? 'Copied!' : 'Copy address'}
-                  >
-                    <span className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${copied ? 'opacity-0 scale-75' : 'opacity-100 scale-100'}`}>
-                      <CopyIcon />
-                    </span>
-                    <span className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${copied ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
-                      <svg width="12" height="12" viewBox="0 0 20 20" fill="none">
-                        <path d="M3 10.5L7.5 15L17 5" stroke="#16c284" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </span>
-                    {copied && (
-                      <span className="absolute -top-7 left-1/2 -translate-x-1/2 rounded bg-[#252527] px-1.5 py-0.5 text-[10px] leading-3 text-[#16c284] whitespace-nowrap animate-[fadeIn_150ms_ease-out]">
-                        Copied!
-                      </span>
-                    )}
-                  </button>
+                  <HeaderCopyButton copied={copied} onCopy={handleCopy} />
                 </div>
                 <a
                   href="#"
