@@ -538,8 +538,8 @@ export default function LiveMarketTable() {
   // Live-updating markets from shared context
   const { markets: liveData } = useLiveMarkets();
 
-  const tabs: { key: MarketTab; label: string; count: number }[] = [
-    { key: 'live', label: 'Live Market', count: marketTabCounts.live },
+  const tabs: { key: MarketTab; label: string; mobileLabel?: string; count: number }[] = [
+    { key: 'live', label: 'Live Market', mobileLabel: 'Live', count: marketTabCounts.live },
     { key: 'upcoming', label: 'Upcoming', count: marketTabCounts.upcoming },
     { key: 'ended', label: 'Ended', count: marketTabCounts.ended },
   ];
@@ -668,7 +668,12 @@ export default function LiveMarketTable() {
                 className="flex items-center gap-2 transition-colors"
               >
                 <span className={`text-lg md:text-xl font-medium leading-7 ${isActive ? 'text-[#f9f9fa]' : 'text-[#7a7a83] hover:text-[#f9f9fa]'}`}>
-                  {tab.label}
+                  {tab.mobileLabel ? (
+                    <>
+                      <span className="md:hidden">{tab.mobileLabel}</span>
+                      <span className="hidden md:inline">{tab.label}</span>
+                    </>
+                  ) : tab.label}
                 </span>
                 <span
                   className={`hidden md:inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-medium leading-4 ${
@@ -831,9 +836,14 @@ export default function LiveMarketTable() {
 
                   {/* Last Price */}
                   <div className="w-[192px] shrink-0 text-right">
-                    <span className="text-sm font-normal text-[#f9f9fa] tabular-nums">
-                      ${formatPrice(market.lastPrice)}
-                    </span>
+                    <div className="flex flex-col items-end gap-0.5">
+                      <span className="text-sm font-normal text-[#f9f9fa] tabular-nums">
+                        ${formatPrice(market.lastPrice)}
+                      </span>
+                      <span className="md:hidden text-xs font-normal text-[#7a7a83] tabular-nums">
+                        vol. ${market.totalVolume >= 1_000_000 ? `${(market.totalVolume / 1_000_000).toFixed(1)}M` : market.totalVolume >= 1_000 ? `${(market.totalVolume / 1_000).toFixed(1)}K` : market.totalVolume.toFixed(2)}
+                      </span>
+                    </div>
                   </div>
 
                   {/* Total Vol — hidden on mobile */}
