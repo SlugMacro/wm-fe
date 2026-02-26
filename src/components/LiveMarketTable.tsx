@@ -676,7 +676,6 @@ export default function LiveMarketTable() {
                 className="w-full h-9 pl-9 pr-3 rounded-lg border border-[#1f1f23] bg-transparent text-sm text-[#f9f9fa] placeholder-[#7a7a83] outline-none focus:border-[#2e2e34] transition-colors"
               />
             </div>
-            <NetworkDropdown value={endedNetwork} onChange={setEndedNetwork} />
             <button
               onClick={() => { setSearchExpanded(false); setEndedSearch(''); }}
               className="flex items-center justify-center w-9 h-9 rounded-lg border border-[#1f1f23] text-[#7a7a83] hover:text-[#f9f9fa] hover:border-[#2e2e34] transition-colors shrink-0"
