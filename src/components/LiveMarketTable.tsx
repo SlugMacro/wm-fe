@@ -362,7 +362,7 @@ function CheckIcon16() {
   );
 }
 
-function NetworkDropdown({ value, onChange }: { value: NetworkFilter; onChange: (v: NetworkFilter) => void }) {
+function NetworkDropdown({ value, onChange, compact = false }: { value: NetworkFilter; onChange: (v: NetworkFilter) => void; compact?: boolean }) {
   const [open, setOpen] = useState(false);
   const [visible, setVisible] = useState(false);
   const active = NETWORKS.find((n) => n.key === value);
@@ -386,17 +386,19 @@ function NetworkDropdown({ value, onChange }: { value: NetworkFilter; onChange: 
     <div className="relative">
       <button
         onClick={() => (open ? handleClose() : setOpen(true))}
-        className="flex items-center gap-2 h-9 px-4 rounded-lg bg-[#1b1b1c] text-sm font-medium text-[#f9f9fa] hover:bg-[#252527] transition-colors"
+        className={`flex items-center gap-2 h-9 rounded-lg bg-[#1b1b1c] text-sm font-medium text-[#f9f9fa] hover:bg-[#252527] transition-colors ${compact ? 'w-9 justify-center' : 'px-4'}`}
       >
         {active?.icon === 'all' ? (
           <AllNetworksIcon />
         ) : (
           <img src={active?.icon} alt="" className="size-4 rounded" />
         )}
-        {active?.label}
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className={`transition-transform ${open ? 'rotate-180' : ''}`}>
-          <path d="M3 5L6 8L9 5" stroke="#7a7a83" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        {!compact && active?.label}
+        {!compact && (
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className={`transition-transform ${open ? 'rotate-180' : ''}`}>
+            <path d="M3 5L6 8L9 5" stroke="#7a7a83" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        )}
       </button>
 
       {open && (
@@ -721,8 +723,8 @@ export default function LiveMarketTable() {
         {/* Search + Network filter (Ended only) */}
         {isEnded && (
           <>
-            {/* Tablet: search icon + network dropdown */}
-            <div className="hidden md:flex lg:hidden items-center gap-2">
+            {/* Mobile + Tablet: search icon + network dropdown */}
+            <div className="flex lg:hidden items-center gap-2">
               <button
                 onClick={() => setSearchExpanded(true)}
                 className="flex items-center justify-center w-9 h-9 rounded-lg border border-[#1f1f23] text-[#7a7a83] hover:text-[#f9f9fa] hover:border-[#2e2e34] transition-colors"
@@ -732,7 +734,9 @@ export default function LiveMarketTable() {
                   <path d="M11 11L14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
               </button>
-              <NetworkDropdown value={endedNetwork} onChange={setEndedNetwork} />
+              {/* Mobile: icon only / Tablet: full label */}
+              <span className="md:hidden"><NetworkDropdown value={endedNetwork} onChange={setEndedNetwork} compact /></span>
+              <span className="hidden md:inline-flex"><NetworkDropdown value={endedNetwork} onChange={setEndedNetwork} /></span>
             </div>
             {/* Desktop: full search + network */}
             <div className="hidden lg:flex items-center gap-3">
