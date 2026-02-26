@@ -220,7 +220,7 @@ export default function TopMetrics() {
   }, [markets]);
 
   return (
-    <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-none md:grid md:grid-cols-4 md:overflow-visible md:pb-0">
+    <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-none md:grid md:grid-cols-2 md:overflow-visible md:pb-0 lg:grid-cols-4">
       {/* Pre-market 24h vol — LIVE from market data */}
       <div className="relative flex flex-col rounded-[10px] bg-[rgba(255,255,255,0.03)] overflow-hidden min-w-[280px] snap-start md:min-w-0">
         <div className="flex flex-col gap-2 px-5 pt-4">

@@ -639,7 +639,8 @@ export default function LiveMarketTable() {
       </div>
 
       {/* Table */}
-      <div className="w-full">
+      <div className="w-full overflow-x-auto">
+        <div className="md:min-w-[1000px]">
         {isUpcoming ? (
           /* ════════════ UPCOMING TABLE ════════════ */
           <>
@@ -866,6 +867,7 @@ export default function LiveMarketTable() {
             </div>
           </>
         )}
+        </div>
       </div>
     </div>
   );
