@@ -10,6 +10,7 @@ import tokenMmt from '../assets/images/token-mmt.png';
 
 // Banner decorations
 import bannerBlueLeftSvg from '../assets/images/banner-blue-left.svg';
+import bannerBlueRightSvg from '../assets/images/banner-blue-right.svg';
 import bannerBlueGlowSvg from '../assets/images/banner-blue-glow.svg';
 import bannerGreenLeftSvg from '../assets/images/banner-green-left.svg';
 import bannerGreenRightSvg from '../assets/images/banner-green-right.svg';
@@ -204,12 +205,14 @@ function Banner({ title, variant, markets, type, emptyText }: BannerProps) {
         className="absolute left-0 top-0 w-[461px] h-[96px] pointer-events-none"
       />
 
-      {/* ── Right decoration (green banner) ── */}
-      {!isBlue && (
-        <div className="absolute right-0 top-0 w-[261px] h-[96px] pointer-events-none rotate-180 -scale-y-100">
-          <img src={bannerGreenRightSvg} alt="" className="w-full h-full" />
-        </div>
-      )}
+      {/* ── Right decoration ── */}
+      <div className="absolute right-0 top-0 w-[261px] h-[96px] pointer-events-none rotate-180 -scale-y-100">
+        <img
+          src={isBlue ? bannerBlueRightSvg : bannerGreenRightSvg}
+          alt=""
+          className="w-full h-full"
+        />
+      </div>
 
       {/* ── Center glow ── */}
       <div
@@ -286,6 +289,7 @@ export default function SettlementBanners() {
   const upcomingMarkets: SettlementMarket[] = liveMarkets
     .filter((m) => m.settleTime && new Date(m.settleTime).getTime() > now)
     .sort((a, b) => new Date(a.settleTime!).getTime() - new Date(b.settleTime!).getTime())
+    .slice(0, 2)
     .map((m) => ({
       id: m.id,
       tokenSymbol: m.tokenSymbol,
