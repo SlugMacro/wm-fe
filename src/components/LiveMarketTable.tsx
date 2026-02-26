@@ -277,7 +277,7 @@ interface NetworkOption {
 }
 
 const NETWORKS: NetworkOption[] = [
-  { key: 'all', label: 'All', icon: 'all' },
+  { key: 'all', label: 'All Networks', icon: 'all' },
   { key: 'solana', label: 'Solana', icon: chainSolanaPng },
   { key: 'ethereum', label: 'Ethereum', icon: chainEthereumPng },
   { key: 'sui', label: 'Sui', icon: chainSuiPng },
@@ -285,11 +285,8 @@ const NETWORKS: NetworkOption[] = [
 
 function AllNetworksIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="6" r="2" fill="#7a7a83" />
-      <circle cx="6" cy="18" r="2" fill="#7a7a83" />
-      <circle cx="18" cy="18" r="2" fill="#7a7a83" />
-      <path d="M12 8V12M12 12L7 16M12 12L17 16" stroke="#7a7a83" strokeWidth="1.5" strokeLinecap="round" />
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path d="M2 4h12M4 8h8M6 12h4" stroke="#f9f9fa" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   );
 }
