@@ -699,7 +699,7 @@ export default function LiveMarketTable() {
       </div>
 
       {/* Table */}
-      <div className="w-full overflow-x-auto lg:overflow-x-visible">
+      <div className="w-full overflow-x-auto lg:overflow-x-visible scrollbar-none">
         <div className="md:min-w-[1000px] lg:min-w-0">
         {isUpcoming ? (
           /* ════════════ UPCOMING TABLE ════════════ */
