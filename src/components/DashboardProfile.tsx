@@ -242,7 +242,7 @@ export default function DashboardProfile({
 
       {/* Right: Link Wallet button */}
       <div className="flex items-center gap-3 shrink-0">
-        <button className="flex h-9 items-center gap-1.5 rounded-lg bg-[#f9f9fa] pl-2 pr-3 text-xs font-medium leading-4 text-[#0a0a0b] transition-colors hover:bg-[#e4e4e6]">
+        <button className="flex items-center gap-1.5 rounded-lg bg-[#f9f9fa] px-4 py-2 text-sm font-medium leading-5 text-[#0a0a0b] transition-opacity hover:opacity-90">
           <WalletLinkIcon />
           Link Wallet
         </button>
