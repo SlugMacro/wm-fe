@@ -135,8 +135,8 @@ export default function RecentTradesTable() {
       </div>
 
       {/* Desktop Table */}
-      <div className="hidden md:block w-full overflow-x-auto">
-        <div className="md:min-w-[900px]">
+      <div className="hidden md:block w-full overflow-x-auto lg:overflow-x-visible">
+        <div className="md:min-w-[900px] lg:min-w-0">
         {/* Header — aligned with market table: Time+Side = Token area, Pair = Chart+LastPrice area */}
         <div className="flex items-center border-b border-[#1b1b1c] h-9 px-2">
           <div className="flex-1 min-w-0 flex items-center">
