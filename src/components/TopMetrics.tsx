@@ -77,7 +77,7 @@ function FearGreedGauge({ value, label }: { value: number; label: string }) {
   const theta = Math.PI * (1 - value / 100);
   return (
     <div className="relative flex flex-col items-center">
-      <svg width="144" height="80" viewBox="0 0 144 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg width="168" height="92" viewBox="0 0 168 92" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="gaugeGradient" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stopColor="#fd5e67" />
@@ -88,22 +88,22 @@ function FearGreedGauge({ value, label }: { value: number; label: string }) {
           </linearGradient>
         </defs>
         <path
-          d="M16 72 A56 56 0 0 1 128 72"
+          d="M16 84 A68 68 0 0 1 152 84"
           stroke="url(#gaugeGradient)"
           strokeWidth="8"
           strokeLinecap="round"
           fill="none"
         />
         <circle
-          cx={72 + 56 * Math.cos(theta)}
-          cy={72 - 56 * Math.sin(theta)}
-          r="6"
+          cx={84 + 68 * Math.cos(theta)}
+          cy={84 - 68 * Math.sin(theta)}
+          r="8"
           fill="#f9f9fa"
           stroke="#0a0a0b"
           strokeWidth="2"
         />
       </svg>
-      <div className="absolute bottom-0 flex flex-col items-center">
+      <div className="absolute bottom-[-4px] flex flex-col items-center">
         <span className="text-[28px] font-medium leading-9 text-[#f9f9fa]">
           {value}
         </span>
