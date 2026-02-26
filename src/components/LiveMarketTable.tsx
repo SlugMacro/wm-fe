@@ -662,16 +662,19 @@ export default function LiveMarketTable() {
         {/* Search + Network filter (Ended only) */}
         {isEnded && (
           <>
-            {/* Tablet: search icon button */}
-            <button
-              onClick={() => setSearchExpanded(true)}
-              className="hidden md:flex lg:hidden items-center justify-center w-9 h-9 rounded-lg border border-[#1f1f23] text-[#7a7a83] hover:text-[#f9f9fa] hover:border-[#2e2e34] transition-colors"
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.5" />
-                <path d="M11 11L14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              </svg>
-            </button>
+            {/* Tablet: search icon + network dropdown */}
+            <div className="hidden md:flex lg:hidden items-center gap-2">
+              <button
+                onClick={() => setSearchExpanded(true)}
+                className="flex items-center justify-center w-9 h-9 rounded-lg border border-[#1f1f23] text-[#7a7a83] hover:text-[#f9f9fa] hover:border-[#2e2e34] transition-colors"
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.5" />
+                  <path d="M11 11L14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+              </button>
+              <NetworkDropdown value={endedNetwork} onChange={setEndedNetwork} />
+            </div>
             {/* Desktop: full search + network */}
             <div className="hidden lg:flex items-center gap-3">
               <SearchInput value={endedSearch} onChange={setEndedSearch} />
