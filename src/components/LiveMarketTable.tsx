@@ -643,7 +643,7 @@ export default function LiveMarketTable() {
         {isUpcoming ? (
           /* ════════════ UPCOMING TABLE ════════════ */
           <>
-            <div className="flex items-center border-b border-[#1b1b1c] h-9 px-2">
+            <div className="flex items-center border-b border-[#1b1b1c] h-9 md:px-2">
               <div className="flex-1 min-w-0">
                 <span className="text-xs font-normal text-[#7a7a83]">Token</span>
               </div>
@@ -688,7 +688,7 @@ export default function LiveMarketTable() {
               <div
                 key={market.id}
                 onClick={() => navigate('/coming-soon')}
-                className="flex items-center border-b border-[#1b1b1c] h-[76px] px-2 cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.02)]"
+                className="flex items-center border-b border-[#1b1b1c] h-[76px] md:px-2 cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.02)]"
               >
                 <div className="flex-1 min-w-0 flex items-center"><UpcomingTokenCell market={market} /></div>
                 <div className="w-[192px] shrink-0">
@@ -706,7 +706,7 @@ export default function LiveMarketTable() {
           /* ════════════ ENDED TABLE ════════════ */
           <>
             {/* Ended Header */}
-            <div className="flex items-center border-b border-[#1b1b1c] h-9 px-2">
+            <div className="flex items-center border-b border-[#1b1b1c] h-9 md:px-2">
               <div className="flex-1 min-w-0">
                 <span className="text-xs font-normal text-[#7a7a83]">Token</span>
               </div>
@@ -761,7 +761,7 @@ export default function LiveMarketTable() {
                 <div
                   key={market.id}
                   onClick={() => navigate('/coming-soon')}
-                  className="flex items-center border-b border-[#1b1b1c] h-[76px] px-2 cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.02)]"
+                  className="flex items-center border-b border-[#1b1b1c] h-[76px] md:px-2 cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.02)]"
                 >
                   {/* Token */}
                   <div className="flex-1 min-w-0 flex items-center">
@@ -819,7 +819,7 @@ export default function LiveMarketTable() {
         ) : (
           /* ════════════ LIVE TABLE ════════════ */
           <>
-            <div className="flex items-center border-b border-[#1b1b1c] h-9 px-2">
+            <div className="flex items-center border-b border-[#1b1b1c] h-9 md:px-2">
               <div className="flex-1 min-w-0">
                 <span className="text-xs font-normal text-[#7a7a83]">Token</span>
               </div>
@@ -852,7 +852,7 @@ export default function LiveMarketTable() {
               <div
                 key={market.id}
                 onClick={() => navigate(`/markets/${market.id}`)}
-                className="flex items-center border-b border-[#1b1b1c] h-[76px] px-2 cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.02)]"
+                className="flex items-center border-b border-[#1b1b1c] h-[76px] md:px-2 cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.02)]"
               >
                 <div className="flex-1 min-w-0 flex items-center"><LiveTokenCell market={market} /></div>
                 <div className="hidden md:flex w-[112px] shrink-0 items-center pr-4"><MiniChart data={market.chartData} color={market.chartColor} /></div>
