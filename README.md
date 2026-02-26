@@ -1,5 +1,7 @@
 # Whales Market — Frontend
 
+**Live Demo:** https://wm-fe-slug.vercel.app
+
 Whales Market frontend built with React, TypeScript, and Tailwind CSS.
 
 ## Tech Stack
