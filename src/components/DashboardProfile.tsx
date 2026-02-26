@@ -6,12 +6,20 @@ import chainEthereumPng from '../assets/images/chain-ethereum.png';
 import chainSolanaPng from '../assets/images/chain-solana.png';
 import chainSuiPng from '../assets/images/chain-sui.png';
 
-/* ───── Icons (outline style — consistent across app) ───── */
+/* ───── Icons ───── */
 
 function CopyIcon() {
   return (
     <svg width="12" height="12" viewBox="0 0 20 20" fill="none">
       <path fillRule="evenodd" clipRule="evenodd" d="M7 0C6.46957 0 5.96086 0.210714 5.58579 0.585786C5.21071 0.960859 5 1.46957 5 2V4H7V2H18V13H16V15H18C18.5304 15 19.0391 14.7893 19.4142 14.4142C19.7893 14.0391 20 13.5304 20 13V2C20 1.46957 19.7893 0.960859 19.4142 0.585786C19.0391 0.210714 18.5304 0 18 0H7ZM2 5C1.46957 5 0.960859 5.21071 0.585786 5.58579C0.210714 5.96086 0 6.46957 0 7V18C0 18.5304 0.210714 19.0391 0.585786 19.4142C0.960859 19.7893 1.46957 20 2 20H13C13.5304 20 14.0391 19.7893 14.4142 19.4142C14.7893 19.0391 15 18.5304 15 18V7C15 6.46957 14.7893 5.96086 14.4142 5.58579C14.0391 5.21071 13.5304 5 13 5H2ZM2 7H13V18H2V7Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 20 20" fill="none">
+      <path d="M3 10.5L7.5 15L17 5" stroke="#16c284" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -31,6 +39,34 @@ function WalletLinkIcon() {
       <path d="M3 10H21" stroke="currentColor" strokeWidth="1.5" />
       <circle cx="16.5" cy="14.5" r="1.5" fill="currentColor" />
     </svg>
+  );
+}
+
+/* ───── CopyButton — reusable animated copy button ───── */
+
+function CopyButton({ text, copied, onCopy }: { text: string; copied: string | null; onCopy: (t: string) => void }) {
+  const isCopied = copied === text;
+  return (
+    <button
+      onClick={() => onCopy(text)}
+      className="relative flex items-center justify-center size-4 text-[#7a7a83] transition-colors hover:text-[#f9f9fa] group"
+      title={isCopied ? 'Copied!' : 'Copy'}
+    >
+      {/* Copy icon */}
+      <span className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${isCopied ? 'opacity-0 scale-75' : 'opacity-100 scale-100'}`}>
+        <CopyIcon />
+      </span>
+      {/* Check icon */}
+      <span className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${isCopied ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
+        <CheckIcon />
+      </span>
+      {/* Tooltip */}
+      {isCopied && (
+        <span className="absolute -top-7 left-1/2 -translate-x-1/2 rounded bg-[#252527] px-1.5 py-0.5 text-[10px] leading-3 text-[#16c284] whitespace-nowrap animate-[fadeIn_150ms_ease-out]">
+          Copied!
+        </span>
+      )}
+    </button>
   );
 }
 
@@ -87,13 +123,7 @@ export default function DashboardProfile({
               <span className="text-lg font-medium leading-7 text-[#f9f9fa] tabular-nums">
                 {walletShort}
               </span>
-              <button
-                onClick={() => handleCopy(walletAddress)}
-                className="flex items-center p-0.5 text-[#7a7a83] transition-colors hover:text-[#f9f9fa]"
-                title={copied === walletAddress ? 'Copied!' : 'Copy address'}
-              >
-                <CopyIcon />
-              </button>
+              <CopyButton text={walletAddress} copied={copied} onCopy={handleCopy} />
             </div>
             <a
               href={`https://solscan.io/account/${walletAddress}`}
@@ -158,13 +188,7 @@ export default function DashboardProfile({
                   <span className="text-xs leading-4 font-normal tabular-nums text-[#f9f9fa]">
                     {wallet.address}
                   </span>
-                  <button
-                    onClick={() => handleCopy(wallet.address)}
-                    className="flex items-center p-0.5 text-[#7a7a83] transition-colors hover:text-[#f9f9fa]"
-                    title={copied === wallet.address ? 'Copied!' : 'Copy'}
-                  >
-                    <CopyIcon />
-                  </button>
+                  <CopyButton text={wallet.address} copied={copied} onCopy={handleCopy} />
                 </div>
               ))}
             </div>

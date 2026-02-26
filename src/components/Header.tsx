@@ -545,14 +545,21 @@ function AvatarDropdown({ onDisconnect }: { onDisconnect: () => void }) {
                   <span className="text-base font-medium text-[#f9f9fa] tabular-nums">{walletAddress}</span>
                   <button
                     onClick={handleCopy}
-                    className="flex items-center p-0.5 text-[#7a7a83] hover:text-[#f9f9fa] transition-colors"
+                    className="relative flex items-center justify-center size-4 text-[#7a7a83] hover:text-[#f9f9fa] transition-colors"
+                    title={copied ? 'Copied!' : 'Copy address'}
                   >
-                    {copied ? (
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="#16c284" />
-                      </svg>
-                    ) : (
+                    <span className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${copied ? 'opacity-0 scale-75' : 'opacity-100 scale-100'}`}>
                       <CopyIcon />
+                    </span>
+                    <span className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${copied ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
+                      <svg width="12" height="12" viewBox="0 0 20 20" fill="none">
+                        <path d="M3 10.5L7.5 15L17 5" stroke="#16c284" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </span>
+                    {copied && (
+                      <span className="absolute -top-7 left-1/2 -translate-x-1/2 rounded bg-[#252527] px-1.5 py-0.5 text-[10px] leading-3 text-[#16c284] whitespace-nowrap animate-[fadeIn_150ms_ease-out]">
+                        Copied!
+                      </span>
                     )}
                   </button>
                 </div>
