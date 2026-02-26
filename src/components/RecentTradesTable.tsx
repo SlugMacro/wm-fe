@@ -56,12 +56,12 @@ interface TradeWithTimestamp extends RecentTrade {
 // Pool of sample trades to cycle through for the animation
 const SAMPLE_NEW_TRADES: Omit<RecentTrade, 'id' | 'time'>[] = [
   { side: 'Buy', pair: 'SKATE/USDC', pairIcon: '', pairChain: 'solana', market: 'Pre-market', price: 0.0052, amount: '20.00K', collateral: 75.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'shrimp' },
-  { side: 'Sell', pair: 'PENGU/SOL', pairIcon: '', pairChain: 'solana', market: 'Pre-market', price: 0.0051, amount: '45.00K', collateral: 500.0, collateralIcon: '/tokens/sol.svg', tierIcon: 'fish' },
-  { side: 'Buy', hasBadge: 'RS' as const, pair: 'IKA/USDT', pairIcon: '', pairChain: 'solana', market: 'Pre-market', price: 0.121, amount: '2.50K', collateral: 302.5, collateralIcon: '/tokens/usdt.svg', tierIcon: 'fish' },
+  { side: 'Sell', pair: 'ERA/USDC', pairIcon: '', pairChain: 'ethereum', market: 'Pre-market', price: 0.0461, amount: '10.85K', collateral: 500.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'fish' },
+  { side: 'Buy', hasBadge: 'RS' as const, pair: 'MMT/USDT', pairIcon: '', pairChain: 'sui', market: 'Pre-market', price: 0.65, amount: '465', collateral: 302.5, collateralIcon: '/tokens/usdt.svg', tierIcon: 'fish' },
   { side: 'Buy', pair: 'GRASS/USDC', pairIcon: '', pairChain: 'solana', market: 'Pre-market', price: 0.071, amount: '7.04K', collateral: 5000.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'dolphin' },
   { side: 'Sell', pair: 'ZBT/USDC', pairIcon: '', pairChain: 'solana', market: 'Pre-market', price: 0.054, amount: '9.26K', collateral: 25000.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'shark' },
   { side: 'Buy', pair: 'LOUD/USDT', pairIcon: '', pairChain: 'solana', market: 'Pre-market', price: 0.958, amount: '1.04K', collateral: 1500.0, collateralIcon: '/tokens/usdt.svg', tierIcon: 'dolphin' },
-  { side: 'Buy', pair: 'PENGU/USDC', pairIcon: '', pairChain: 'solana', market: 'Pre-market', price: 0.0049, amount: '102.00K', collateral: 200000.0, collateralIcon: '/tokens/usdc.svg', tierIcon: 'whale' },
+  { side: 'Buy', pair: 'ERA/USDT', pairIcon: '', pairChain: 'ethereum', market: 'Pre-market', price: 0.0470, amount: '4.25K', collateral: 200000.0, collateralIcon: '/tokens/usdt.svg', tierIcon: 'whale' },
   { side: 'Sell', pair: 'SKATE/SOL', pairIcon: '', pairChain: 'solana', market: 'Pre-market', price: 0.0048, amount: '15.00K', collateral: 50000.0, collateralIcon: '/tokens/sol.svg', tierIcon: 'shark' },
 ];
 
