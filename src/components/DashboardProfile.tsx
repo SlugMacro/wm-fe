@@ -35,7 +35,7 @@ function ExternalArrowIcon() {
 
 function WalletLinkIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
       <rect x="3" y="6" width="18" height="13" rx="2" stroke="currentColor" strokeWidth="1.5" />
       <path d="M3 10H21" stroke="currentColor" strokeWidth="1.5" />
       <circle cx="16.5" cy="14.5" r="1.5" fill="currentColor" />
@@ -242,10 +242,8 @@ export default function DashboardProfile({
 
       {/* Right: Link Wallet button */}
       <div className="flex items-center gap-3 shrink-0">
-        <button className="flex items-center gap-1.5 rounded-lg bg-[#f9f9fa] pl-2 pr-4 py-2 text-sm font-medium leading-5 text-[#0a0a0b] transition-colors hover:bg-[#e4e4e6]">
-          <span className="flex items-center p-0.5">
-            <WalletLinkIcon />
-          </span>
+        <button className="flex h-9 items-center gap-1.5 rounded-lg bg-[#f9f9fa] pl-2 pr-3 text-xs font-medium leading-4 text-[#0a0a0b] transition-colors hover:bg-[#e4e4e6]">
+          <WalletLinkIcon />
           Link Wallet
         </button>
       </div>
