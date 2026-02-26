@@ -5,7 +5,7 @@ import BottomStats from '../components/BottomStats';
 
 export default function MarketsPage() {
   return (
-    <div className="mx-auto max-w-[1440px] px-12 py-4">
+    <div className="mx-auto max-w-[1440px] px-4 py-4 md:px-12">
       {/* Top Metrics */}
       <div className="mb-8">
         <TopMetrics />

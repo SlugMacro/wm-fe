@@ -134,8 +134,8 @@ export default function RecentTradesTable() {
         <h2 className="text-xl font-medium leading-7 text-[#f9f9fa]">Recent Trades</h2>
       </div>
 
-      {/* Table */}
-      <div className="w-full">
+      {/* Desktop Table */}
+      <div className="hidden md:block w-full">
         {/* Header — aligned with market table: Time+Side = Token area, Pair = Chart+LastPrice area */}
         <div className="flex items-center border-b border-[#1b1b1c] h-9 px-2">
           <div className="flex-1 min-w-0 flex items-center">
@@ -238,6 +238,68 @@ export default function RecentTradesTable() {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Mobile Card List */}
+      <div className="md:hidden">
+        {trades.map((trade) => (
+          <div
+            key={trade.id}
+            className={`border-b border-[#1b1b1c] last:border-b-0 py-4 transition-all ${
+              trade.isNew ? 'bg-[rgba(91,209,151,0.05)]' : ''
+            }`}
+            style={trade.isNew ? { animation: 'slideIn 0.4s ease-out' } : undefined}
+          >
+            {/* Row 1: Side + badge + token icon + name ... time */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1">
+                <span className={`text-sm font-medium ${trade.side === 'Buy' ? 'text-[#5bd197]' : 'text-[#fd5e67]'}`}>
+                  Filled Order {trade.side}
+                </span>
+                {trade.hasBadge && (
+                  <span className="inline-flex items-center justify-center rounded-full bg-[#eab308] px-1.5 py-0.5 text-[10px] font-medium uppercase leading-3 text-[#0a0a0b]">
+                    {trade.hasBadge}
+                  </span>
+                )}
+                <TokenIcon symbol={trade.pair.split('/')[0]} chain="solana" size="xs" showChain={false} />
+                <span className="text-sm font-medium text-[#f9f9fa]">{trade.pair.split('/')[0]}</span>
+              </div>
+              <span className={`text-xs font-normal ${trade.isNew ? 'text-[#5bd197]' : 'text-[#7a7a83]'}`}>
+                {trade.time}
+              </span>
+            </div>
+            {/* Row 2: Price + Amount/Collateral + Tx */}
+            <div className="flex items-end justify-between mt-2">
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-1">
+                  <span className="text-xs font-normal text-[#7a7a83]">Price</span>
+                  <span className={`text-xs font-medium tabular-nums ${trade.hasBadge === 'RS' ? 'text-[#eab308]' : 'text-[#f9f9fa]'}`}>
+                    ${trade.price.toFixed(4)}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1 flex-wrap">
+                  <span className="text-xs font-normal text-[#7a7a83]">Amount</span>
+                  <span className="text-xs font-normal text-[#7a7a83]">/</span>
+                  <span className="text-xs font-normal text-[#7a7a83]">Collateral</span>
+                  <span className="text-xs font-medium text-[#f9f9fa] tabular-nums">{trade.amount}</span>
+                  <span className="text-xs font-normal text-[#7a7a83]">/</span>
+                  <span className="text-xs font-medium text-[#f9f9fa] tabular-nums">
+                    {trade.collateral < 1
+                      ? trade.collateral.toFixed(2)
+                      : trade.collateral >= 1000
+                        ? `${(trade.collateral / 1000).toFixed(2)}K`
+                        : trade.collateral.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                  <TokenIcon symbol={getCollateralSymbol(trade.collateralIcon)} size="xs" showChain={false} />
+                  <TierIcon tier={trade.tierIcon} />
+                </div>
+              </div>
+              <button className="inline-flex items-center justify-center w-[52px] h-7 rounded-md border border-[#252527] transition-colors hover:border-[#3a3a3d] hover:bg-[rgba(255,255,255,0.03)] shrink-0 ml-2">
+                <ArrowRightUpIcon />
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Animation keyframes */}

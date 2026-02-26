@@ -615,17 +615,28 @@ function AvatarDropdown({ onDisconnect }: { onDisconnect: () => void }) {
 export default function Header() {
   const wallet = useWallet();
   const { isConnected } = wallet;
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <>
       <header className="flex items-center justify-center border-b border-[#1b1b1c] bg-[#0a0a0b] px-0 py-3">
-        <div className="flex flex-1 items-center gap-4 max-w-[1440px] px-12">
+        <div className="flex flex-1 items-center gap-4 max-w-[1440px] px-4 md:px-12">
           {/* Logo + Menu */}
           <div className="flex flex-1 items-center gap-2">
+            {/* Mobile hamburger */}
+            <button
+              onClick={() => setMobileMenuOpen((v) => !v)}
+              className="flex items-center justify-center rounded-lg p-2 text-[#f9f9fa] md:hidden"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </button>
+
             {/* Logo */}
             <NavLink to="/" className="flex items-center gap-1.5 p-1.5 shrink-0">
               <img src={mascotSvg} alt="Whales Market" className="w-6 h-6" />
-              <div className="relative" style={{ width: '172px', height: '15px' }}>
+              <div className="relative hidden md:block" style={{ width: '172px', height: '15px' }}>
                 <img
                   src={logoTopSvg}
                   alt=""
@@ -641,8 +652,8 @@ export default function Header() {
               </div>
             </NavLink>
 
-            {/* Navigation */}
-            <nav className="flex flex-1 items-center">
+            {/* Navigation — hidden on mobile */}
+            <nav className="hidden md:flex flex-1 items-center">
               <NavItem to="/markets" label="Markets" />
               <NavItem to="/dashboard" label="Dashboard" />
               <NavDropdown
@@ -659,7 +670,7 @@ export default function Header() {
           </div>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2 md:gap-3 shrink-0">
             {isConnected ? (
               <>
                 {/* Chain Selector */}
@@ -672,8 +683,8 @@ export default function Header() {
                   </div>
                 </button>
 
-                {/* Fee */}
-                <button className="flex items-center gap-1.5 h-9 rounded-lg border border-[#252527] p-2 overflow-hidden transition-colors hover:border-[#3a3a3d]">
+                {/* Fee — hidden on mobile */}
+                <button className="hidden md:flex items-center gap-1.5 h-9 rounded-lg border border-[#252527] p-2 overflow-hidden transition-colors hover:border-[#3a3a3d]">
                   <div className="flex items-center p-0.5">
                     <img src={tokenFeePng} alt="" className="w-4 h-4 rounded-full" />
                   </div>
@@ -708,24 +719,60 @@ export default function Header() {
               </button>
             )}
 
-            {/* Divider */}
-            <div className="h-4 w-px bg-[#252527]" />
+            {/* Divider — hidden on mobile */}
+            <div className="hidden md:block h-4 w-px bg-[#252527]" />
 
-            {/* Help → GitHub Docs */}
+            {/* Help → GitHub Docs — hidden on mobile */}
             <a
               href="https://github.com/SlugMacro/wm-fe"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center rounded-full bg-[#1b1b1c] p-2 text-[#f9f9fa] transition-colors hover:bg-[#252527]"
+              className="hidden md:flex items-center justify-center rounded-full bg-[#1b1b1c] p-2 text-[#f9f9fa] transition-colors hover:bg-[#252527]"
             >
               <QuestionIcon />
             </a>
 
-            {/* Language Selector */}
-            <LanguageDropdown />
+            {/* Language Selector — hidden on mobile */}
+            <div className="hidden md:block">
+              <LanguageDropdown />
+            </div>
           </div>
         </div>
       </header>
+
+      {/* Mobile Navigation Menu */}
+      {mobileMenuOpen && (
+        <>
+          <div className="fixed inset-0 z-40 bg-black/50 md:hidden" onClick={() => setMobileMenuOpen(false)} />
+          <div className="fixed top-0 left-0 bottom-0 z-50 w-[280px] bg-[#0a0a0b] border-r border-[#1b1b1c] p-4 flex flex-col gap-2 md:hidden">
+            {/* Close */}
+            <div className="flex items-center justify-between mb-4">
+              <NavLink to="/" className="flex items-center gap-1.5" onClick={() => setMobileMenuOpen(false)}>
+                <img src={mascotSvg} alt="Whales Market" className="w-6 h-6" />
+                <div className="relative" style={{ width: '172px', height: '15px' }}>
+                  <img src={logoTopSvg} alt="" className="absolute left-0 top-0" style={{ width: '82.58px', height: '14.52px' }} />
+                  <img src={logoBottomSvg} alt="" className="absolute" style={{ width: '82.62px', height: '14px', left: '89.2px', top: '0.26px' }} />
+                </div>
+              </NavLink>
+              <button onClick={() => setMobileMenuOpen(false)} className="text-[#7a7a83] p-1">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
+              </button>
+            </div>
+            {/* Nav links */}
+            <NavLink to="/markets" onClick={() => setMobileMenuOpen(false)} className={({ isActive }) => `flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${isActive ? 'text-[#19fb9b] bg-[#1b1b1c]' : 'text-[#f9f9fa] hover:bg-[#1b1b1c]'}`}>Markets</NavLink>
+            <NavLink to="/dashboard" onClick={() => setMobileMenuOpen(false)} className={({ isActive }) => `flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${isActive ? 'text-[#19fb9b] bg-[#1b1b1c]' : 'text-[#f9f9fa] hover:bg-[#1b1b1c]'}`}>Dashboard</NavLink>
+            <div className="h-px bg-[#1b1b1c] my-1" />
+            <span className="px-3 text-xs font-medium text-[#7a7a83] uppercase">Earn</span>
+            <NavLink to="/staking" onClick={() => setMobileMenuOpen(false)} className={({ isActive }) => `flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${isActive ? 'text-[#19fb9b] bg-[#1b1b1c]' : 'text-[#f9f9fa] hover:bg-[#1b1b1c]'}`}>Stake</NavLink>
+            <NavLink to="/referral" onClick={() => setMobileMenuOpen(false)} className={({ isActive }) => `flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${isActive ? 'text-[#19fb9b] bg-[#1b1b1c]' : 'text-[#f9f9fa] hover:bg-[#1b1b1c]'}`}>Referral</NavLink>
+            <NavLink to="/affiliate" onClick={() => setMobileMenuOpen(false)} className={({ isActive }) => `flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${isActive ? 'text-[#19fb9b] bg-[#1b1b1c]' : 'text-[#f9f9fa] hover:bg-[#1b1b1c]'}`}>Affiliate</NavLink>
+            <div className="h-px bg-[#1b1b1c] my-1" />
+            <span className="px-3 text-xs font-medium text-[#7a7a83] uppercase">Resources</span>
+            <NavLink to="/about" onClick={() => setMobileMenuOpen(false)} className={({ isActive }) => `flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${isActive ? 'text-[#19fb9b] bg-[#1b1b1c]' : 'text-[#f9f9fa] hover:bg-[#1b1b1c]'}`}>About</NavLink>
+            <a href="https://github.com/SlugMacro/wm-fe" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-[#f9f9fa] hover:bg-[#1b1b1c] transition-colors">Docs</a>
+          </div>
+        </>
+      )}
 
       {/* Connect Wallet Modal */}
       <ConnectWalletModal
