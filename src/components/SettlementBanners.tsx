@@ -16,6 +16,7 @@ import bannerBlueGlowSvg from '../assets/images/banner-blue-glow.svg';
 import bannerGreenLeftSvg from '../assets/images/banner-green-left.svg';
 import bannerGreenRightSvg from '../assets/images/banner-green-right.svg';
 import bannerGreenGlowSvg from '../assets/images/banner-green-glow.svg';
+import emptyBoxSvg from '../assets/images/empty-box.svg';
 
 /* ───── Token image map ───── */
 
@@ -241,13 +242,21 @@ function Banner({ title, variant, markets, type, emptyText, emptyTooltip }: Bann
       />
 
       {/* ── Right decoration ── */}
-      <div className="absolute right-0 top-0 w-[261px] h-[96px] pointer-events-none rotate-180 -scale-y-100">
+      {markets.length > 0 ? (
+        <div className="absolute right-0 top-0 w-[261px] h-[96px] pointer-events-none rotate-180 -scale-y-100">
+          <img
+            src={isBlue ? bannerBlueRightSvg : bannerGreenRightSvg}
+            alt=""
+            className="w-full h-full"
+          />
+        </div>
+      ) : (
         <img
-          src={isBlue ? bannerBlueRightSvg : bannerGreenRightSvg}
+          src={emptyBoxSvg}
           alt=""
-          className="w-full h-full"
+          className="absolute right-4 top-1/2 -translate-y-1/2 h-[80px] w-auto pointer-events-none"
         />
-      </div>
+      )}
 
       {/* ── Center glow ── */}
       <div
