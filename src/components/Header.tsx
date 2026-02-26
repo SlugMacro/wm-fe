@@ -626,7 +626,7 @@ export default function Header() {
             {/* Mobile hamburger */}
             <button
               onClick={() => setMobileMenuOpen((v) => !v)}
-              className="flex items-center justify-center rounded-lg p-2 text-[#f9f9fa] md:hidden"
+              className="flex items-center justify-center rounded-lg p-2 text-[#f9f9fa] lg:hidden"
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                 <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -636,7 +636,7 @@ export default function Header() {
             {/* Logo */}
             <NavLink to="/" className="flex items-center gap-1.5 p-1.5 shrink-0">
               <img src={mascotSvg} alt="Whales Market" className="w-6 h-6" />
-              <div className="relative hidden md:block" style={{ width: '172px', height: '15px' }}>
+              <div className="relative hidden lg:block" style={{ width: '172px', height: '15px' }}>
                 <img
                   src={logoTopSvg}
                   alt=""
@@ -653,7 +653,7 @@ export default function Header() {
             </NavLink>
 
             {/* Navigation — hidden on mobile */}
-            <nav className="hidden md:flex flex-1 items-center">
+            <nav className="hidden lg:flex flex-1 items-center">
               <NavItem to="/markets" label="Markets" />
               <NavItem to="/dashboard" label="Dashboard" />
               <NavDropdown
@@ -670,7 +670,7 @@ export default function Header() {
           </div>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-2 md:gap-3 shrink-0">
+          <div className="flex items-center gap-2 lg:gap-3 shrink-0">
             {isConnected ? (
               <>
                 {/* Chain Selector */}
@@ -684,7 +684,7 @@ export default function Header() {
                 </button>
 
                 {/* Fee — hidden on mobile */}
-                <button className="hidden md:flex items-center gap-1.5 h-9 rounded-lg border border-[#252527] p-2 overflow-hidden transition-colors hover:border-[#3a3a3d]">
+                <button className="hidden lg:flex items-center gap-1.5 h-9 rounded-lg border border-[#252527] p-2 overflow-hidden transition-colors hover:border-[#3a3a3d]">
                   <div className="flex items-center p-0.5">
                     <img src={tokenFeePng} alt="" className="w-4 h-4 rounded-full" />
                   </div>
@@ -720,20 +720,20 @@ export default function Header() {
             )}
 
             {/* Divider — hidden on mobile */}
-            <div className="hidden md:block h-4 w-px bg-[#252527]" />
+            <div className="hidden lg:block h-4 w-px bg-[#252527]" />
 
             {/* Help → GitHub Docs — hidden on mobile */}
             <a
               href="https://github.com/SlugMacro/wm-fe"
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden md:flex items-center justify-center rounded-full bg-[#1b1b1c] p-2 text-[#f9f9fa] transition-colors hover:bg-[#252527]"
+              className="hidden lg:flex items-center justify-center rounded-full bg-[#1b1b1c] p-2 text-[#f9f9fa] transition-colors hover:bg-[#252527]"
             >
               <QuestionIcon />
             </a>
 
             {/* Language Selector — hidden on mobile */}
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
               <LanguageDropdown />
             </div>
           </div>
@@ -743,8 +743,8 @@ export default function Header() {
       {/* Mobile Navigation Menu */}
       {mobileMenuOpen && (
         <>
-          <div className="fixed inset-0 z-40 bg-black/50 md:hidden" onClick={() => setMobileMenuOpen(false)} />
-          <div className="fixed top-0 left-0 bottom-0 z-50 w-[280px] bg-[#0a0a0b] border-r border-[#1b1b1c] p-4 flex flex-col gap-2 md:hidden">
+          <div className="fixed inset-0 z-40 bg-black/50 lg:hidden" onClick={() => setMobileMenuOpen(false)} />
+          <div className="fixed top-0 left-0 bottom-0 z-50 w-[280px] bg-[#0a0a0b] border-r border-[#1b1b1c] p-4 flex flex-col gap-2 lg:hidden">
             {/* Close */}
             <div className="flex items-center justify-between mb-4">
               <NavLink to="/" className="flex items-center gap-1.5" onClick={() => setMobileMenuOpen(false)}>
