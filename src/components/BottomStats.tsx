@@ -88,7 +88,7 @@ export default function BottomStats() {
   const { totalVol, vol24h } = useLiveMarkets();
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-between bg-[#0a0a0b] px-12 py-3">
+    <div className="fixed bottom-0 left-0 right-0 z-40 hidden md:flex items-center justify-between bg-[#0a0a0b] px-12 py-3">
       {/* Left - Live data */}
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-1.5">

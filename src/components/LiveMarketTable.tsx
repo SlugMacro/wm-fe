@@ -658,7 +658,7 @@ export default function LiveMarketTable() {
     <div>
       {/* Tab Filters + Search/Network — fixed height to prevent layout jank */}
       <div className="flex items-center justify-between mb-2 h-10">
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 md:gap-6">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.key;
             return (
@@ -667,11 +667,11 @@ export default function LiveMarketTable() {
                 onClick={() => handleTabChange(tab.key)}
                 className="flex items-center gap-2 transition-colors"
               >
-                <span className={`text-xl font-medium leading-7 ${isActive ? 'text-[#f9f9fa]' : 'text-[#7a7a83] hover:text-[#f9f9fa]'}`}>
+                <span className={`text-lg md:text-xl font-medium leading-7 ${isActive ? 'text-[#f9f9fa]' : 'text-[#7a7a83] hover:text-[#f9f9fa]'}`}>
                   {tab.label}
                 </span>
                 <span
-                  className={`inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-medium leading-4 ${
+                  className={`hidden md:inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-medium leading-4 ${
                     isActive
                       ? 'bg-[rgba(22,194,132,0.15)] text-[#5bd197]'
                       : 'bg-[#252527] text-[#7a7a83]'
@@ -684,9 +684,9 @@ export default function LiveMarketTable() {
           })}
         </div>
 
-        {/* Search + Network filter (Ended only) */}
+        {/* Search + Network filter (Ended only) — hidden on mobile */}
         {isEnded && (
-          <div className="flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-3">
             <SearchInput value={endedSearch} onChange={setEndedSearch} />
             <NetworkDropdown value={endedNetwork} onChange={setEndedNetwork} />
           </div>
@@ -711,7 +711,7 @@ export default function LiveMarketTable() {
                   <SortIcon active={sortConfig.field === 'watchers'} direction={sortConfig.field === 'watchers' ? sortConfig.direction : null} />
                 </button>
               </div>
-              <div className="w-[192px] shrink-0">
+              <div className="hidden md:block w-[192px] shrink-0">
                 <span className="relative group cursor-help inline-flex">
                   <span className="text-xs font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34]">
                     Investors & Backers
@@ -721,10 +721,10 @@ export default function LiveMarketTable() {
                   </span>
                 </span>
               </div>
-              <div className="w-[192px] shrink-0">
+              <div className="hidden md:block w-[192px] shrink-0">
                 <span className="text-xs font-normal text-[#7a7a83]">Narrative</span>
               </div>
-              <div className="w-[192px] shrink-0 relative">
+              <div className="hidden md:block w-[192px] shrink-0 relative">
                 <button
                   onClick={() => handleSort('moniScore')}
                   className="group inline-flex items-center gap-0.5 text-xs font-normal text-[#7a7a83] hover:text-[#f9f9fa] transition-colors border-b border-dashed border-[#2e2e34]"
@@ -749,9 +749,9 @@ export default function LiveMarketTable() {
                 <div className="w-[192px] shrink-0">
                   <span className="text-sm font-normal text-[#f9f9fa] tabular-nums">{market.watchers.toLocaleString('en-US')}</span>
                 </div>
-                <div className="w-[192px] shrink-0"><InvestorAvatarsCell investors={market.investors} extra={market.investorExtra} /></div>
-                <div className="w-[192px] shrink-0"><NarrativeBadges narratives={market.narratives} /></div>
-                <div className="w-[192px] shrink-0"><MoniScoreBar score={market.moniScore} /></div>
+                <div className="hidden md:block w-[192px] shrink-0"><InvestorAvatarsCell investors={market.investors} extra={market.investorExtra} /></div>
+                <div className="hidden md:block w-[192px] shrink-0"><NarrativeBadges narratives={market.narratives} /></div>
+                <div className="hidden md:block w-[192px] shrink-0"><MoniScoreBar score={market.moniScore} /></div>
               </div>
             ))}
             </div>
@@ -774,7 +774,7 @@ export default function LiveMarketTable() {
                   <SortIcon active={sortConfig.field === 'lastPrice'} direction={sortConfig.field === 'lastPrice' ? sortConfig.direction : null} />
                 </button>
               </div>
-              <div className="w-[192px] shrink-0 text-right">
+              <div className="hidden md:block w-[192px] shrink-0 text-right">
                 <button
                   onClick={() => handleSort('totalVolume')}
                   className="inline-flex items-center gap-0.5 text-xs font-normal text-[#7a7a83] hover:text-[#f9f9fa] transition-colors"
@@ -783,7 +783,7 @@ export default function LiveMarketTable() {
                   <SortIcon active={sortConfig.field === 'totalVolume'} direction={sortConfig.field === 'totalVolume' ? sortConfig.direction : null} />
                 </button>
               </div>
-              <div className="w-[192px] shrink-0 text-right">
+              <div className="hidden md:block w-[192px] shrink-0 text-right">
                 <span className="relative group cursor-help inline-flex">
                   <span className="text-xs font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34]">
                     Settle Starts (UTC)
@@ -793,7 +793,7 @@ export default function LiveMarketTable() {
                   </span>
                 </span>
               </div>
-              <div className="w-[192px] shrink-0 text-right">
+              <div className="hidden md:block w-[192px] shrink-0 text-right">
                 <span className="relative group cursor-help inline-flex">
                   <span className="text-xs font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34]">
                     Settle Ends (UTC)
@@ -836,20 +836,20 @@ export default function LiveMarketTable() {
                     </span>
                   </div>
 
-                  {/* Total Vol */}
-                  <div className="w-[192px] shrink-0 text-right">
+                  {/* Total Vol — hidden on mobile */}
+                  <div className="hidden md:block w-[192px] shrink-0 text-right">
                     <span className="text-sm font-normal text-[#f9f9fa] tabular-nums">
                       {formatVolume(market.totalVolume)}
                     </span>
                   </div>
 
-                  {/* Settle Starts */}
-                  <div className="w-[192px] shrink-0 text-right">
+                  {/* Settle Starts — hidden on mobile */}
+                  <div className="hidden md:block w-[192px] shrink-0 text-right">
                     <EndedSettleCell time={market.settleStartTime} />
                   </div>
 
-                  {/* Settle Ends */}
-                  <div className="w-[192px] shrink-0 text-right">
+                  {/* Settle Ends — hidden on mobile */}
+                  <div className="hidden md:block w-[192px] shrink-0 text-right">
                     <EndedSettleCell time={market.settleEndTime} />
                   </div>
                 </div>
@@ -867,9 +867,9 @@ export default function LiveMarketTable() {
               <div className="flex-1 min-w-0">
                 <span className="text-xs font-normal text-[#7a7a83]">Token</span>
               </div>
-              <div className="w-[112px] shrink-0" />
-              {liveSortableHeaders.map((header) => (
-                <div key={header.field} className={`${header.width} shrink-0 text-right`}>
+              <div className="hidden md:block w-[112px] shrink-0" />
+              {liveSortableHeaders.map((header, idx) => (
+                <div key={header.field} className={`${header.width} shrink-0 text-right ${idx === 0 ? '' : 'hidden md:block'}`}>
                   <button
                     onClick={() => handleSort(header.field)}
                     className="inline-flex items-center gap-0.5 text-xs font-normal text-[#7a7a83] hover:text-[#f9f9fa] transition-colors"
@@ -879,7 +879,7 @@ export default function LiveMarketTable() {
                   </button>
                 </div>
               ))}
-              <div className="w-[180px] shrink-0 text-right">
+              <div className="hidden md:block w-[180px] shrink-0 text-right">
                 <span className="relative group cursor-help inline-flex">
                   <span className="text-xs font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34]">
                     Settle Time (UTC)
@@ -899,12 +899,12 @@ export default function LiveMarketTable() {
                 className="flex items-center border-b border-[#1b1b1c] h-[76px] px-2 cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.02)]"
               >
                 <div className="flex-1 min-w-0 flex items-center"><LiveTokenCell market={market} /></div>
-                <div className="w-[112px] shrink-0 flex items-center pr-4"><MiniChart data={market.chartData} color={market.chartColor} /></div>
+                <div className="hidden md:flex w-[112px] shrink-0 items-center pr-4"><MiniChart data={market.chartData} color={market.chartColor} /></div>
                 <div className="w-[180px] shrink-0"><PriceCell price={market.lastPrice} change={market.priceChange24h} flash={market.flash} /></div>
-                <div className="w-[180px] shrink-0"><VolumeCell volume={market.volume24h} change={market.volumeChange24h} flash={market.flash} /></div>
-                <div className="w-[180px] shrink-0"><VolumeCell volume={market.totalVolume} change={market.totalVolumeChange} flash={null} /></div>
-                <div className="w-[180px] shrink-0 text-right"><span className="text-sm font-medium text-[#f9f9fa] tabular-nums">{market.impliedFdv}</span></div>
-                <div className="w-[180px] shrink-0"><SettlementCell market={market} /></div>
+                <div className="hidden md:block w-[180px] shrink-0"><VolumeCell volume={market.volume24h} change={market.volumeChange24h} flash={market.flash} /></div>
+                <div className="hidden md:block w-[180px] shrink-0"><VolumeCell volume={market.totalVolume} change={market.totalVolumeChange} flash={null} /></div>
+                <div className="hidden md:block w-[180px] shrink-0 text-right"><span className="text-sm font-medium text-[#f9f9fa] tabular-nums">{market.impliedFdv}</span></div>
+                <div className="hidden md:block w-[180px] shrink-0"><SettlementCell market={market} /></div>
               </div>
             ))}
             </div>

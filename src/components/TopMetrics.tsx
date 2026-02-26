@@ -220,9 +220,9 @@ export default function TopMetrics() {
   }, [markets]);
 
   return (
-    <div className="grid grid-cols-4 gap-4">
+    <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-none md:grid md:grid-cols-4 md:overflow-visible md:pb-0">
       {/* Pre-market 24h vol — LIVE from market data */}
-      <div className="relative flex flex-col rounded-[10px] bg-[rgba(255,255,255,0.03)] overflow-hidden">
+      <div className="relative flex flex-col rounded-[10px] bg-[rgba(255,255,255,0.03)] overflow-hidden min-w-[280px] snap-start md:min-w-0">
         <div className="flex flex-col gap-2 px-5 pt-4">
           <div className="flex items-center gap-1.5">
             <span className="text-xs font-normal text-[#7a7a83]">Pre-market 24h vol.</span>
@@ -241,13 +241,13 @@ export default function TopMetrics() {
       </div>
 
       {/* Fear & Greed */}
-      <div className="flex flex-col items-center gap-1 rounded-[10px] bg-[rgba(255,255,255,0.03)] px-5 pt-4 pb-5">
+      <div className="flex flex-col items-center gap-1 rounded-[10px] bg-[rgba(255,255,255,0.03)] px-5 pt-4 pb-5 min-w-[280px] snap-start md:min-w-0">
         <span className="text-xs font-normal text-[#7a7a83] self-start">Fear & Greed</span>
         <FearGreedGauge value={fearGreed.value} label={fearGreed.label} />
       </div>
 
       {/* Altcoin Season */}
-      <div className="flex flex-col gap-2 rounded-[10px] bg-[rgba(255,255,255,0.03)] px-5 pt-4 pb-5">
+      <div className="flex flex-col gap-2 rounded-[10px] bg-[rgba(255,255,255,0.03)] px-5 pt-4 pb-5 min-w-[280px] snap-start md:min-w-0">
         <span className="text-xs font-medium text-[#7a7a83]">Altcoin season</span>
         <div className="flex flex-col gap-4">
           <div className="flex items-center text-2xl font-medium leading-8">
@@ -259,7 +259,7 @@ export default function TopMetrics() {
       </div>
 
       {/* Next Settlement */}
-      <div className="flex flex-col gap-2 rounded-[10px] bg-[rgba(255,255,255,0.03)] px-5 pt-4 pb-5">
+      <div className="flex flex-col gap-2 rounded-[10px] bg-[rgba(255,255,255,0.03)] px-5 pt-4 pb-5 min-w-[280px] snap-start md:min-w-0">
         <span className="text-xs font-medium text-[#7a7a83]">Next settlement</span>
         {nextSettle ? (
           <div className="flex flex-col items-center gap-4">
