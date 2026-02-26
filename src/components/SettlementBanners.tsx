@@ -254,7 +254,7 @@ function Banner({ title, variant, markets, type, emptyText, emptyTooltip }: Bann
         <img
           src={emptyBoxSvg}
           alt=""
-          className="absolute right-0 bottom-0 h-full w-auto pointer-events-none"
+          className="absolute right-8 bottom-[-10%] h-[200%] w-auto pointer-events-none"
         />
       )}
 
