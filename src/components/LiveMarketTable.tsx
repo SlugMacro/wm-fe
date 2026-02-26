@@ -521,6 +521,7 @@ export default function LiveMarketTable() {
   // Ended-tab state
   const [endedPage, setEndedPage] = useState(1);
   const [endedSearch, setEndedSearch] = useState('');
+  const [searchExpanded, setSearchExpanded] = useState(false);
   const [endedNetwork, setEndedNetwork] = useState<NetworkFilter>('all');
   const [isLoading, setIsLoading] = useState(false);
   const loadingTimer = useRef<ReturnType<typeof setTimeout>>(null);
@@ -657,7 +658,36 @@ export default function LiveMarketTable() {
   return (
     <div>
       {/* Tab Filters + Search/Network — fixed height to prevent layout jank */}
-      <div className="flex items-center justify-between mb-2 h-10">
+      <div className="relative flex items-center justify-between mb-2 h-10">
+        {/* Expanded search overlay — tablet only */}
+        {isEnded && searchExpanded && (
+          <div className="absolute inset-0 z-10 flex items-center gap-2 bg-[#0a0a0b] lg:hidden">
+            <div className="relative flex-1">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[#7a7a83]" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.5" />
+                <path d="M11 11L14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+              <input
+                type="text"
+                value={endedSearch}
+                onChange={(e) => setEndedSearch(e.target.value)}
+                placeholder="Search"
+                autoFocus
+                className="w-full h-9 pl-9 pr-3 rounded-lg border border-[#1f1f23] bg-transparent text-sm text-[#f9f9fa] placeholder-[#7a7a83] outline-none focus:border-[#2e2e34] transition-colors"
+              />
+            </div>
+            <NetworkDropdown value={endedNetwork} onChange={setEndedNetwork} />
+            <button
+              onClick={() => { setSearchExpanded(false); setEndedSearch(''); }}
+              className="flex items-center justify-center w-9 h-9 rounded-lg border border-[#1f1f23] text-[#7a7a83] hover:text-[#f9f9fa] hover:border-[#2e2e34] transition-colors shrink-0"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            </button>
+          </div>
+        )}
+
         <div className="flex items-center gap-4 md:gap-6">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.key;
@@ -689,12 +719,25 @@ export default function LiveMarketTable() {
           })}
         </div>
 
-        {/* Search + Network filter (Ended only) — hidden on mobile */}
+        {/* Search + Network filter (Ended only) */}
         {isEnded && (
-          <div className="hidden md:flex items-center gap-3">
-            <SearchInput value={endedSearch} onChange={setEndedSearch} />
-            <NetworkDropdown value={endedNetwork} onChange={setEndedNetwork} />
-          </div>
+          <>
+            {/* Tablet: search icon button */}
+            <button
+              onClick={() => setSearchExpanded(true)}
+              className="hidden md:flex lg:hidden items-center justify-center w-9 h-9 rounded-lg border border-[#1f1f23] text-[#7a7a83] hover:text-[#f9f9fa] hover:border-[#2e2e34] transition-colors"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.5" />
+                <path d="M11 11L14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            </button>
+            {/* Desktop: full search + network */}
+            <div className="hidden lg:flex items-center gap-3">
+              <SearchInput value={endedSearch} onChange={setEndedSearch} />
+              <NetworkDropdown value={endedNetwork} onChange={setEndedNetwork} />
+            </div>
+          </>
         )}
       </div>
 
