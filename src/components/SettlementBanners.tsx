@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { liveMarkets } from '../mock-data/markets';
 
 // Token images (reuse from existing assets)
@@ -150,18 +151,47 @@ function SettlingPill({ market }: { market: SettlementMarket }) {
   );
 }
 
+/* ───── Portal tooltip — rendered at body level so it's never clipped ───── */
+
+function PortalTooltip({ anchorRef, text }: { anchorRef: React.RefObject<HTMLDivElement | null>; text: string }) {
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+
+  useLayoutEffect(() => {
+    const el = anchorRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    setPos({ x: r.left + r.width / 2, y: r.top - 8 });
+  }, [anchorRef]);
+
+  return createPortal(
+    <span
+      className="fixed z-[9999] -translate-x-1/2 -translate-y-full w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-left text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg pointer-events-none whitespace-normal animate-[fadeIn_150ms_ease-out]"
+      style={{ left: pos.x, top: pos.y }}
+    >
+      {text}
+    </span>,
+    document.body,
+  );
+}
+
 /* ───── Empty state pill ───── */
 
 function EmptyPill({ text, tooltip }: { text: string; tooltip: string }) {
+  const [hovered, setHovered] = useState(false);
+  const iconRef = useRef<HTMLDivElement>(null);
+
   return (
     <div className="flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-[16px] pl-2 pr-4 py-2">
-      {/* Info icon — 16x16 icon, 20x20 tap area (2px padding), with hover tooltip */}
-      <div className="relative group cursor-help flex items-center justify-center size-5 shrink-0">
+      {/* Info icon — 16x16 icon, 20x20 tap area, portal tooltip on hover */}
+      <div
+        ref={iconRef}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        className="cursor-help flex items-center justify-center size-5 shrink-0"
+      >
         <InfoIcon />
-        <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 rounded-md border border-[#252527] bg-[#141415] px-3 py-2 text-left text-[11px] leading-4 font-normal text-[#b4b4ba] shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 group-hover:pointer-events-auto z-[9999] whitespace-normal">
-          {tooltip}
-        </span>
       </div>
+      {hovered && <PortalTooltip anchorRef={iconRef} text={tooltip} />}
       <span className="text-sm font-medium leading-5 text-[#f9f9fa] tabular-nums">{text}</span>
     </div>
   );
