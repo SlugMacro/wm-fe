@@ -6,7 +6,7 @@ import chainEthereumPng from '../assets/images/chain-ethereum.png';
 import chainSolanaPng from '../assets/images/chain-solana.png';
 import chainSuiPng from '../assets/images/chain-sui.png';
 
-/* ───── Icons ───── */
+/* ───── Icons (outline style — consistent across app) ───── */
 
 function CopyIcon() {
   return (
@@ -19,8 +19,8 @@ function CopyIcon() {
 
 function ExternalArrowIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <path d="M7 17L17 7M17 7H9M17 7V15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+      <path d="M3.5 8.5L8.5 3.5M8.5 3.5H4.5M8.5 3.5V7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -72,9 +72,9 @@ export default function DashboardProfile({
   };
 
   return (
-    <div className="flex items-center gap-4 border-b-4 border-[#1b1b1c] py-6">
+    <div className="flex items-center justify-between border-b-[4px] border-[#1b1b1c] py-4">
       {/* Left: Token info (avatar + wallet + stats) */}
-      <div className="flex flex-1 items-center gap-8 overflow-hidden">
+      <div className="flex flex-1 items-end gap-8 overflow-visible">
         {/* Avatar + Wallet info */}
         <div className="flex items-center gap-2 shrink-0">
           {/* Avatar slot — 44px container, 32px image */}
@@ -83,7 +83,7 @@ export default function DashboardProfile({
           </div>
 
           {/* Wallet address + explorer link */}
-          <div className="flex flex-col w-[168px]">
+          <div className="flex flex-col">
             <div className="flex items-center gap-1">
               <span className="text-lg font-medium leading-7 text-[#f9f9fa] tabular-nums">
                 {walletShort}
@@ -100,51 +100,63 @@ export default function DashboardProfile({
               href={`https://solscan.io/account/${walletAddress}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-0.5 border-b border-[#252527] self-start text-sm text-[#b4b4ba] transition-colors hover:text-[#f9f9fa] tabular-nums"
+              className="flex items-center gap-0.5 border-b border-[#252527] self-start text-xs leading-4 font-normal text-[#7a7a83] transition-colors hover:text-[#f9f9fa] tabular-nums"
             >
               Open in Explorer
-              <span className="flex items-center p-0.5">
-                <ExternalArrowIcon />
-              </span>
+              <ExternalArrowIcon />
             </a>
           </div>
         </div>
 
         {/* Stats */}
-        <div className="flex items-center gap-8 shrink-0">
+        <div className="flex items-center gap-8">
           {/* Total Trading Vol */}
-          <StatItem label="Total Trading Vol." value={totalTradingVol} />
+          <div className="flex flex-col gap-1.5 shrink-0">
+            <span className="text-xs leading-4 font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34] self-start">
+              Total Trading Vol.
+            </span>
+            <span className="text-xs leading-4 font-normal tabular-nums text-[#f9f9fa]">
+              {totalTradingVol}
+            </span>
+          </div>
 
           {/* Discount Tier */}
-          <StatItem label="Discount Tier" value={discountTier} valueColor="text-[#5bd197]" />
+          <div className="flex flex-col gap-1.5 shrink-0">
+            <span className="text-xs leading-4 font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34] self-start">
+              Discount Tier
+            </span>
+            <span className="text-xs leading-4 font-normal tabular-nums text-[#5bd197]">
+              {discountTier}
+            </span>
+          </div>
 
           {/* XWhales Holding */}
-          <div className="flex flex-col">
-            <StatLabel>XWhales Holding</StatLabel>
-            <div className="flex items-center gap-1 px-0 py-0.5">
-              <div className="flex items-center p-0.5">
-                <img src={tokenFeePng} alt="XWhales" className="size-4 rounded-full" />
-              </div>
-              <span className="text-xs text-[#f9f9fa] tabular-nums text-center leading-4">
+          <div className="flex flex-col gap-1.5 shrink-0">
+            <span className="text-xs leading-4 font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34] self-start">
+              XWhales Holding
+            </span>
+            <div className="flex items-center gap-1">
+              <img src={tokenFeePng} alt="XWhales" className="size-4 rounded-full" />
+              <span className="text-xs leading-4 font-normal tabular-nums text-[#f9f9fa]">
                 {xWhalesHolding.toFixed(2)}
               </span>
             </div>
           </div>
 
           {/* Linked Wallets */}
-          <div className="flex flex-col">
-            <StatLabel>Linked Wallets</StatLabel>
+          <div className="flex flex-col gap-1.5 shrink-0">
+            <span className="text-xs leading-4 font-normal text-[#7a7a83] border-b border-dashed border-[#2e2e34] self-start">
+              Linked Wallets
+            </span>
             <div className="flex items-center gap-4">
               {linkedWallets.map((wallet) => (
-                <div key={wallet.address} className="flex items-center gap-1 rounded-md">
-                  <div className="flex items-center p-0.5">
-                    <img
-                      src={CHAIN_ICONS[wallet.chain] ?? chainSolanaPng}
-                      alt={wallet.chain}
-                      className="size-4 rounded border-2 border-[#0a0a0b]"
-                    />
-                  </div>
-                  <span className="text-xs text-[#f9f9fa] tabular-nums leading-4">
+                <div key={wallet.address} className="flex items-center gap-1">
+                  <img
+                    src={CHAIN_ICONS[wallet.chain] ?? chainSolanaPng}
+                    alt={wallet.chain}
+                    className="size-4 rounded border-2 border-[#0a0a0b]"
+                  />
+                  <span className="text-xs leading-4 font-normal tabular-nums text-[#f9f9fa]">
                     {wallet.address}
                   </span>
                   <button
@@ -162,38 +174,13 @@ export default function DashboardProfile({
       </div>
 
       {/* Right: Link Wallet button */}
-      <div className="flex items-center justify-end shrink-0">
+      <div className="flex items-center gap-3 shrink-0">
         <button className="flex items-center gap-1.5 rounded-lg bg-[#f9f9fa] pl-2 pr-4 py-2 text-sm font-medium leading-5 text-[#0a0a0b] transition-colors hover:bg-[#e4e4e6]">
           <span className="flex items-center p-0.5">
             <WalletLinkIcon />
           </span>
           Link Wallet
         </button>
-      </div>
-    </div>
-  );
-}
-
-/* ───── Helpers ───── */
-
-function StatLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex items-center py-1.5">
-      <span className="border-b border-dashed border-[#2e2e34] text-xs text-[#7a7a83] leading-4">
-        {children}
-      </span>
-    </div>
-  );
-}
-
-function StatItem({ label, value, valueColor = 'text-[#f9f9fa]' }: { label: string; value: string; valueColor?: string }) {
-  return (
-    <div className="flex flex-col">
-      <StatLabel>{label}</StatLabel>
-      <div className="flex items-center justify-center px-0 py-0.5">
-        <span className={`text-xs ${valueColor} tabular-nums text-center leading-4`}>
-          {value}
-        </span>
       </div>
     </div>
   );
