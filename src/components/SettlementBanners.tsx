@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { Link } from 'react-router-dom';
 import { liveMarkets } from '../mock-data/markets';
 
 // Token images (reuse from existing assets)
@@ -102,7 +103,10 @@ function ChevronRightIcon() {
 function UpcomingPill({ market }: { market: SettlementMarket }) {
   const icon = TOKEN_IMAGES[market.tokenSymbol];
   return (
-    <div className="flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-[16px] pl-2 pr-4 py-2 shrink-0">
+    <Link
+      to={`/markets/${market.id}`}
+      className="flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-[16px] pl-2 pr-4 py-2 shrink-0 cursor-pointer transition-all duration-200 hover:bg-white/20 hover:scale-[1.02]"
+    >
       <div className="flex items-center gap-2">
         {icon ? (
           <img src={icon} alt={market.tokenSymbol} className="size-5 rounded-full object-cover" />
@@ -118,7 +122,7 @@ function UpcomingPill({ market }: { market: SettlementMarket }) {
       <span className="text-sm font-medium leading-5 text-[#5bd197] tabular-nums">
         {formatSettleDate(market.settleTime)}
       </span>
-    </div>
+    </Link>
   );
 }
 
@@ -128,7 +132,10 @@ function SettlingPill({ market }: { market: SettlementMarket }) {
   const icon = TOKEN_IMAGES[market.tokenSymbol];
   const { h, m, s } = useCountdown(market.settleTime);
   return (
-    <div className="flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-[16px] pl-2 pr-4 py-2 shrink-0">
+    <Link
+      to={`/markets/${market.id}`}
+      className="flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-[16px] pl-2 pr-4 py-2 shrink-0 cursor-pointer transition-all duration-200 hover:bg-white/20 hover:scale-[1.02]"
+    >
       <div className="flex items-center gap-2">
         {icon ? (
           <img src={icon} alt={market.tokenSymbol} className="size-5 rounded-full object-cover" />
@@ -148,7 +155,7 @@ function SettlingPill({ market }: { market: SettlementMarket }) {
         <span className="opacity-40">:</span>
         <span>{s}s</span>
       </div>
-    </div>
+    </Link>
   );
 }
 
